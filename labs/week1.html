@@ -105,7 +105,8 @@
   <p>In this lab you will, in order:</p>
   <ol>
     <li><b>Analyse real ticket data with Claude Code</b> to find the biggest bottlenecks in a business process.</li>
-    <li><b>Redesign the workflow</b>, categorising every step as AI-ready, AI-assisted or human-only.</li>
+    <li><b>Categorise every step</b> as AI-ready, AI-assisted or human-only.</li>
+    <li><b>Write down the redesigned process</b> — what changed and who does each step now.</li>
     <li><b>Insert mandatory human approval gates</b>, each with an owner role and pass/fail rules, so AI output is validated before it moves on.</li>
     <li><b>Set target metrics</b> for cycle time and rework, with real numbers.</li>
     <li><b>Commit your blueprint</b> to Git, locally.</li>
@@ -278,8 +279,8 @@ Answer as a table, nothing else.</code></pre>
     narrative.
   </div>
   <p>
-    <b>Write into section 1</b> of your blueprint: the three worst transitions, their
-    medians, and whether each is a queue or effort. You now know where the process is slow
+    <b>Write into section 1</b> of your blueprint: the three worst transitions, with the
+    median and p90 the report gave you, and whether each is a queue or effort. You now know where the process is slow
     and why. Step 2 is where you decide what to do about it.
   </p>
 
@@ -353,34 +354,46 @@ Do not edit the file and do not rewrite my table. Reply as a list only.</code></
     with it in step 3.
   </div>
 
-  <div class="step">
+    <div class="step">
     <span class="step__n">3</span><span class="step__t">Write down the new process</span>
     <span class="step__time">19–26 min</span>
   </div>
   <p>
-    You have just decided which of the sixteen steps AI touches. Section 3 is where you
-    say what the process becomes as a result — the same process, rewritten.
+    Step 2 gave you a verdict per step. Now write the sixteen steps out again, changed.
+    For each one, say what happened to it and who does it now.
   </p>
-  <p>Pick the pattern that fits and commit to it:</p>
   <table>
-    <thead><tr><th>Pattern</th><th>Use when the process is about</th></tr></thead>
+    <thead><tr><th>Column</th><th>What you put in it</th></tr></thead>
     <tbody>
-      <tr><td>Draft-Review-Approve</td><td>Producing a document — requirements, specs, release notes</td></tr>
-      <tr><td>Analyze-Validate-Escalate</td><td>Making a judgement — triage, incidents, impact</td></tr>
-      <tr><td>Generate-Verify-Publish</td><td>Producing an artifact — code, tests, configuration</td></tr>
+      <tr><td>Step</td><td>The number and name from the narrative, all sixteen</td></tr>
+      <tr><td>Change</td><td><b>Removed</b> — AI made it unnecessary · <b>Merged into step N</b> — AI now does both at once · <b>Unchanged</b></td></tr>
+      <tr><td>Who does it now</td><td><b>Person</b> · <b>AI</b> · <b>AI, person checks</b></td></tr>
     </tbody>
   </table>
   <p>
-    In section 3, list which steps <b>disappear</b>, which <b>merge</b>, and which are
-    <b>untouched</b>. Naming what you are not changing matters as much — it shows you
-    considered a step and chose to leave it alone.
+    Ask yourself the knock-on question as you go. If step 6 is now AI-drafted, does
+    step 5 still need to be separate? If step 3 is AI-ready, is anyone still tagging
+    components by hand? That is where steps disappear and merge.
   </p>
   <div class="watch">
-    <b>Anti-pattern.</b> AI at the approval step. AI drafts and analyses; a named human
-    approves. If your target state has a machine approving anything, redraw it.
+    <b>Most steps should say Unchanged.</b> If half your list is Removed, you have
+    redesigned a process you do not work in. Leaving a step alone is a decision, and
+    section 3 is where you record that you made it.
+  </div>
+  <div class="card">
+    <b>Context, not a choice to make.</b> The sixteen steps run through four phases, and
+    each phase has a shape: <b>steps 1–7</b> produce a requirements document and
+    <b>steps 8–11</b> produce a design, both Draft-Review-Approve. <b>Steps 12–14</b> produce
+    code and tests, Generate-Verify-Publish. <b>Steps 15–16</b> release it,
+    Analyze-Validate-Escalate. Use this to sense-check your table: a step that produces
+    a document needs a reviewer, a step that produces code needs a verifier.
+  </div>
+  <div class="watch">
+    <b>Anti-pattern.</b> AI at an approval step. AI drafts and analyses; a named human
+    approves. If any row says the approval itself is done by AI, change it.
   </div>
 
-  <div class="step">
+<div class="step">
     <span class="step__n">4</span><span class="step__t">Add the human sign-offs</span>
     <span class="step__time">26–36 min</span>
   </div>
@@ -395,11 +408,12 @@ Do not edit the file and do not rewrite my table. Reply as a list only.</code></
   </p>
   <p>
     <b>Every step you marked AI-ready or AI-assisted gets a gate after it.</b> At least
-    two in total. Fill in section 4 — all five columns, no blanks:
+    two in total. Fill in section 4 — all six columns, no blanks:
   </p>
   <table>
     <thead><tr><th>Column</th><th>What it must say</th></tr></thead>
     <tbody>
+      <tr><td>Gate</td><td>A short name for it, so you can refer to it later — &quot;Acceptance criteria check&quot;</td></tr>
       <tr><td>Placed after step</td><td>The step number from the narrative</td></tr>
       <tr><td>Owner role</td><td>One of: Business Analyst, Developer, Architect, Quality Engineer, Release Manager. A team is not an owner. See <code>docs/helios-landscape.md</code></td></tr>
       <tr><td>Pass criteria</td><td>What has to be true to move on — testable, not &quot;looks fine&quot;</td></tr>
@@ -461,7 +475,7 @@ would not. Be specific about the gate, and say plainly if none of them would.</c
     the report reads the whole file, and it is the ground truth.
   </div>
   <p>
-    Put both numbers in section 5 with a target beside each, and say how each will be
+    Put the cycle time and rework rate in section 5 with a target beside each, and say how each will be
     measured. <b>A target without a number is a wish.</b> Read the rework reasons as a
     list of information the process failed to collect — that is what your gates are aimed at.
   </p>

@@ -11,14 +11,14 @@ Author: <your name>  ·  Date: <date>  ·  Workflow: request to release
 
 From `data/helios-tickets.csv`, filtered to request_to_release.
 
-| Transition | Median hours | P90 hours | Wait or work? |
+| Transition | Median h | P90 h | Queue or effort? |
 |---|---|---|---|
 |  |  |  |  |
 
 Three worst by median: 1. ___  2. ___  3. ___
 
-State for each whether it is a queue (waiting) or effort (working). They are
-treated differently.
+A queue is the ticket sitting still. Effort is someone working. They are fixed
+differently, so say which each one is.
 
 ## 2. Step classification
 
@@ -33,15 +33,16 @@ human-only.
 "It is faster" is not a justification. Say what makes the task bounded and
 verifiable, or what makes it a judgement call.
 
-## 3. Target state
+## 3. The new process
 
-Pattern chosen: <Draft-Review-Approve | Analyze-Validate-Escalate | Generate-Verify-Publish>
+All sixteen steps, rewritten. Change is Removed, Merged into step N, or Unchanged.
+Who does it now is Person, AI, or AI with a person checking.
 
-| Change | Steps affected |
-|---|---|
-| Disappears |  |
-| Merges |  |
-| Untouched |  |
+| # | Step | Change | Who does it now |
+|---|---|---|---|
+|  |  |  |  |
+
+Most steps should say Unchanged. Leaving a step alone is a decision; record it.
 
 ## 4. Gates
 
@@ -53,7 +54,7 @@ Minimum two. Every gate names one role from the RACI in `docs/helios-landscape.m
 
 ## 5. Metrics
 
-| Metric | Today (from data) | Target | How it will be measured |
+| Metric | Today (from the data) | Target | How it will be measured |
 |---|---|---|---|
 | Cycle time, created to closed |  |  |  |
 | Rework rate |  |  |  |

@@ -267,6 +267,41 @@ for _i, _b in enumerate(_prompts, 1):
     _refs = re.findall(r'(?:docs|data|apps|templates|week1)/[A-Za-z0-9_./-]+', _txt)
     check(len(_refs) > 0, f"prompt {_i} in week1.html names no file for Claude to read")
 
+# Section numbers the lab writes into must exist in the canvas, and the self-check
+# must not cite a section that has been renamed or removed.
+_canvas = (ROOT / "templates" / "blueprint-canvas.md").read_text(encoding="utf-8")
+_chk = (ROOT / "templates" / "self-check-8.md").read_text(encoding="utf-8")
+_canvas_secs = set(re.findall(r"^## (\d)\.", _canvas, re.M))
+for _s in sorted(set(re.findall(r"section (\d)", lab))):
+    check(_s in _canvas_secs, f"lab writes into section {_s} but the canvas has no such section")
+for _s in sorted(set(re.findall(r"section (\d)", _chk))):
+    check(_s in _canvas_secs, f"self-check cites section {_s} but the canvas has no such section")
+check("target state" not in _chk.lower(),
+      "self-check still references the removed 'target state' section")
+check("The new process" in _canvas, "canvas section 3 is not the rewritten step list")
+
+# The four phases quoted in step 3 must account for all sixteen steps.
+_cov = set()
+for _a, _b in re.findall(r"steps? (\d+)[\u2013-](\d+)", html.unescape(lab).lower()):
+    _cov |= set(range(int(_a), int(_b) + 1))
+check(set(range(1, 17)) <= _cov,
+      f"step 3 phase ranges do not cover all sixteen steps, missing {sorted(set(range(1,17)) - _cov)}")
+
+# One vocabulary across the lab, the template and the worked example. A column
+# renamed in one place and not the others is how a participant gets lost.
+_ex = (ROOT / "docs" / "examples" / "blueprint-defect-triage.md").read_text(encoding="utf-8")
+_lab_plain = html.unescape(lab)
+for _sec_body in re.findall(r"^## \d\. .+?$(.*?)(?=^## |\Z)", _canvas, re.M | re.S):
+    _hdr = re.search(r"^\|(.+?)\|\s*$", _sec_body, re.M)
+    if not _hdr:
+        continue
+    for _col in [c.strip() for c in _hdr.group(1).split("|") if c.strip()]:
+        check(_col in _ex, f"worked example does not use canvas column '{_col}'")
+for _term in ["queue", "effort", "AI-ready", "AI-assisted", "human-only",
+              "Bounded", "Checkable", "Reversible", "Escalation trigger"]:
+    check(_term.lower() in _lab_plain.lower(), f"lab never uses the term '{_term}'")
+    check(_term.lower() in _ex.lower(), f"worked example never uses the term '{_term}'")
+
 readme = (ROOT / "README.md").read_text(encoding="utf-8")
 check("baseline-capture.md" in readme, "README does not mention the baseline capture step")
 
@@ -275,9 +310,12 @@ example = ROOT / "docs" / "examples" / "blueprint-defect-triage.md"
 check(example.exists(), "worked example blueprint is missing")
 if example.exists():
     ex = example.read_text(encoding="utf-8")
-    for section in ["1. Stage durations", "2. Step classification", "3. Target state",
-                    "4. Gates", "5. Metrics"]:
-        check(section in ex, f"worked example is missing section '{section}'")
+    _canvas_titles = re.findall(r"^## (\d\. .+)$", _canvas, re.M)
+    for section in _canvas_titles:
+        check(section in ex,
+              f"worked example is missing section '{section}' that the canvas defines")
+    check("Bounded?" in ex and "Who does it now" in ex,
+          "worked example does not use the current table columns")
     check("551.6" in ex, "worked example cycle time does not match the dataset")
     check("29.5%" in ex, "worked example rework rate does not match the dataset")
     check("defect_triage" in ex, "worked example does not name its scenario")
