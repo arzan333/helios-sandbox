@@ -198,6 +198,11 @@ for needed, why in [
     ("baseline-capture.md", "the baseline capture step"),
     ("Set up your working copy", "the step 0 heading"),
     ("The situation", "the Helios orientation"),
+    ("What you will be able to do", "the learning outcomes"),
+    ("What you are building", "the description of the deliverable"),
+    ("Four terms, before you meet them", "the glossary"),
+    ("Your scenario", "the scenario explanation"),
+    ("filter value", "an explanation of what the filter value is"),
 ]:
     check(needed in lab, f"week1.html is missing {why}")
 

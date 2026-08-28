@@ -123,33 +123,115 @@
     <code>docs/helios-landscape.md</code> if you want it.
   </p>
 
-  <h2>What this lab is really about</h2>
+  <h2>What you will be able to do by the end</h2>
+  <ul>
+    <li>Read delivery data and say <em>where</em> a process loses time, with numbers rather than opinion.</li>
+    <li>Tell the difference between a step that is waiting and a step that is working, and know why that changes what you do about it.</li>
+    <li>Judge whether a task is safe to hand to AI, using a test that is not "it would be faster".</li>
+    <li>Place a human sign-off in the right position, with a named owner and a defined failure path.</li>
+  </ul>
   <p>
-    You already use Claude Code. The gap this week is method, not access. So the lab
-    does not teach you to prompt. It asks you to look at a process that is genuinely
-    slow, find out <em>why</em> from data rather than opinion, and decide where a human
-    must sign before work continues.
-  </p>
-  <p>
-    You will finish with a workflow blueprint. It is the input to Week 3, so it is
-    worth doing properly rather than quickly.
+    You already use Claude Code. The gap this week is method, not access, so this lab
+    does not teach prompting. It teaches you what to point it at.
   </p>
 
-  <h2>Pick your scenario</h2>
-  <p>Take the one that matches the last digit of your employee number, or just choose.</p>
+  <h2>What you are building</h2>
+  <p>
+    One document: a <b>workflow blueprint</b>. It is a before-and-after picture of a
+    single process, backed by data, showing where AI helps and where a human must
+    still sign. You fill in a template — five sections, roughly a page:
+  </p>
   <table>
-    <thead><tr><th>Scenario</th><th>Narrative</th><th>Filter value</th></tr></thead>
+    <thead><tr><th>Section</th><th>What goes in it</th><th>Filled in at</th></tr></thead>
     <tbody>
-      <tr><td>Requirement intake</td><td><code>docs/process/requirement-intake.md</code></td><td><code>intake</code></td></tr>
-      <tr><td>Defect triage</td><td><code>docs/process/defect-triage.md</code></td><td><code>defect_triage</code></td></tr>
-      <tr><td>Release notes</td><td><code>docs/process/release-notes.md</code></td><td><code>release_notes</code></td></tr>
-      <tr><td>Change approval</td><td><code>docs/process/change-approval.md</code></td><td><code>change_approval</code></td></tr>
+      <tr><td>1. Stage durations</td><td>How long each stage of the process actually takes, from the ticket data</td><td>Step 1</td></tr>
+      <tr><td>2. Step classification</td><td>Every step marked AI-ready, AI-assisted or human-only, with your reasoning</td><td>Step 2</td></tr>
+      <tr><td>3. Target state</td><td>What disappears, what merges, what you deliberately leave alone</td><td>Step 3</td></tr>
+      <tr><td>4. Gates</td><td>Where work stops for a human signature, and who signs</td><td>Step 4</td></tr>
+      <tr><td>5. Metrics</td><td>Today's numbers and the target you are aiming at</td><td>Step 5</td></tr>
     </tbody>
   </table>
   <p>
-    Everything below uses <code>intake</code> as the example. Substitute your own filter
-    value wherever you see it.
+    It is not a throwaway. In Week 3 you cost this blueprint against real volumes, so a
+    vague one becomes a vague cost model.
   </p>
+
+  <h2>Four terms, before you meet them</h2>
+  <table>
+    <thead><tr><th>Term</th><th>Meaning here</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>Queue vs effort</b></td>
+        <td>A <em>queue</em> is a ticket sitting still, waiting for a person or an
+            environment. <em>Effort</em> is someone actively working. Long queues are
+            usually fixed by changing the process; long effort is not.</td>
+      </tr>
+      <tr>
+        <td><b>AI-ready</b></td>
+        <td>A step where the scope is bounded, the output can be verified, and being
+            wrong is reversible. Miss any one of those three and it is not AI-ready,
+            however repetitive it looks.</td>
+      </tr>
+      <tr>
+        <td><b>Gate</b></td>
+        <td>A point where work stops until a named person signs. Not a review meeting,
+            not a team — one role, one decision, and a defined answer to "what happens
+            if it fails".</td>
+      </tr>
+      <tr>
+        <td><b>Insertion point</b></td>
+        <td>A place in the process where you are proposing AI does some of the work.
+            Every insertion point needs a gate after it.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Your scenario</h2>
+  <p>
+    Helios has more than one slow process. Rather than everyone analysing the same one
+    and copying each other, the room splits across four. They are all real processes
+    inside Helios, all backed by six months of ticket data in the same CSV, and all
+    take about the same time to work through. <b>Which one you take does not matter</b>
+    — the method is identical and the discussion afterwards is richer for the spread.
+  </p>
+  <p>
+    Take the row matching the last digit of your employee number, or just pick one.
+    The <b>narrative</b> is a written description of how that process runs today, in
+    steps. The <b>filter value</b> is what you type into the report command in step 1
+    so it shows only your process&apos;s tickets.
+  </p>
+  <table>
+    <thead>
+      <tr><th>Last digit</th><th>Scenario</th><th>What it covers</th><th>Narrative to read</th><th>Filter value</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>0–2</td><td><b>Requirement intake</b></td>
+        <td>A business request becomes a specification ready to build</td>
+        <td><code>docs/process/requirement-intake.md</code></td><td><code>intake</code></td>
+      </tr>
+      <tr>
+        <td>3–5</td><td><b>Defect triage</b></td>
+        <td>A reported bug is assessed, prioritised and routed</td>
+        <td><code>docs/process/defect-triage.md</code></td><td><code>defect_triage</code></td>
+      </tr>
+      <tr>
+        <td>6–7</td><td><b>Release notes</b></td>
+        <td>Shipped changes are collected and written up for customers</td>
+        <td><code>docs/process/release-notes.md</code></td><td><code>release_notes</code></td>
+      </tr>
+      <tr>
+        <td>8–9</td><td><b>Change approval</b></td>
+        <td>A change to a live system is reviewed and authorised</td>
+        <td><code>docs/process/change-approval.md</code></td><td><code>change_approval</code></td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="card">
+    <b>Every example below uses <code>intake</code>.</b> Wherever you see
+    <code>intake</code> in a command or prompt, replace it with your own filter value,
+    and read your own narrative instead of the intake one. Nothing else changes.
+  </div>
 
   <div class="step">
     <span class="step__n">0</span><span class="step__t">Set up your working copy</span>
