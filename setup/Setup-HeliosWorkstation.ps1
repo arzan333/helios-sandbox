@@ -57,7 +57,8 @@ $ProgressPreference    = 'SilentlyContinue'
 #  CONFIGURATION
 # ===========================================================================
 
-$script:ScriptVersion = '1.0.0'
+$script:ScriptVersion = '1.2.0'
+$script:WingetExe     = $null
 
 $script:Requirements = @(
     @{ Key='git';    Name='Git';           Min='2.40.0'; WingetId='Git.Git';                        Probe='git';    Args=@('--version') }
@@ -65,7 +66,7 @@ $script:Requirements = @(
     @{ Key='node';   Name='Node.js';       Min='20.0.0'; WingetId='OpenJS.NodeJS.LTS';              Probe='node';   Args=@('--version') }
     @{ Key='java';   Name='JDK (Temurin)'; Min='17.0.0'; WingetId='EclipseAdoptium.Temurin.17.JDK'; Probe='java';   Args=@('-version') }
     @{ Key='code';   Name='VS Code';       Min='1.85.0'; WingetId='Microsoft.VisualStudioCode';     Probe='code';   Args=@('--version') }
-    @{ Key='pandoc'; Name='Pandoc';        Min='3.0.0';  WingetId='JGM.Pandoc';                     Probe='pandoc'; Args=@('--version') }
+    @{ Key='pandoc'; Name='Pandoc';        Min='3.0.0';  WingetId='JohnMacFarlane.Pandoc';                     Probe='pandoc'; Args=@('--version') }
     @{ Key='claude'; Name='Claude Code';   Min='2.0.0';  WingetId='Anthropic.ClaudeCode';           Probe='claude'; Args=@('--version') }
 )
 
@@ -287,6 +288,15 @@ function Invoke-SelfTest {
     Assert-Equal 'False' (Test-JsonWithComments '{ "url":"https://x.com/a" }')   'url in string is not a comment'
 
     Write-Host ''
+    Write-Host 'Tool resolution' -ForegroundColor White
+    $winPath  = 'C:\Users\a\AppData\Local\Microsoft\WindowsApps\winget.exe'
+    $stubPath = 'C:\Users\a\AppData\Local\Microsoft\WindowsApps\python.exe'
+    Assert-Equal 'False' ((@('python','python3') -contains 'winget') -and ($winPath -like '*\WindowsApps\*')) `
+        'winget under WindowsApps is never filtered'
+    Assert-Equal 'True'  ((@('python','python3') -contains 'python') -and ($stubPath -like '*\WindowsApps\*')) `
+        'python under WindowsApps is filtered as a Store stub'
+
+    Write-Host ''
     if ($script:selfTestFailures -eq 0) {
         Write-Host '  All self tests passed.' -ForegroundColor Green
         return 0
@@ -332,23 +342,117 @@ function Update-SessionPath {
 }
 
 function Get-ToolCommand {
+    <#
+        Resolves a tool on PATH.
+
+        The WindowsApps folder holds two very different things: the Microsoft Store
+        stub for python.exe, which must be skipped, and genuine apps such as
+        winget.exe, which must not be. Only python is filtered.
+    #>
     param([string] $Name)
+    $skipStoreStub = @('python', 'python3')
     $cmds = @(Get-Command $Name -CommandType Application -ErrorAction SilentlyContinue)
     foreach ($c in $cmds) {
-        if ($c.Source -and $c.Source -like '*\WindowsApps\*') { continue }
+        if ($skipStoreStub -contains $Name -and $c.Source -and $c.Source -like '*\WindowsApps\*') {
+            continue
+        }
         return $c
     }
     return $null
 }
 
+function Resolve-Winget {
+    <#
+        Finds winget.exe even when it is not on PATH.
+
+        An elevated session does not always inherit the user's WindowsApps folder,
+        so 'winget' can work in a normal shell and appear missing in an admin one.
+        The versioned path under Program Files is the one that survives elevation.
+    #>
+    $cmd = Get-ToolCommand -Name 'winget'
+    if ($cmd) { return $cmd.Source }
+
+    $candidates = @()
+    if ($env:LOCALAPPDATA) {
+        $userPath = Join-Path $env:LOCALAPPDATA 'Microsoft\WindowsApps\winget.exe'
+        if (Test-Path -LiteralPath $userPath) { $candidates += $userPath }
+    }
+
+    # ProgramW6432 does not exist on 32-bit Windows, so never Join-Path a null.
+    $pf = $null
+    foreach ($root in @($env:ProgramW6432, $env:ProgramFiles)) {
+        if (-not $root) { continue }
+        $try = Join-Path $root 'WindowsApps'
+        if (Test-Path -LiteralPath $try) { $pf = $try; break }
+    }
+    if ($pf) {
+        $found = Get-ChildItem -Path $pf -Filter 'Microsoft.DesktopAppInstaller_*' -Directory -ErrorAction SilentlyContinue |
+            Sort-Object Name -Descending |
+            ForEach-Object { Join-Path $_.FullName 'winget.exe' } |
+            Where-Object { Test-Path -LiteralPath $_ }
+        if ($found) { $candidates += $found }
+    }
+
+    foreach ($c in $candidates) {
+        if ((Invoke-Native -Exe $c -Arguments @('--version')).ExitCode -eq 0) { return $c }
+    }
+    return $null
+}
+
+function Install-Winget {
+    <# Last resort: install App Installer from Microsoft's published bundle. #>
+    Write-Doing 'winget not found anywhere - installing App Installer'
+    $tmp = Join-Path $env:TEMP 'AppInstaller.msixbundle'
+    try {
+        Invoke-WebRequest -Uri 'https://aka.ms/getwinget' -OutFile $tmp -UseBasicParsing
+        Add-AppxPackage -Path $tmp -ErrorAction Stop
+        Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue
+        Update-SessionPath
+        return (Resolve-Winget)
+    } catch {
+        Write-Note $_.Exception.Message
+        return $null
+    }
+}
+
 function Get-ToolVersionText {
     param([string] $Exe, [string[]] $Arguments)
+    $previous = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
     try {
         $out = & $Exe @Arguments 2>&1 | Out-String
         if ([string]::IsNullOrWhiteSpace($out)) { return $null }
         return $out.Trim()
     } catch {
         return $null
+    } finally {
+        $ErrorActionPreference = $previous
+    }
+}
+
+function Invoke-Native {
+    <#
+        Runs a native command and returns its exit code, never throwing.
+
+        Windows PowerShell 5.1 turns anything a native command writes to stderr
+        into a terminating error when $ErrorActionPreference is 'Stop'. pip prints
+        dependency notices to stderr on a perfectly successful install, which was
+        enough to abort the whole script. The preference is lowered for the call
+        and restored afterwards.
+    #>
+    param(
+        [Parameter(Mandatory = $true)] [string] $Exe,
+        [string[]] $Arguments = @()
+    )
+    $previous = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+        $output = & $Exe @Arguments 2>&1 | Out-String
+        return [pscustomobject]@{ ExitCode = $LASTEXITCODE; Output = $output }
+    } catch {
+        return [pscustomobject]@{ ExitCode = 1; Output = $_.Exception.Message }
+    } finally {
+        $ErrorActionPreference = $previous
     }
 }
 
@@ -362,8 +466,11 @@ function Invoke-Winget {
         '--disable-interactivity'
     )
     try {
-        $output = & winget @wingetArgs 2>&1 | Out-String
-        $code = $LASTEXITCODE
+        $exe = $script:WingetExe
+        if (-not $exe) { $exe = 'winget' }
+        $r = Invoke-Native -Exe $exe -Arguments $wingetArgs
+        $output = $r.Output
+        $code = $r.ExitCode
         if ($code -eq 0) { return $true }
         if ($output -match 'already installed' -or $output -match 'No applicable upgrade') { return $true }
         Write-Note "winget exit code $code"
@@ -482,15 +589,22 @@ if ($net -and $net.TcpTestSucceeded) {
     Write-Warn2 'Could not confirm HTTPS access to github.com. Installs may fail behind a proxy.'
 }
 
-$wingetCmd = Get-ToolCommand -Name 'winget'
-if ($wingetCmd) {
-    $wgVer = Get-ToolVersionText -Exe 'winget' -Arguments @('--version')
+$script:WingetExe = Resolve-Winget
+if (-not $script:WingetExe -and -not $VerifyOnly) {
+    $script:WingetExe = Install-Winget
+}
+if ($script:WingetExe) {
+    $wgVer = Get-ToolVersionText -Exe $script:WingetExe -Arguments @('--version')
     Write-Ok "winget $($wgVer -replace '\s+', ' ')"
+    if ($script:WingetExe -notlike 'winget*' -and (Split-Path -Leaf $script:WingetExe) -eq 'winget.exe') {
+        Write-Note "resolved at $script:WingetExe"
+    }
 } elseif ($VerifyOnly) {
-    Write-Warn2 'winget not found. Install mode would fail.'
+    Write-Warn2 'winget not found. Install mode would attempt to install App Installer.'
 } else {
-    Write-Fail 'winget (App Installer) is required and was not found.'
-    Write-Note 'Install "App Installer" from the Microsoft Store, then run this script again.'
+    Write-Fail 'winget could not be found or installed automatically.'
+    Write-Note 'Open the Microsoft Store, install "App Installer", then run this script again.'
+    Write-Note 'If the Store is blocked by policy, tell your facilitator before the session.'
     exit 2
 }
 
@@ -587,7 +701,7 @@ if (-not $pythonCmd) {
     Add-Result -Component 'Python packages' -Required ($script:PipPackages -join ', ') -Found 'skipped' -Status 'SKIP' -Detail 'reopen shell'
 } else {
     $pipList = ''
-    try { $pipList = & $pythonCmd.Source -m pip list --disable-pip-version-check --format=freeze 2>&1 | Out-String } catch { }
+    $pipList = (Invoke-Native -Exe $pythonCmd.Source -Arguments @('-m','pip','list','--disable-pip-version-check','--format=freeze')).Output
     foreach ($pkg in $script:PipPackages) {
         $present = $pipList -match ('(?im)^' + [regex]::Escape($pkg) + '==')
         if ($present) {
@@ -601,8 +715,8 @@ if (-not $pythonCmd) {
             continue
         }
         Write-Doing "installing $pkg"
-        $null = & $pythonCmd.Source -m pip install --quiet --disable-pip-version-check $pkg 2>&1
-        if ($LASTEXITCODE -eq 0) {
+        $r = Invoke-Native -Exe $pythonCmd.Source -Arguments @('-m','pip','install','--quiet','--disable-pip-version-check',$pkg)
+        if ($r.ExitCode -eq 0) {
             Write-Added "$pkg installed"
             Add-Result -Component "pip: $pkg" -Required 'any' -Found 'installed' -Status 'NEW'
         } else {
@@ -622,7 +736,7 @@ if (-not $npmCmd) {
     Add-Result -Component 'npm packages' -Required ($script:NpmPackages -join ', ') -Found 'skipped' -Status 'SKIP' -Detail 'reopen shell'
 } else {
     $npmList = ''
-    try { $npmList = & $npmCmd.Source ls -g --depth=0 2>&1 | Out-String } catch { }
+    $npmList = (Invoke-Native -Exe $npmCmd.Source -Arguments @('ls','-g','--depth=0')).Output
     foreach ($pkg in $script:NpmPackages) {
         if ($npmList -match [regex]::Escape($pkg)) {
             Write-Ok "$pkg already installed"
@@ -635,8 +749,8 @@ if (-not $npmCmd) {
             continue
         }
         Write-Doing "installing $pkg"
-        $null = & $npmCmd.Source install -g $pkg 2>&1
-        if ($LASTEXITCODE -eq 0) {
+        $r = Invoke-Native -Exe $npmCmd.Source -Arguments @('install','-g',$pkg)
+        if ($r.ExitCode -eq 0) {
             Write-Added "$pkg installed"
             Add-Result -Component "npm: $pkg" -Required 'any' -Found 'installed' -Status 'NEW'
         } else {
@@ -685,8 +799,9 @@ if (-not $codeCmd) {
             continue
         }
         Write-Doing "installing $ext"
-        $out = & $codeCmd.Source --install-extension $ext --force 2>&1 | Out-String
-        if ($LASTEXITCODE -eq 0 -or $out -match 'successfully installed' -or $out -match 'already installed') {
+        $r = Invoke-Native -Exe $codeCmd.Source -Arguments @('--install-extension',$ext,'--force')
+        $out = $r.Output
+        if ($r.ExitCode -eq 0 -or $out -match 'successfully installed' -or $out -match 'already installed') {
             Write-Added "$ext installed"
             Add-Result -Component "ext: $ext" -Required 'installed' -Found 'installed' -Status 'NEW'
         } else {
