@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Week 1 lab — Mindset and AI-Native Workflow Design</title>
+<title>Week 1 lab — Designing AI-Native Workflows</title>
 <style>
   :root {
     --gray-50:#ffffff; --gray-75:#fafafa; --gray-100:#f5f5f5; --gray-200:#e1e1e1;
@@ -172,7 +172,8 @@ rework_reason    acceptance criteria missing</code></pre>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>cd $env:USERPROFILE\Helios
+<pre><code>mkdir $env:USERPROFILE\Helios -Force | Out-Null
+cd $env:USERPROFILE\Helios
 git clone https://github.com/arzan333/helios-sandbox.git
 cd helios-sandbox</code></pre>
   </div>
@@ -182,7 +183,8 @@ cd helios-sandbox</code></pre>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>git checkout -b yourname/foundation
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+git checkout -b yourname/foundation
 git config core.hooksPath .githooks</code></pre>
   </div>
   <div class="watch">
@@ -194,34 +196,53 @@ git config core.hooksPath .githooks</code></pre>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>mkdir week1 -Force
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+mkdir week1 -Force
 if (-not (Test-Path week1\blueprint.md)) { copy templates\blueprint-canvas.md week1\blueprint.md }</code></pre>
   </div>
 
-  <p><b>d.</b> Open the folder in VS Code and start Claude Code from the repository
-     root, so it picks up <code>CLAUDE.md</code>:</p>
+  <p><b>d.</b> Check the three things above worked. Run this and read the output:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>code .
-claude</code></pre>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+git branch --show-current
+Test-Path week1\blueprint.md
+git config core.hooksPath</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Your branch name, then <code>True</code>, then
+    <code>.githooks</code>. If any line is blank or wrong, redo that part of step 0
+    before going on.
   </div>
 
-  <div class="card">
-    <b>Check before you continue.</b> <code>git branch</code> shows your branch,
-    <code>week1\blueprint.md</code> exists, and Claude Code is running in the
-    repository root.
+  <p><b>e.</b> Now open the folder in VS Code and start Claude Code:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+code .
+claude</code></pre>
+  </div>
+  <div class="watch">
+    <b>Claude Code takes over this PowerShell window.</b> Leave it running — you will
+    give it prompts in steps 1, 2 and 5. For the ordinary commands in steps 1, 4 and 6,
+    use the terminal inside VS Code instead: <b>Ctrl+Shift+&#96;</b> opens one. Every
+    PowerShell block below starts with a <code>cd</code>, so it runs correctly in
+    either window.
   </div>
 
   <div class="step">
     <span class="step__n">1</span><span class="step__t">Analyse the data and find the bottlenecks</span>
     <span class="step__time">0–9 min</span>
   </div>
-  <p>First get the ground truth, so you can check Claude against it. From the repository root:</p>
+  <p>First get the ground truth, so you can check Claude against it. Use a second
+     terminal, not the one running Claude Code:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>python apps/insight/report.py stages --workflow intake</code></pre>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+python apps/insight/report.py stages --workflow intake</code></pre>
   </div>
   <div class="expect">
     <b>Expected.</b> Eleven stage transitions with a median and p90, the three longest
@@ -335,7 +356,8 @@ faster", say so plainly. Do not rewrite my table.</code></pre>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>type docs\design\HEL-142-hld.md</code></pre>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+type docs\design\HEL-142-hld.md</code></pre>
   </div>
   <p>
     Decide, on your own judgement, whether it should pass a design gate. Write your
@@ -390,7 +412,8 @@ have added would most likely reduce, and why.</code></pre>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>git add week1/blueprint.md
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+git add week1/blueprint.md
 git commit -m "Week 1: requirement intake workflow blueprint"</code></pre>
   </div>
   <div class="watch">

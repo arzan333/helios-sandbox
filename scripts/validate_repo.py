@@ -8,6 +8,7 @@ Run:  python scripts/validate_repo.py
 """
 
 import csv
+import html
 import json
 import re
 import sys
@@ -245,6 +246,17 @@ vite = (ROOT / "apps/shop/vite.config.js").read_text()
 check("8080" in vite, "Vite proxy does not point at OrderCore on 8080")
 
 # ------------------------------------------------------------------ report
+# Every PowerShell block must be runnable from any directory. Claude Code takes
+# over the terminal in step 0e, so participants paste later blocks into a new one.
+_blocks = re.findall(
+    r'<span class="snippet__lang">powershell</span>.*?<pre><code>(.*?)</code></pre>',
+    lab, re.S)
+_nocd = [b for b in _blocks if not html.unescape(b).strip().startswith(("cd ", "mkdir "))]
+check(len(_nocd) == 0,
+      f"{len(_nocd)} PowerShell block(s) in week1.html do not set their own directory")
+check("takes over this PowerShell window" in lab,
+      "week1.html does not warn that Claude Code occupies the terminal")
+
 readme = (ROOT / "README.md").read_text(encoding="utf-8")
 check("baseline-capture.md" in readme, "README does not mention the baseline capture step")
 
