@@ -101,12 +101,27 @@
     <span><b>Needs</b> Claude Code, Python, this repository</span>
   </div>
 
-  <div class="card">
-    <b>Before you start.</b> You should already have run
-    <code>Setup-HeliosWorkstation.ps1</code>, cloned this repository, created your own
-    branch, and filled in <code>templates/baseline-capture.md</code>. If any of those
-    are outstanding, do them first — this lab assumes them.
-  </div>
+  <h2>The situation</h2>
+  <p>
+    <b>Helios Group</b> is a consumer products company with a 200-person internal
+    delivery team. It is fictional, and every ticket, document and number in this
+    repository is synthetic — but the problem is not invented. Helios ships four
+    systems: a React storefront (<b>Shop</b>), a Python order API (<b>OrderCore</b>),
+    Python reporting jobs (<b>Insight</b>) and a small Java invoicing service
+    (<b>Billing</b>).
+  </p>
+  <p>
+    Delivery is slow and nobody agrees on why. The team blames the architect; the
+    architect blames unclear requirements; leadership blames both. Six months of
+    ticket data sits in this repository and has never been looked at. Today you look
+    at it.
+  </p>
+  <p>
+    Five roles appear throughout, and you will need them when you assign gate owners:
+    <b>Business Analyst</b>, <b>Developer</b>, <b>Architect</b>, <b>Quality Engineer</b>
+    and <b>Release Manager</b>. The full picture is in
+    <code>docs/helios-landscape.md</code> if you want it.
+  </p>
 
   <h2>What this lab is really about</h2>
   <p>
@@ -135,6 +150,67 @@
     Everything below uses <code>intake</code> as the example. Substitute your own filter
     value wherever you see it.
   </p>
+
+  <div class="step">
+    <span class="step__n">0</span><span class="step__t">Set up your working copy</span>
+    <span class="step__time">before the clock starts</span>
+  </div>
+  <p>
+    Do this once. If you have already cloned and branched, skip to step 1. Run each
+    block in <b>PowerShell</b>, in order.
+  </p>
+
+  <p><b>a.</b> Clone the repository into your Helios folder:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios
+git clone https://github.com/arzan333/helios-sandbox.git
+cd helios-sandbox</code></pre>
+  </div>
+
+  <p><b>b.</b> Create your own branch and turn on the push guard. Replace
+     <code>yourname</code> with your first name, lower case:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>git checkout -b yourname/foundation
+git config core.hooksPath .githooks</code></pre>
+  </div>
+  <div class="watch">
+    <b>Why the guard.</b> The second line installs a hook that refuses every push.
+    Your work stays on this machine for the whole programme. If you ever type
+    <code>git push</code> by habit, it will stop you and explain why.
+  </div>
+
+  <p><b>c.</b> Create your own copy of the blueprint canvas. You write into this all
+     lab; the template stays clean for everyone else:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>mkdir week1 -Force
+if (-not (Test-Path week1\blueprint.md)) { copy templates\blueprint-canvas.md week1\blueprint.md }</code></pre>
+  </div>
+
+  <p><b>d.</b> Open the folder in VS Code and start Claude Code in its terminal.
+     Starting it here matters — it reads <code>CLAUDE.md</code> from the repository root:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>code .
+claude</code></pre>
+  </div>
+
+  <p><b>e.</b> Fill in <code>templates/baseline-capture.md</code> — how you use Claude
+     Code today, unedited. Five minutes, and nobody marks it. You will compare against
+     it in Week 4.</p>
+
+  <div class="card">
+    <b>Check before you continue.</b> You are on your own branch
+    (<code>git branch</code> shows it), <code>week1\blueprint.md</code> exists, and
+    Claude Code is running in the repository root. If any of those is missing, fix it
+    now rather than at step 3.
+  </div>
 
   <div class="step">
     <span class="step__n">1</span><span class="step__t">Find the waits</span>
@@ -180,19 +256,8 @@ Cite the step number from the narrative. Answer in a table, nothing else.</code>
     <span class="step__time">8–16 min</span>
   </div>
   <p>
-    Copy <code>templates/blueprint-canvas.md</code> into your own week 1 folder first,
-    so the template stays clean for everyone else:
-  </p>
-
-  <div class="snippet">
-    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
-      <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>mkdir week1 -Force
-if (-not (Test-Path week1\blueprint.md)) { copy templates\blueprint-canvas.md week1\blueprint.md }</code></pre>
-  </div>
-
-  <p>
-    Now go through the narrative and classify each step as <b>AI-ready</b>,
+    Open <code>week1\blueprint.md</code> in VS Code — you created it in step 0.
+    Go through the narrative and classify each step as <b>AI-ready</b>,
     <b>AI-assisted</b> or <b>human-only</b>. Write your own one-line justification for
     each. Then have Claude Code challenge you, not do it for you:
   </p>
