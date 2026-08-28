@@ -1,0 +1,21 @@
+{
+  "key": "HEL-104",
+  "summary": "Approve schema change on the orders table",
+  "type": "Task",
+  "status": "In Review",
+  "priority": "medium",
+  "reporter": "Helios delivery team",
+  "assignee": "unassigned",
+  "components": [
+    "OrderCore",
+    "Insight"
+  ],
+  "labels": [
+    "change-approval"
+  ],
+  "created": "2025-10-31",
+  "description": "A new nullable column is proposed on orders. Insight reads that table directly, so the change needs an owner and a review before it ships.",
+  "acceptance_criteria": [],
+  "linked_documents": [],
+  "notes": "No acceptance criteria written."
+}

@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# Java
+target/
+*.class
+
+# Editors and OS
+.DS_Store
+.idea/
+*.swp
+
+# Participant week folders are COMMITTED, not ignored. Each participant works on
+# their own local branch and nothing is ever pushed, so there is no shared history
+# to pollute. The weekly artifact is the deliverable - it must be committable.

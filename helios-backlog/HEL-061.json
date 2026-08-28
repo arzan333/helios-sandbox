@@ -1,0 +1,21 @@
+{
+  "key": "HEL-061",
+  "summary": "Support split shipment on order confirmation",
+  "type": "Story",
+  "status": "In Analysis",
+  "priority": "medium",
+  "reporter": "Helios delivery team",
+  "assignee": "unassigned",
+  "components": [
+    "OrderCore",
+    "Shop"
+  ],
+  "labels": [
+    "customer-facing"
+  ],
+  "created": "2025-10-29",
+  "description": "Large wholesale orders ship in two or three parts. The confirmation email implies a single delivery, so customers open tickets when the first box arrives alone.",
+  "acceptance_criteria": [],
+  "linked_documents": [],
+  "notes": "No acceptance criteria written."
+}

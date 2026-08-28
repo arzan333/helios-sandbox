@@ -1,0 +1,21 @@
+{
+  "key": "HEL-035",
+  "summary": "Cart badge count wrong after removing an item",
+  "type": "Bug",
+  "status": "Triage",
+  "priority": "low",
+  "reporter": "Helios delivery team",
+  "assignee": "unassigned",
+  "components": [
+    "Shop"
+  ],
+  "labels": [
+    "defect",
+    "ui"
+  ],
+  "created": "2025-10-28",
+  "description": "Remove an item from the cart and the badge still counts it until the page is refreshed. Cosmetic but visible on every session.",
+  "acceptance_criteria": [],
+  "linked_documents": [],
+  "notes": "No acceptance criteria written."
+}

@@ -1,0 +1,173 @@
+/*
+  Helios Shop styling.
+
+  Colours follow Adobe Spectrum so the prop looks like it belongs in an Adobe
+  delivery context. Nothing here is decorative beyond that: flat surfaces, one
+  accent, no shadows or gradients to maintain.
+*/
+
+:root {
+  /* Spectrum greys */
+  --gray-50: #ffffff;
+  --gray-75: #fafafa;
+  --gray-100: #f5f5f5;
+  --gray-200: #e1e1e1;
+  --gray-300: #cacaca;
+  --gray-600: #6e6e6e;
+  --gray-800: #2c2c2c;
+  --gray-900: #1b1b1b;
+
+  /* Spectrum accents */
+  --blue-500: #1473e6;
+  --blue-600: #0d66d0;
+  --green-500: #2d9d78;
+  --orange-500: #e68619;
+  --red-500: #e34850;
+
+  /* Adobe brand red, used only for the wordmark */
+  --adobe-red: #fa0f00;
+
+  --radius: 4px;
+  --border: 1px solid var(--gray-200);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Source Sans 3", "Adobe Clean", -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--gray-100);
+  color: var(--gray-800);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.masthead {
+  background: var(--gray-900);
+  color: var(--gray-50);
+  padding: 14px 24px;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.masthead__mark {
+  color: var(--adobe-red);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.02em;
+}
+
+.masthead__title { font-size: 16px; font-weight: 600; }
+.masthead__env {
+  margin-left: auto;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gray-300);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 16px;
+  padding: 16px 24px 32px;
+  align-items: start;
+}
+
+.panel {
+  background: var(--gray-50);
+  border: var(--border);
+  border-radius: var(--radius);
+}
+
+.panel__head {
+  padding: 12px 16px;
+  border-bottom: var(--border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel__title { font-weight: 600; font-size: 14px; }
+.panel__body { padding: 16px; }
+
+.order-list { list-style: none; margin: 0; padding: 0; }
+
+.order-list__item {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-bottom: var(--border);
+  padding: 12px 16px;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  display: block;
+}
+
+.order-list__item:hover { background: var(--gray-75); }
+.order-list__item[aria-current="true"] {
+  background: #e8f0fc;
+  box-shadow: inset 3px 0 0 var(--blue-500);
+}
+
+.order-list__id { font-weight: 600; }
+.order-list__customer { color: var(--gray-600); font-size: 13px; }
+
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid currentColor;
+}
+
+.badge--pending   { color: var(--orange-500); }
+.badge--confirmed { color: var(--blue-600); }
+.badge--shipped   { color: var(--green-500); }
+.badge--cancelled { color: var(--red-500); }
+
+table.lines { width: 100%; border-collapse: collapse; }
+table.lines th {
+  text-align: left;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--gray-600);
+  border-bottom: 1px solid var(--gray-300);
+  padding: 8px 8px 8px 0;
+}
+table.lines td { padding: 10px 8px 10px 0; border-bottom: var(--border); }
+table.lines .num { text-align: right; }
+
+.totals {
+  margin-top: 16px;
+  border-top: 2px solid var(--gray-300);
+  padding-top: 12px;
+  display: grid;
+  gap: 6px;
+  max-width: 320px;
+  margin-left: auto;
+}
+
+.totals__row { display: flex; justify-content: space-between; }
+.totals__row--grand { font-weight: 700; font-size: 16px; }
+.totals__label { color: var(--gray-600); }
+
+.notice {
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  border-left: 3px solid var(--orange-500);
+  background: #fff6e8;
+  color: #6b4708;
+}
+
+.notice--error { border-left-color: var(--red-500); background: #fdecee; color: #7d1d24; }
+.empty { color: var(--gray-600); padding: 24px 0; text-align: center; }

@@ -1,0 +1,21 @@
+{
+  "key": "HEL-181",
+  "summary": "Allow partial refund against a paid invoice",
+  "type": "Story",
+  "status": "In Analysis",
+  "priority": "medium",
+  "reporter": "Helios delivery team",
+  "assignee": "unassigned",
+  "components": [
+    "Billing",
+    "OrderCore"
+  ],
+  "labels": [
+    "finance"
+  ],
+  "created": "2025-09-19",
+  "description": "Refunds are all-or-nothing today. Customer service want to refund a single line when one item arrives damaged.",
+  "acceptance_criteria": [],
+  "linked_documents": [],
+  "notes": "No acceptance criteria written."
+}

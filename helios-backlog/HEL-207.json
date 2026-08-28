@@ -1,0 +1,35 @@
+{
+  "key": "HEL-207",
+  "summary": "Add discount code field to the order API",
+  "type": "Story",
+  "status": "Ready for Build",
+  "priority": "high",
+  "reporter": "Daniel Okoro (Sales Operations)",
+  "assignee": "unassigned",
+  "components": [
+    "OrderCore",
+    "Billing",
+    "Shop"
+  ],
+  "labels": [
+    "pricing",
+    "cross-system"
+  ],
+  "created": "2025-10-31",
+  "description": "Sales agree ad hoc discounts with wholesale customers over email. Finance then adjusts the invoice by hand, which is slow and occasionally wrong.\n\nAdd an optional discount to an order. OrderCore should accept a whole-percentage discount on the order, pass it to Billing, and Billing should apply it to the subtotal before tax. The Shop should show the discount as its own line in the totals.\n\nDiscount must be between 0 and 50 percent. Anything above 50 needs a finance approval we are not building yet, so reject it.",
+  "acceptance_criteria": [
+    "An order can carry an optional discount_percent between 0 and 50",
+    "Billing applies the discount to the subtotal before tax is calculated",
+    "Tax is charged on the discounted subtotal, not the original subtotal",
+    "A discount above 50 or below 0 is rejected with a 422",
+    "Orders without a discount behave exactly as they do today",
+    "The Shop totals panel shows the discount as its own row when present"
+  ],
+  "linked_documents": [
+    "data/entity-map.md"
+  ],
+  "notes": "Touches Python and Java. The contract between OrderCore and Billing changes.",
+  "expected_outputs": [
+    "docs/design/HEL-207-lld.md (written by you during the build)"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "key": "HEL-166",
+  "summary": "Onboard a new developer to OrderCore",
+  "type": "Task",
+  "status": "In Analysis",
+  "priority": "low",
+  "reporter": "Helios delivery team",
+  "assignee": "unassigned",
+  "components": [
+    "OrderCore"
+  ],
+  "labels": [
+    "onboarding"
+  ],
+  "created": "2026-02-10",
+  "description": "Three developers join next month. The current setup notes are eight months old and reference a service that no longer exists.",
+  "acceptance_criteria": [],
+  "linked_documents": [],
+  "notes": "No acceptance criteria written."
+}

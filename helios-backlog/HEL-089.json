@@ -1,0 +1,21 @@
+{
+  "key": "HEL-089",
+  "summary": "Compile release notes for the monthly drop",
+  "type": "Task",
+  "status": "Ready for Build",
+  "priority": "low",
+  "reporter": "Helios delivery team",
+  "assignee": "unassigned",
+  "components": [
+    "OrderCore",
+    "Shop"
+  ],
+  "labels": [
+    "release"
+  ],
+  "created": "2025-09-23",
+  "description": "Release notes are assembled by hand each month from the closed ticket list. Takes a release manager most of a morning.",
+  "acceptance_criteria": [],
+  "linked_documents": [],
+  "notes": "No acceptance criteria written."
+}

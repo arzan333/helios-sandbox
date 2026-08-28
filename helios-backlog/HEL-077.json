@@ -1,0 +1,21 @@
+{
+  "key": "HEL-077",
+  "summary": "Order search times out beyond 500 results",
+  "type": "Bug",
+  "status": "In Analysis",
+  "priority": "high",
+  "reporter": "Helios delivery team",
+  "assignee": "unassigned",
+  "components": [
+    "OrderCore"
+  ],
+  "labels": [
+    "defect",
+    "performance"
+  ],
+  "created": "2026-02-06",
+  "description": "The internal order search hangs when a customer has more than about 500 orders. Two accounts are affected today, more next quarter.",
+  "acceptance_criteria": [],
+  "linked_documents": [],
+  "notes": "No acceptance criteria written."
+}

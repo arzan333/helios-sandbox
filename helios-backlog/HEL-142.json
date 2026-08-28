@@ -1,0 +1,24 @@
+{
+  "key": "HEL-142",
+  "summary": "Show estimated delivery window in the cart",
+  "type": "Story",
+  "status": "In Analysis",
+  "priority": "medium",
+  "reporter": "Priya Raman (Product)",
+  "assignee": "unassigned",
+  "components": [
+    "Shop",
+    "OrderCore"
+  ],
+  "labels": [
+    "customer-facing",
+    "checkout"
+  ],
+  "created": "2025-11-03",
+  "description": "Customers call the contact centre asking when an order will arrive. The information exists in OrderCore but is never shown before checkout.\n\nWe want the cart page to show an estimated delivery window before the customer confirms. Something like 'arrives 18-20 March'. Marketing want it to look confident, not hedged.\n\nThe warehouse team say the window depends on stock location and the carrier cut-off, which they hold in a spreadsheet today. Nobody has decided where that data should live.",
+  "acceptance_criteria": [],
+  "linked_documents": [
+    "docs/design/HEL-142-hld.md"
+  ],
+  "notes": "No acceptance criteria were written. The ticket moved to In Analysis anyway."
+}

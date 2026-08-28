@@ -1,0 +1,51 @@
+[
+  {
+    "order_id": "ORD-1001",
+    "customer": "Northwind Retail",
+    "status": "confirmed",
+    "currency": "GBP",
+    "lines": [
+      { "sku": "HG-CLEAN-500", "description": "Surface cleaner 500ml", "quantity": 24, "unit_price_pence": 249 },
+      { "sku": "HG-CLOTH-10", "description": "Microfibre cloth 10 pack", "quantity": 6, "unit_price_pence": 899 }
+    ]
+  },
+  {
+    "order_id": "ORD-1002",
+    "customer": "Bellweather Stores",
+    "status": "confirmed",
+    "currency": "GBP",
+    "lines": [
+      { "sku": "HG-SOAP-250", "description": "Hand soap 250ml", "quantity": 100, "unit_price_pence": 189 }
+    ]
+  },
+  {
+    "order_id": "ORD-1003",
+    "customer": "Cedar Grove Group",
+    "status": "pending",
+    "currency": "GBP",
+    "lines": [
+      { "sku": "HG-CLEAN-500", "description": "Surface cleaner 500ml", "quantity": 12, "unit_price_pence": 249 },
+      { "sku": "HG-SPRAY-750", "description": "Kitchen spray 750ml", "quantity": 18, "unit_price_pence": 329 },
+      { "sku": "HG-CLOTH-10", "description": "Microfibre cloth 10 pack", "quantity": 3, "unit_price_pence": 899 }
+    ]
+  },
+  {
+    "order_id": "ORD-1004",
+    "customer": "Northwind Retail",
+    "status": "shipped",
+    "currency": "GBP",
+    "lines": [
+      { "sku": "HG-SPRAY-750", "description": "Kitchen spray 750ml", "quantity": 40, "unit_price_pence": 329 }
+    ]
+  },
+  {
+    "order_id": "ORD-1005",
+    "customer": "Halloway & Sons",
+    "status": "confirmed",
+    "currency": "GBP",
+    "lines": [
+      { "sku": "HG-SOAP-250", "description": "Hand soap 250ml", "quantity": 8, "unit_price_pence": 189 },
+      { "sku": "HG-CLEAN-500", "description": "Surface cleaner 500ml", "quantity": 8, "unit_price_pence": 249 }
+    ]
+  }
+]

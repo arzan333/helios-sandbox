@@ -1,0 +1,27 @@
+#!/bin/sh
+# Blocks every push from a participant workstation.
+#
+# Nothing in the Claude Code Capability Program is ever pushed. Work is committed
+# to your own local branch and reviewed by screen share or a git bundle.
+#
+# Facilitators seeding the repository can bypass this with:
+#   git push --no-verify
+cat >&2 <<'MSG'
+
+  ============================================================
+   PUSH BLOCKED - this is a training sandbox
+  ============================================================
+
+   Your work stays on this machine. Commit locally as normal:
+
+       git add week1/blueprint.md
+       git commit -m "Week 1: workflow blueprint"
+
+   To hand work to a facilitator, create a bundle:
+
+       git bundle create my-week1.bundle HEAD
+
+  ============================================================
+
+MSG
+exit 1

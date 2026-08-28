@@ -1,0 +1,20 @@
+{
+  "key": "HEL-133",
+  "summary": "Duplicate confirmation email on retry",
+  "type": "Bug",
+  "status": "In Analysis",
+  "priority": "medium",
+  "reporter": "Helios delivery team",
+  "assignee": "unassigned",
+  "components": [
+    "OrderCore"
+  ],
+  "labels": [
+    "defect"
+  ],
+  "created": "2025-12-02",
+  "description": "When the confirmation send is retried the customer receives two emails. Happens roughly once a week.",
+  "acceptance_criteria": [],
+  "linked_documents": [],
+  "notes": "No acceptance criteria written."
+}

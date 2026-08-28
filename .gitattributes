@@ -1,0 +1,9 @@
+# Git for Windows defaults to core.autocrlf=true, which rewrites line endings on
+# checkout. Pin them so every participant's working copy is byte-identical and
+# nobody sees phantom whole-file diffs.
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.png binary
+*.pdf binary
+*.docx binary
+*.xlsx binary

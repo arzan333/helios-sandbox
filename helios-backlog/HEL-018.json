@@ -1,0 +1,21 @@
+{
+  "key": "HEL-018",
+  "summary": "Invoice total ignores line level discount",
+  "type": "Bug",
+  "status": "Triage",
+  "priority": "high",
+  "reporter": "Helios delivery team",
+  "assignee": "unassigned",
+  "components": [
+    "Billing",
+    "OrderCore"
+  ],
+  "labels": [
+    "defect"
+  ],
+  "created": "2025-12-30",
+  "description": "Finance report that when a line has a negotiated price the invoice still shows the list total. Reproduced on ORD-1003. Unclear whether Billing or OrderCore is at fault.",
+  "acceptance_criteria": [],
+  "linked_documents": [],
+  "notes": "No acceptance criteria written."
+}

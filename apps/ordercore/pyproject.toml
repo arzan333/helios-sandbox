@@ -1,0 +1,23 @@
+# Pinned so every participant VM gets identical lint results.
+# Week 3 uses "ruff check" as a gate, so the ruleset must not drift.
+
+[project]
+name = "ordercore"
+version = "0.1.0"
+description = "Helios order management API"
+requires-python = ">=3.11"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

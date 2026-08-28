@@ -1,0 +1,22 @@
+{
+  "key": "HEL-118",
+  "summary": "Currency rounding differs between Shop and Billing",
+  "type": "Bug",
+  "status": "Triage",
+  "priority": "medium",
+  "reporter": "Helios delivery team",
+  "assignee": "unassigned",
+  "components": [
+    "Shop",
+    "Billing"
+  ],
+  "labels": [
+    "defect",
+    "pricing"
+  ],
+  "created": "2025-09-30",
+  "description": "A customer saw a total one penny higher in the cart than on the invoice. Suspected rounding difference between the front end and the invoice calculation.",
+  "acceptance_criteria": [],
+  "linked_documents": [],
+  "notes": "No acceptance criteria written."
+}

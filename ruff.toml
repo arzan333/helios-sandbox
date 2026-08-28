@@ -1,0 +1,12 @@
+# Repository-wide lint settings.
+#
+# Week 3 uses "ruff check" as a gate, so the ruleset is pinned here and applies
+# from any directory. Without this, ruff falls back to its defaults and a
+# participant sees pre-existing findings that are not theirs.
+
+target-version = "py311"
+line-length = 100
+
+[lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]

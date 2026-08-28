@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 1 lab — Mindset and AI-Native Workflow Design</title>
+<style>
+  :root {
+    --gray-50:#ffffff; --gray-75:#fafafa; --gray-100:#f5f5f5; --gray-200:#e1e1e1;
+    --gray-300:#cacaca; --gray-600:#6e6e6e; --gray-800:#2c2c2c; --gray-900:#1b1b1b;
+    --blue-500:#1473e6; --blue-600:#0d66d0; --green-500:#2d9d78;
+    --orange-500:#e68619; --red-500:#e34850; --adobe-red:#fa0f00;
+    --radius:4px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--gray-100); color:var(--gray-800);
+    font-family:"Source Sans 3","Adobe Clean",-apple-system,"Segoe UI",Roboto,sans-serif;
+    font-size:15px; line-height:1.6;
+  }
+  header.masthead{
+    background:var(--gray-900); color:#fff; padding:14px 24px;
+    display:flex; align-items:baseline; gap:12px; position:sticky; top:0; z-index:10;
+  }
+  .masthead__mark{color:var(--adobe-red); font-weight:700; font-size:18px; letter-spacing:-.02em}
+  .masthead__title{font-size:16px; font-weight:600}
+  .masthead__env{margin-left:auto; font-size:11px; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--gray-300)}
+  main{max-width:920px; margin:0 auto; padding:24px 24px 80px}
+  h1{font-size:26px; margin:8px 0 4px}
+  .sub{color:var(--gray-600); margin:0 0 24px}
+  h2{font-size:19px; margin:36px 0 4px; padding-top:16px; border-top:1px solid var(--gray-200)}
+  h3{font-size:15px; margin:22px 0 6px}
+  p,li{margin:8px 0}
+  ul,ol{padding-left:22px}
+  .card{background:var(--gray-50); border:1px solid var(--gray-200);
+    border-radius:var(--radius); padding:16px 18px; margin:16px 0}
+  .meta{display:flex; gap:24px; flex-wrap:wrap; font-size:13px; color:var(--gray-600);
+    background:var(--gray-50); border:1px solid var(--gray-200);
+    border-radius:var(--radius); padding:12px 16px}
+  .meta b{color:var(--gray-800)}
+  .step{display:flex; align-items:baseline; gap:10px; margin:28px 0 6px}
+  .step__n{flex:0 0 auto; width:26px; height:26px; border-radius:50%;
+    background:var(--blue-500); color:#fff; font-size:13px; font-weight:700;
+    display:inline-flex; align-items:center; justify-content:center}
+  .step__t{font-size:17px; font-weight:600}
+  .step__time{margin-left:auto; font-size:12px; color:var(--gray-600);
+    border:1px solid var(--gray-300); border-radius:10px; padding:1px 10px; white-space:nowrap}
+  .snippet{position:relative; margin:12px 0}
+  .snippet__bar{display:flex; align-items:center; gap:8px; background:var(--gray-800);
+    color:var(--gray-300); font-size:12px; padding:6px 10px;
+    border-radius:var(--radius) var(--radius) 0 0}
+  .snippet__lang{text-transform:uppercase; letter-spacing:.06em}
+  .snippet__copy{margin-left:auto; background:var(--blue-500); color:#fff; border:0;
+    border-radius:3px; padding:3px 12px; font:inherit; font-size:12px; cursor:pointer}
+  .snippet__copy:hover{background:var(--blue-600)}
+  .snippet__copy.done{background:var(--green-500)}
+  pre{margin:0; background:var(--gray-900); color:#f0f0f0; padding:12px 14px;
+    border-radius:0 0 var(--radius) var(--radius); overflow-x:auto;
+    font-family:"Consolas","DejaVu Sans Mono",monospace; font-size:13px; line-height:1.5;
+    white-space:pre; tab-size:2}
+  code{font-family:"Consolas","DejaVu Sans Mono",monospace; font-size:.92em;
+    background:var(--gray-200); padding:1px 5px; border-radius:3px}
+  pre code{background:none; padding:0; font-size:inherit}
+  .expect{border-left:3px solid var(--green-500); background:#eef8f4;
+    padding:10px 14px; border-radius:0 var(--radius) var(--radius) 0; margin:10px 0}
+  .expect b{color:#1a6b52}
+  .watch{border-left:3px solid var(--orange-500); background:#fff6e8;
+    padding:10px 14px; border-radius:0 var(--radius) var(--radius) 0; margin:10px 0}
+  .watch b{color:#8a5a0b}
+  .bar{border-left:3px solid var(--gray-600); background:var(--gray-75);
+    padding:12px 16px; border-radius:0 var(--radius) var(--radius) 0; margin:16px 0}
+  table{width:100%; border-collapse:collapse; margin:12px 0; font-size:14px}
+  th{text-align:left; background:var(--gray-100); border-bottom:1px solid var(--gray-300);
+    padding:8px 10px; font-size:12px; text-transform:uppercase; letter-spacing:.04em;
+    color:var(--gray-600)}
+  td{padding:8px 10px; border-bottom:1px solid var(--gray-200); vertical-align:top}
+  details{background:var(--gray-50); border:1px solid var(--gray-200);
+    border-radius:var(--radius); padding:10px 14px; margin:12px 0}
+  summary{cursor:pointer; font-weight:600; font-size:14px}
+  footer{color:var(--gray-600); font-size:13px; margin-top:48px;
+    border-top:1px solid var(--gray-200); padding-top:16px}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <span class="masthead__mark">Helios</span>
+  <span class="masthead__title">Week 1 lab book</span>
+  <span class="masthead__env">Training environment</span>
+</header>
+
+<main>
+  <h1>Mindset and AI-Native Workflow Design</h1>
+  <p class="sub">Self-paced. Work through it in order. Every command has a copy button.</p>
+
+  <div class="meta">
+    <span><b>Time</b> 45 minutes</span>
+    <span><b>You produce</b> week1/blueprint.md</span>
+    <span><b>Committed</b> locally, never pushed</span>
+    <span><b>Needs</b> Claude Code, Python, this repository</span>
+  </div>
+
+  <div class="card">
+    <b>Before you start.</b> You should already have run
+    <code>Setup-HeliosWorkstation.ps1</code>, cloned this repository, created your own
+    branch, and filled in <code>templates/baseline-capture.md</code>. If any of those
+    are outstanding, do them first — this lab assumes them.
+  </div>
+
+  <h2>What this lab is really about</h2>
+  <p>
+    You already use Claude Code. The gap this week is method, not access. So the lab
+    does not teach you to prompt. It asks you to look at a process that is genuinely
+    slow, find out <em>why</em> from data rather than opinion, and decide where a human
+    must sign before work continues.
+  </p>
+  <p>
+    You will finish with a workflow blueprint. It is the input to Week 3, so it is
+    worth doing properly rather than quickly.
+  </p>
+
+  <h2>Pick your scenario</h2>
+  <p>Take the one that matches the last digit of your employee number, or just choose.</p>
+  <table>
+    <thead><tr><th>Scenario</th><th>Narrative</th><th>Filter value</th></tr></thead>
+    <tbody>
+      <tr><td>Requirement intake</td><td><code>docs/process/requirement-intake.md</code></td><td><code>intake</code></td></tr>
+      <tr><td>Defect triage</td><td><code>docs/process/defect-triage.md</code></td><td><code>defect_triage</code></td></tr>
+      <tr><td>Release notes</td><td><code>docs/process/release-notes.md</code></td><td><code>release_notes</code></td></tr>
+      <tr><td>Change approval</td><td><code>docs/process/change-approval.md</code></td><td><code>change_approval</code></td></tr>
+    </tbody>
+  </table>
+  <p>
+    Everything below uses <code>intake</code> as the example. Substitute your own filter
+    value wherever you see it.
+  </p>
+
+  <div class="step">
+    <span class="step__n">1</span><span class="step__t">Find the waits</span>
+    <span class="step__time">0–8 min</span>
+  </div>
+  <p>Start your working copy and get the numbers. Run this from the repository root:</p>
+
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>python apps/insight/report.py stages --workflow intake</code></pre>
+  </div>
+
+  <div class="expect">
+    <b>Expected.</b> A table of eleven stage transitions with a median and a p90 column,
+    then the three longest by median, then your end-to-end median, rework rate and the top
+    rework reasons. It needs nothing installed beyond Python. Keep this output open — you
+    will check Claude's answers against it later in the lab.
+  </div>
+
+  <p>Now use Claude Code to interpret it rather than to fetch it. Open Claude Code in the repository and give it this:</p>
+
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Read data/helios-tickets.csv and docs/process/requirement-intake.md.
+For the intake workflow only, tell me the three longest stage transitions by
+median duration. For each one, say whether it is a queue (the ticket is waiting
+for a person or an environment) or effort (someone is actively working).
+Cite the step number from the narrative. Answer in a table, nothing else.</code></pre>
+  </div>
+
+  <div class="watch">
+    <b>Watch for.</b> The third longest is not a queue. If Claude tells you all three
+    are waits, it has pattern-matched instead of reading. Push back and make it justify
+    each one against the narrative.
+  </div>
+
+  <p>Record the table in section 1 of your canvas.</p>
+
+  <div class="step">
+    <span class="step__n">2</span><span class="step__t">Classify every step</span>
+    <span class="step__time">8–16 min</span>
+  </div>
+  <p>
+    Copy <code>templates/blueprint-canvas.md</code> into your own week 1 folder first,
+    so the template stays clean for everyone else:
+  </p>
+
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>mkdir week1 -Force
+if (-not (Test-Path week1\blueprint.md)) { copy templates\blueprint-canvas.md week1\blueprint.md }</code></pre>
+  </div>
+
+  <p>
+    Now go through the narrative and classify each step as <b>AI-ready</b>,
+    <b>AI-assisted</b> or <b>human-only</b>. Write your own one-line justification for
+    each. Then have Claude Code challenge you, not do it for you:
+  </p>
+
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Here is my classification of the intake steps. For each row, argue the opposite
+case in one sentence. Where my justification is really just "it would be faster",
+say so plainly. Do not rewrite my table.</code></pre>
+  </div>
+
+  <div class="bar">
+    A step is AI-ready when the scope is bounded, the output can be verified, and being
+    wrong is reversible. If any of those three is missing, it is not AI-ready no matter
+    how repetitive it looks.
+  </div>
+
+  <div class="step">
+    <span class="step__n">3</span><span class="step__t">Redraw the target state</span>
+    <span class="step__time">16–26 min</span>
+  </div>
+  <p>Pick one pattern and commit to it:</p>
+  <table>
+    <thead><tr><th>Pattern</th><th>Fits</th></tr></thead>
+    <tbody>
+      <tr><td>Draft-Review-Approve</td><td>Requirements, specs, documentation, release notes</td></tr>
+      <tr><td>Analyze-Validate-Escalate</td><td>Defect triage, incident response, impact analysis</td></tr>
+      <tr><td>Generate-Verify-Publish</td><td>Code, tests, configuration</td></tr>
+    </tbody>
+  </table>
+  <p>
+    In section 3 of your canvas, state what <b>disappears</b>, what <b>merges</b> and what
+    is <b>untouched</b>. Being explicit about what you are not changing is half the value.
+  </p>
+  <div class="watch">
+    <b>Anti-pattern.</b> Putting AI at the approval step. AI drafts and analyses; a named
+    human approves. If your target state has a machine approving something, redraw it.
+  </div>
+
+  <div class="step">
+    <span class="step__n">4</span><span class="step__t">Place your gates</span>
+    <span class="step__time">26–36 min</span>
+  </div>
+  <p>
+    A gate is a point where work stops until a named person signs. Minimum two. Fill in
+    section 4 of the canvas. Owner roles must come from the RACI in
+    <code>docs/helios-landscape.md</code> — Business Analyst, Developer, Architect,
+    Quality Engineer or Release Manager.
+  </p>
+  <p>
+    Now look at a real design document that went through the existing review,
+    <code>docs/design/HEL-142-hld.md</code>:
+  </p>
+
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>type docs\design\HEL-142-hld.md</code></pre>
+  </div>
+
+  <p>
+    Read it and decide, on your own judgement, whether it should pass a design gate.
+    Write your verdict and one sentence of reasoning at the bottom of your blueprint.
+  </p>
+
+  <div class="bar">
+    <b>Compare with the person next to you.</b> You will probably disagree, and you will
+    both be able to defend your answer. That disagreement is the reason Week 3 introduces
+    a rubric. Do not resolve it now.
+  </div>
+
+  <details>
+    <summary>What the architect actually left out (open only after you have decided)</summary>
+    <p>
+      No out-of-scope statement. Insight reads order data and is never mentioned. The
+      spreadsheet import has no owner and no home. "About three days" has no basis. The
+      one-line risk has no response and no owner. No alternative was considered. The
+      <code>review_date</code> in the front matter is unset.
+    </p>
+    <p>
+      None of that makes it obviously a fail. That is the point.
+    </p>
+  </details>
+
+  <div class="step">
+    <span class="step__n">5</span><span class="step__t">Baseline the metrics</span>
+    <span class="step__time">36–43 min</span>
+  </div>
+  <p>Get your rework rate and cycle time from the data, not from the narrative:</p>
+
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>From data/helios-tickets.csv, for the intake workflow only, calculate:
+1. median working hours from created to closed
+2. percentage of tickets with rework_count above zero
+3. the three most common rework_reason values with counts
+Show the numbers only. Then tell me which of the three is most likely caused by
+the gate I am adding, and why.</code></pre>
+  </div>
+
+  <p>
+    Put those numbers in section 5 and set a target next to each. A target without a
+    number is a wish.
+  </p>
+
+  <div class="step">
+    <span class="step__n">6</span><span class="step__t">Self-check and commit</span>
+    <span class="step__time">43–45 min</span>
+  </div>
+  <p>Run the eight-point check in <code>templates/self-check-8.md</code>. Fix anything that fails. Then:</p>
+
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>git add week1/blueprint.md
+git commit -m "Week 1: workflow blueprint for intake"</code></pre>
+  </div>
+
+  <div class="watch">
+    <b>Local only.</b> Do not push. Nothing in this programme leaves your machine.
+  </div>
+
+  <h2>Passing bar</h2>
+  <div class="bar">
+    Every insertion point has a gate. Every gate names a single role and says what
+    happens when the check fails. Every metric in section 5 has a number that came from
+    the CSV. If a facilitator asks "where did this number come from", you can show them
+    the command.
+  </div>
+
+  <h2>If something breaks</h2>
+  <table>
+    <thead><tr><th>Symptom</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><code>python</code> opens the Microsoft Store</td>
+        <td>Settings &gt; Apps &gt; Advanced app settings &gt; App execution aliases, turn off
+            <code>python.exe</code> and <code>python3.exe</code>, then reopen PowerShell.</td>
+      </tr>
+      <tr>
+        <td><code>ModuleNotFoundError: httpx</code></td>
+        <td><code>pip install -r apps/ordercore/requirements.txt</code></td>
+      </tr>
+      <tr>
+        <td><code>copy</code> or <code>type</code> says the path does not exist</td>
+        <td>You are not in the repository root. Run <code>cd</code> to the folder that
+            contains <code>CLAUDE.md</code>, then try again. The report script finds its
+            own data from anywhere, but these two commands do not.</td>
+      </tr>
+      <tr>
+        <td>Claude Code cannot see the files</td>
+        <td>Start it from the repository root so <code>CLAUDE.md</code> is picked up.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <footer>
+    Helios Group is fictional. All data in this repository is synthetic.
+    Week 1 of the Claude Code Capability Program.
+  </footer>
+</main>
+
+<script>
+  // Copy buttons. Text is taken from the <pre> exactly as written, so what lands on
+  // the clipboard is what is on screen - no smart quotes, no wrapped commands.
+  document.querySelectorAll('.snippet').forEach(function (block) {
+    var button = block.querySelector('.snippet__copy');
+    var pre = block.querySelector('pre');
+    if (!button || !pre) return;
+    button.addEventListener('click', function () {
+      var text = pre.innerText;
+      var done = function () {
+        button.textContent = 'Copied';
+        button.classList.add('done');
+        setTimeout(function () {
+          button.textContent = 'Copy';
+          button.classList.remove('done');
+        }, 1500);
+      };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } else {
+        fallback();
+      }
+      function fallback() {
+        var area = document.createElement('textarea');
+        area.value = text;
+        area.style.position = 'fixed';
+        area.style.opacity = '0';
+        document.body.appendChild(area);
+        area.select();
+        try { document.execCommand('copy'); done(); } catch (e) { button.textContent = 'Select manually'; }
+        document.body.removeChild(area);
+      }
+    });
+  });
+</script>
+</body>
+</html>
