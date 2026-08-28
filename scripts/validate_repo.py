@@ -174,9 +174,6 @@ for doc in doc_files:
 lab = (ROOT / "labs" / "week1.html").read_text(encoding="utf-8")
 for referenced in [
     "docs/process/requirement-intake.md",
-    "docs/process/defect-triage.md",
-    "docs/process/release-notes.md",
-    "docs/process/change-approval.md",
     "templates/blueprint-canvas.md",
     "templates/self-check-8.md",
     "data/helios-tickets.csv",
@@ -195,20 +192,24 @@ for needed, why in [
     ("git clone https://github.com/arzan333/helios-sandbox.git", "the clone command"),
     ("git checkout -b", "the branch command"),
     ("git config core.hooksPath .githooks", "the push guard"),
-    ("baseline-capture.md", "the baseline capture step"),
     ("Set up your working copy", "the step 0 heading"),
-    ("The situation", "the Helios orientation"),
-    ("What you will be able to do", "the learning outcomes"),
-    ("What you are building", "the description of the deliverable"),
-    ("Four terms, before you meet them", "the glossary"),
-    ("Your scenario", "the scenario explanation"),
-    ("filter value", "an explanation of what the filter value is"),
+    ("What you will do", "the five-step summary"),
+    ("week1/blueprint.md", "the named deliverable"),
+    ("blueprint-defect-triage.md", "the link to the worked example"),
+    ("The process you are analysing", "the process framing"),
+    ("The three categories.", "the AI-ready definition at point of use"),
+    ("What a gate is", "the gate definition at point of use"),
+    ("Queue or effort.", "the queue vs effort definition at point of use"),
+    ("needs a gate after it", "the rule that AI steps require a gate"),
+    ("Challenge", "the swap and critique challenge"),
+    ("Escalation trigger", "the full gate column set"),
+    ("A target without a number is a wish", "the metrics discipline line"),
 ]:
     check(needed in lab, f"week1.html is missing {why}")
 
 # The canvas must be created before it is first referenced.
 canvas_created = lab.find("blueprint-canvas.md")
-canvas_used = lab.find("section 1 of your canvas")
+canvas_used = lab.find("section 1</b> of your blueprint")
 check(canvas_created != -1 and canvas_used != -1 and canvas_created < canvas_used,
       "week1.html references the canvas before creating it")
 check("&lt;" not in lab.split("<pre>")[0], "unescaped markup before the first snippet")
@@ -244,6 +245,21 @@ vite = (ROOT / "apps/shop/vite.config.js").read_text()
 check("8080" in vite, "Vite proxy does not point at OrderCore on 8080")
 
 # ------------------------------------------------------------------ report
+readme = (ROOT / "README.md").read_text(encoding="utf-8")
+check("baseline-capture.md" in readme, "README does not mention the baseline capture step")
+
+# ------------------------------------------------- worked example blueprint
+example = ROOT / "docs" / "examples" / "blueprint-defect-triage.md"
+check(example.exists(), "worked example blueprint is missing")
+if example.exists():
+    ex = example.read_text(encoding="utf-8")
+    for section in ["1. Stage durations", "2. Step classification", "3. Target state",
+                    "4. Gates", "5. Metrics"]:
+        check(section in ex, f"worked example is missing section '{section}'")
+    check("551.6" in ex, "worked example cycle time does not match the dataset")
+    check("29.5%" in ex, "worked example rework rate does not match the dataset")
+    check("defect_triage" in ex, "worked example does not name its scenario")
+
 print(f"Ran {checks} checks.\n")
 if warnings:
     print(f"{len(warnings)} warning(s):")

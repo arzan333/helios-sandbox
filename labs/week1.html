@@ -91,7 +91,7 @@
 </header>
 
 <main>
-  <h1>Mindset and AI-Native Workflow Design</h1>
+  <h1>Designing AI-Native Workflows</h1>
   <p class="sub">Self-paced. Work through it in order. Every command has a copy button.</p>
 
   <div class="meta">
@@ -101,148 +101,74 @@
     <span><b>Needs</b> Claude Code, Python, this repository</span>
   </div>
 
-  <h2>The situation</h2>
+  <h2>What you will do</h2>
+  <p>In this lab you will, in order:</p>
+  <ol>
+    <li><b>Analyse real ticket data with Claude Code</b> to find the biggest bottlenecks in a business process.</li>
+    <li><b>Redesign the workflow</b>, categorising every step as AI-ready, AI-assisted or human-only.</li>
+    <li><b>Insert mandatory human approval gates</b>, each with an owner role and pass/fail rules, so AI output is validated before it moves on.</li>
+    <li><b>Set target metrics</b> for cycle time and rework, with real numbers.</li>
+    <li><b>Commit your blueprint</b> to Git, locally.</li>
+  </ol>
   <p>
-    <b>Helios Group</b> is a consumer products company with a 200-person internal
-    delivery team. It is fictional, and every ticket, document and number in this
-    repository is synthetic — but the problem is not invented. Helios ships four
-    systems: a React storefront (<b>Shop</b>), a Python order API (<b>OrderCore</b>),
-    Python reporting jobs (<b>Insight</b>) and a small Java invoicing service
-    (<b>Billing</b>).
+    The output is one file, <code>week1/blueprint.md</code>. It is the input to Week 3,
+    where you cost it against real volumes.
   </p>
-  <p>
-    Delivery is slow and nobody agrees on why. The team blames the architect; the
-    architect blames unclear requirements; leadership blames both. Six months of
-    ticket data sits in this repository and has never been looked at. Today you look
-    at it.
-  </p>
-  <p>
-    Five roles appear throughout, and you will need them when you assign gate owners:
-    <b>Business Analyst</b>, <b>Developer</b>, <b>Architect</b>, <b>Quality Engineer</b>
-    and <b>Release Manager</b>. The full picture is in
-    <code>docs/helios-landscape.md</code> if you want it.
-  </p>
-
-  <h2>What you will be able to do by the end</h2>
-  <ul>
-    <li>Read delivery data and say <em>where</em> a process loses time, with numbers rather than opinion.</li>
-    <li>Tell the difference between a step that is waiting and a step that is working, and know why that changes what you do about it.</li>
-    <li>Judge whether a task is safe to hand to AI, using a test that is not "it would be faster".</li>
-    <li>Place a human sign-off in the right position, with a named owner and a defined failure path.</li>
-  </ul>
-  <p>
-    You already use Claude Code. The gap this week is method, not access, so this lab
-    does not teach prompting. It teaches you what to point it at.
-  </p>
-
-  <h2>What you are building</h2>
-  <p>
-    One document: a <b>workflow blueprint</b>. It is a before-and-after picture of a
-    single process, backed by data, showing where AI helps and where a human must
-    still sign. You fill in a template — five sections, roughly a page:
-  </p>
-  <table>
-    <thead><tr><th>Section</th><th>What goes in it</th><th>Filled in at</th></tr></thead>
-    <tbody>
-      <tr><td>1. Stage durations</td><td>How long each stage of the process actually takes, from the ticket data</td><td>Step 1</td></tr>
-      <tr><td>2. Step classification</td><td>Every step marked AI-ready, AI-assisted or human-only, with your reasoning</td><td>Step 2</td></tr>
-      <tr><td>3. Target state</td><td>What disappears, what merges, what you deliberately leave alone</td><td>Step 3</td></tr>
-      <tr><td>4. Gates</td><td>Where work stops for a human signature, and who signs</td><td>Step 4</td></tr>
-      <tr><td>5. Metrics</td><td>Today's numbers and the target you are aiming at</td><td>Step 5</td></tr>
-    </tbody>
-  </table>
-  <p>
-    It is not a throwaway. In Week 3 you cost this blueprint against real volumes, so a
-    vague one becomes a vague cost model.
-  </p>
-
-  <h2>Four terms, before you meet them</h2>
-  <table>
-    <thead><tr><th>Term</th><th>Meaning here</th></tr></thead>
-    <tbody>
-      <tr>
-        <td><b>Queue vs effort</b></td>
-        <td>A <em>queue</em> is a ticket sitting still, waiting for a person or an
-            environment. <em>Effort</em> is someone actively working. Long queues are
-            usually fixed by changing the process; long effort is not.</td>
-      </tr>
-      <tr>
-        <td><b>AI-ready</b></td>
-        <td>A step where the scope is bounded, the output can be verified, and being
-            wrong is reversible. Miss any one of those three and it is not AI-ready,
-            however repetitive it looks.</td>
-      </tr>
-      <tr>
-        <td><b>Gate</b></td>
-        <td>A point where work stops until a named person signs. Not a review meeting,
-            not a team — one role, one decision, and a defined answer to "what happens
-            if it fails".</td>
-      </tr>
-      <tr>
-        <td><b>Insertion point</b></td>
-        <td>A place in the process where you are proposing AI does some of the work.
-            Every insertion point needs a gate after it.</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <h2>Your scenario</h2>
-  <p>
-    Helios has more than one slow process. Rather than everyone analysing the same one
-    and copying each other, the room splits across four. They are all real processes
-    inside Helios, all backed by six months of ticket data in the same CSV, and all
-    take about the same time to work through. <b>Which one you take does not matter</b>
-    — the method is identical and the discussion afterwards is richer for the spread.
-  </p>
-  <p>
-    Take the row matching the last digit of your employee number, or just pick one.
-    The <b>narrative</b> is a written description of how that process runs today, in
-    steps. The <b>filter value</b> is what you type into the report command in step 1
-    so it shows only your process&apos;s tickets.
-  </p>
-  <table>
-    <thead>
-      <tr><th>Last digit</th><th>Scenario</th><th>What it covers</th><th>Narrative to read</th><th>Filter value</th></tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>0–2</td><td><b>Requirement intake</b></td>
-        <td>A business request becomes a specification ready to build</td>
-        <td><code>docs/process/requirement-intake.md</code></td><td><code>intake</code></td>
-      </tr>
-      <tr>
-        <td>3–5</td><td><b>Defect triage</b></td>
-        <td>A reported bug is assessed, prioritised and routed</td>
-        <td><code>docs/process/defect-triage.md</code></td><td><code>defect_triage</code></td>
-      </tr>
-      <tr>
-        <td>6–7</td><td><b>Release notes</b></td>
-        <td>Shipped changes are collected and written up for customers</td>
-        <td><code>docs/process/release-notes.md</code></td><td><code>release_notes</code></td>
-      </tr>
-      <tr>
-        <td>8–9</td><td><b>Change approval</b></td>
-        <td>A change to a live system is reviewed and authorised</td>
-        <td><code>docs/process/change-approval.md</code></td><td><code>change_approval</code></td>
-      </tr>
-    </tbody>
-  </table>
   <div class="card">
-    <b>Every example below uses <code>intake</code>.</b> Wherever you see
-    <code>intake</code> in a command or prompt, replace it with your own filter value,
-    and read your own narrative instead of the intake one. Nothing else changes.
+    <b>See a finished one first — two minutes.</b><br>
+    Open <code>docs/examples/blueprint-defect-triage.md</code>. It is a completed
+    blueprint for a different Helios process. Yours will look like that. You cannot
+    copy it, but you can see the depth expected.
   </div>
+
+  <h2>The process you are analysing</h2>
+  <p>
+    <b>Helios Group</b> is a fictional consumer products company. Its delivery team
+    maintains four services: a React storefront, a Python order API, Python reporting
+    jobs and a Java invoicing service. You have just joined. Nobody on your team wrote
+    this code and there is no architect to ask — the repository is your only source of
+    truth.
+  </p>
+  <p>
+    The process you are redesigning is <b>requirement intake</b>: the sixteen steps
+    between a request arriving and a developer being able to start building. Every
+    change to this codebase travels that path, including the one you will make in
+    Week 3.
+  </p>
+
+  <h3>The data you will analyse</h3>
+  <p>
+    <code>data/helios-tickets.csv</code> holds 210 tickets from the last six months,
+    91 of them intake. Each row records the moment a ticket entered every stage, plus
+    whether it went backwards and why. One real row:
+  </p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">HEL-005</span></div>
+<pre><code>title            Capture marketing consent at account creation
+created          2026-02-16 15:00
+analysis_done    2026-02-18 14:52
+design_start     2026-02-27 12:53   &lt;- nine days later
+build_start      2026-03-03 09:59
+build_done       2026-03-05 17:10   &lt;- two days of building
+test_start       2026-03-11 09:24   &lt;- six days later
+closed           2026-03-13 11:09
+rework_count     1
+rework_reason    acceptance criteria missing</code></pre>
+  </div>
+  <p>
+    Twenty-five days from raised to closed. Two of them spent building. The rest is
+    mostly waiting, and it went backwards once because nobody wrote down what
+    &quot;done&quot; meant. Subtracting one timestamp from the next, across all 91
+    tickets, is how you find the bottlenecks in step 1.
+  </p>
 
   <div class="step">
     <span class="step__n">0</span><span class="step__t">Set up your working copy</span>
     <span class="step__time">before the clock starts</span>
   </div>
-  <p>
-    Do this once. If you have already cloned and branched, skip to step 1. Run each
-    block in <b>PowerShell</b>, in order.
-  </p>
+  <p>Do this once. If you have already cloned and branched, skip to step 1.</p>
 
-  <p><b>a.</b> Clone the repository into your Helios folder:</p>
+  <p><b>a.</b> Clone the repository:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
@@ -251,8 +177,8 @@ git clone https://github.com/arzan333/helios-sandbox.git
 cd helios-sandbox</code></pre>
   </div>
 
-  <p><b>b.</b> Create your own branch and turn on the push guard. Replace
-     <code>yourname</code> with your first name, lower case:</p>
+  <p><b>b.</b> Create your branch and turn on the push guard. Replace
+     <code>yourname</code> with your first name:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
@@ -260,13 +186,11 @@ cd helios-sandbox</code></pre>
 git config core.hooksPath .githooks</code></pre>
   </div>
   <div class="watch">
-    <b>Why the guard.</b> The second line installs a hook that refuses every push.
-    Your work stays on this machine for the whole programme. If you ever type
-    <code>git push</code> by habit, it will stop you and explain why.
+    <b>Why the guard.</b> The second line installs a hook that refuses every push. Your
+    work stays on this machine for the whole programme.
   </div>
 
-  <p><b>c.</b> Create your own copy of the blueprint canvas. You write into this all
-     lab; the template stays clean for everyone else:</p>
+  <p><b>c.</b> Make your own copy of the blueprint template:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
@@ -274,8 +198,8 @@ git config core.hooksPath .githooks</code></pre>
 if (-not (Test-Path week1\blueprint.md)) { copy templates\blueprint-canvas.md week1\blueprint.md }</code></pre>
   </div>
 
-  <p><b>d.</b> Open the folder in VS Code and start Claude Code in its terminal.
-     Starting it here matters — it reads <code>CLAUDE.md</code> from the repository root:</p>
+  <p><b>d.</b> Open the folder in VS Code and start Claude Code from the repository
+     root, so it picks up <code>CLAUDE.md</code>:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
@@ -283,154 +207,161 @@ if (-not (Test-Path week1\blueprint.md)) { copy templates\blueprint-canvas.md we
 claude</code></pre>
   </div>
 
-  <p><b>e.</b> Fill in <code>templates/baseline-capture.md</code> — how you use Claude
-     Code today, unedited. Five minutes, and nobody marks it. You will compare against
-     it in Week 4.</p>
-
   <div class="card">
-    <b>Check before you continue.</b> You are on your own branch
-    (<code>git branch</code> shows it), <code>week1\blueprint.md</code> exists, and
-    Claude Code is running in the repository root. If any of those is missing, fix it
-    now rather than at step 3.
+    <b>Check before you continue.</b> <code>git branch</code> shows your branch,
+    <code>week1\blueprint.md</code> exists, and Claude Code is running in the
+    repository root.
   </div>
 
   <div class="step">
-    <span class="step__n">1</span><span class="step__t">Find the waits</span>
-    <span class="step__time">0–8 min</span>
+    <span class="step__n">1</span><span class="step__t">Analyse the data and find the bottlenecks</span>
+    <span class="step__time">0–9 min</span>
   </div>
-  <p>Start your working copy and get the numbers. Run this from the repository root:</p>
-
+  <p>First get the ground truth, so you can check Claude against it. From the repository root:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>python apps/insight/report.py stages --workflow intake</code></pre>
   </div>
-
   <div class="expect">
-    <b>Expected.</b> A table of eleven stage transitions with a median and a p90 column,
-    then the three longest by median, then your end-to-end median, rework rate and the top
-    rework reasons. It needs nothing installed beyond Python. Keep this output open — you
-    will check Claude's answers against it later in the lab.
+    <b>Expected.</b> Eleven stage transitions with a median and p90, the three longest
+    by median, your end-to-end median, the rework rate and the top rework reasons.
+    Leave this on screen — you will check Claude&apos;s answers against it twice.
   </div>
 
-  <p>Now use Claude Code to interpret it rather than to fetch it. Open Claude Code in the repository and give it this:</p>
-
+  <p>Now have Claude Code interpret it rather than just repeat it:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">prompt</span>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>Read data/helios-tickets.csv and docs/process/requirement-intake.md.
-For the intake workflow only, tell me the three longest stage transitions by
+For the intake workflow only, give me the three longest stage transitions by
 median duration. For each one, say whether it is a queue (the ticket is waiting
-for a person or an environment) or effort (someone is actively working).
-Cite the step number from the narrative. Answer in a table, nothing else.</code></pre>
+for a person or an environment) or effort (someone is actively working), and
+cite the step number from the narrative that explains it.
+Answer as a table, nothing else.</code></pre>
   </div>
-
   <div class="watch">
-    <b>Watch for.</b> The third longest is not a queue. If Claude tells you all three
-    are waits, it has pattern-matched instead of reading. Push back and make it justify
-    each one against the narrative.
+    <b>Queue or effort.</b> A <b>queue</b> is a ticket sitting still. <b>Effort</b> is
+    someone working. It matters because a queue is fixed by changing the process, and
+    effort is not — pointing an agent at genuine effort just produces faster wrong
+    answers. Two of the three here are queues and one is effort. If Claude calls all
+    three waits, it has guessed instead of reading. Make it justify each against the
+    narrative.
   </div>
-
-  <p>Record the table in section 1 of your canvas.</p>
+  <p><b>Write into section 1</b> of your blueprint: the three transitions, their
+     medians, and queue or effort for each.</p>
 
   <div class="step">
-    <span class="step__n">2</span><span class="step__t">Classify every step</span>
-    <span class="step__time">8–16 min</span>
+    <span class="step__n">2</span><span class="step__t">Categorise every step</span>
+    <span class="step__time">9–19 min</span>
+  </div>
+  <div class="card">
+    <b>The three categories.</b>
+    <b>AI-ready</b> — the job is bounded (you can state exactly what done looks like),
+    checkable (you could tell if it were wrong), and reversible (a mistake breaks
+    nothing permanently). All three, or it is not AI-ready.
+    <b>AI-assisted</b> — AI drafts, a person finishes and owns it.
+    <b>Human-only</b> — keep AI out of the decision.
   </div>
   <p>
-    Open <code>week1\blueprint.md</code> in VS Code — you created it in step 0.
-    Go through the narrative and classify each step as <b>AI-ready</b>,
-    <b>AI-assisted</b> or <b>human-only</b>. Write your own one-line justification for
-    each. Then have Claude Code challenge you, not do it for you:
+    Open <code>docs/process/requirement-intake.md</code> and go through all sixteen
+    steps. Categorise each one in section 2 of your blueprint and write your own
+    one-line reason. <b>&quot;It would be faster&quot; is not a reason</b> — say what
+    makes the step bounded and checkable, or what makes it a judgement call.
   </p>
-
+  <p>Then make Claude argue with you, not do it for you:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">prompt</span>
       <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>Here is my classification of the intake steps. For each row, argue the opposite
-case in one sentence. Where my justification is really just "it would be faster",
-say so plainly. Do not rewrite my table.</code></pre>
+<pre><code>Here is my categorisation of the sixteen intake steps. For each row, argue the
+opposite case in one sentence. Where my reason is really just "it would be
+faster", say so plainly. Do not rewrite my table.</code></pre>
   </div>
-
-  <div class="bar">
-    A step is AI-ready when the scope is bounded, the output can be verified, and being
-    wrong is reversible. If any of those three is missing, it is not AI-ready no matter
-    how repetitive it looks.
+  <div class="watch">
+    <b>Watch for.</b> Steps that are queues, not tasks. Step 8 is the ticket waiting
+    for the architect. No category fixes that — it is a process problem, and you deal
+    with it in step 3.
   </div>
 
   <div class="step">
-    <span class="step__n">3</span><span class="step__t">Redraw the target state</span>
-    <span class="step__time">16–26 min</span>
+    <span class="step__n">3</span><span class="step__t">Redesign the workflow</span>
+    <span class="step__time">19–26 min</span>
   </div>
   <p>Pick one pattern and commit to it:</p>
   <table>
-    <thead><tr><th>Pattern</th><th>Fits</th></tr></thead>
+    <thead><tr><th>Pattern</th><th>Use when the process is about</th></tr></thead>
     <tbody>
-      <tr><td>Draft-Review-Approve</td><td>Requirements, specs, documentation, release notes</td></tr>
-      <tr><td>Analyze-Validate-Escalate</td><td>Defect triage, incident response, impact analysis</td></tr>
-      <tr><td>Generate-Verify-Publish</td><td>Code, tests, configuration</td></tr>
+      <tr><td>Draft-Review-Approve</td><td>Producing a document — requirements, specs, release notes</td></tr>
+      <tr><td>Analyze-Validate-Escalate</td><td>Making a judgement — triage, incidents, impact</td></tr>
+      <tr><td>Generate-Verify-Publish</td><td>Producing an artifact — code, tests, configuration</td></tr>
     </tbody>
   </table>
   <p>
-    In section 3 of your canvas, state what <b>disappears</b>, what <b>merges</b> and what
-    is <b>untouched</b>. Being explicit about what you are not changing is half the value.
+    In section 3, state what <b>disappears</b>, what <b>merges</b> and what is
+    <b>untouched</b>. Being explicit about what you are not changing is half the value
+    — it is how a reviewer knows you thought about it.
   </p>
   <div class="watch">
-    <b>Anti-pattern.</b> Putting AI at the approval step. AI drafts and analyses; a named
-    human approves. If your target state has a machine approving something, redraw it.
+    <b>Anti-pattern.</b> AI at the approval step. AI drafts and analyses; a named human
+    approves. If your target state has a machine approving anything, redraw it.
   </div>
 
   <div class="step">
-    <span class="step__n">4</span><span class="step__t">Place your gates</span>
+    <span class="step__n">4</span><span class="step__t">Insert the approval gates</span>
     <span class="step__time">26–36 min</span>
   </div>
+  <div class="card">
+    <b>What a gate is.</b> A point where work stops until one named person says yes.
+    Not a meeting, not &quot;the team reviews it&quot;. One role, one decision, and a
+    written answer to what happens when they say no.
+  </div>
   <p>
-    A gate is a point where work stops until a named person signs. Minimum two. Fill in
-    section 4 of the canvas. Owner roles must come from the RACI in
-    <code>docs/helios-landscape.md</code> — Business Analyst, Developer, Architect,
-    Quality Engineer or Release Manager.
+    <b>Every step you marked AI-ready or AI-assisted needs a gate after it.</b> That is
+    the rule this week exists to teach: AI output is not accepted, it is validated. You
+    need at least two gates. Fill in section 4 with all five columns:
   </p>
-  <p>
-    Now look at a real design document that went through the existing review,
-    <code>docs/design/HEL-142-hld.md</code>:
-  </p>
+  <table>
+    <thead><tr><th>Column</th><th>What it must say</th></tr></thead>
+    <tbody>
+      <tr><td>Placed after step</td><td>The step number from the narrative</td></tr>
+      <tr><td>Owner role</td><td>One of: Business Analyst, Developer, Architect, Quality Engineer, Release Manager. A team is not an owner. See <code>docs/helios-landscape.md</code></td></tr>
+      <tr><td>Pass criteria</td><td>What has to be true to move on — testable, not &quot;looks fine&quot;</td></tr>
+      <tr><td>Failure handling</td><td>Where it goes back to, and what gets recorded</td></tr>
+      <tr><td>Escalation trigger</td><td>What makes this stop being the owner&apos;s decision</td></tr>
+    </tbody>
+  </table>
 
+  <p>Now test your instinct on a real document that passed the existing review:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>type docs\design\HEL-142-hld.md</code></pre>
   </div>
-
   <p>
-    Read it and decide, on your own judgement, whether it should pass a design gate.
-    Write your verdict and one sentence of reasoning at the bottom of your blueprint.
+    Decide, on your own judgement, whether it should pass a design gate. Write your
+    verdict and one sentence of reasoning at the bottom of your blueprint.
   </p>
-
-  <div class="bar">
-    <b>Compare with the person next to you.</b> You will probably disagree, and you will
-    both be able to defend your answer. That disagreement is the reason Week 3 introduces
-    a rubric. Do not resolve it now.
+  <div class="watch">
+    <b>Compare with the person next to you.</b> You will probably disagree, and you
+    will both be able to defend your answer. That disagreement is why Week 3 introduces
+    a scoring rubric. Do not resolve it now.
   </div>
-
   <details>
     <summary>What the architect actually left out (open only after you have decided)</summary>
     <p>
       No out-of-scope statement. Insight reads order data and is never mentioned. The
-      spreadsheet import has no owner and no home. "About three days" has no basis. The
-      one-line risk has no response and no owner. No alternative was considered. The
-      <code>review_date</code> in the front matter is unset.
-    </p>
-    <p>
-      None of that makes it obviously a fail. That is the point.
+      spreadsheet import has no owner. &quot;About three days&quot; has no basis. The
+      one risk has no response and no owner. No alternative was considered. The
+      <code>review_date</code> is unset. None of that makes it obviously a fail — it
+      makes it unreviewable, which is the actual problem.
     </p>
   </details>
 
   <div class="step">
-    <span class="step__n">5</span><span class="step__t">Baseline the metrics</span>
-    <span class="step__time">36–43 min</span>
+    <span class="step__n">5</span><span class="step__t">Set target metrics</span>
+    <span class="step__time">36–42 min</span>
   </div>
-  <p>Get your rework rate and cycle time from the data, not from the narrative:</p>
-
+  <p>Get today&apos;s numbers from the data, not from the narrative:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">prompt</span>
       <button class="snippet__copy" type="button">Copy</button></div>
@@ -438,38 +369,56 @@ say so plainly. Do not rewrite my table.</code></pre>
 1. median working hours from created to closed
 2. percentage of tickets with rework_count above zero
 3. the three most common rework_reason values with counts
-Show the numbers only. Then tell me which of the three is most likely caused by
-the gate I am adding, and why.</code></pre>
+Show the numbers only. Then tell me which of those rework reasons the gates I
+have added would most likely reduce, and why.</code></pre>
   </div>
-
+  <div class="expect">
+    <b>Check these against your step 1 output.</b> If they disagree, Claude is wrong —
+    the report reads the whole file, and it is the ground truth.
+  </div>
   <p>
-    Put those numbers in section 5 and set a target next to each. A target without a
-    number is a wish.
+    Put both numbers in section 5 with a target beside each, and say how each will be
+    measured. <b>A target without a number is a wish.</b> Read the rework reasons as a
+    list of information intake failed to collect — that is what your gates are aimed at.
   </p>
 
   <div class="step">
     <span class="step__n">6</span><span class="step__t">Self-check and commit</span>
-    <span class="step__time">43–45 min</span>
+    <span class="step__time">42–45 min</span>
   </div>
-  <p>Run the eight-point check in <code>templates/self-check-8.md</code>. Fix anything that fails. Then:</p>
-
+  <p>Run the eight-point check in <code>templates/self-check-8.md</code>. Fix anything that fails, then:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>git add week1/blueprint.md
-git commit -m "Week 1: workflow blueprint for intake"</code></pre>
+git commit -m "Week 1: requirement intake workflow blueprint"</code></pre>
   </div>
-
   <div class="watch">
     <b>Local only.</b> Do not push. Nothing in this programme leaves your machine.
   </div>
 
+  <h2>Challenge — swap and critique</h2>
+  <p class="sub">10 minutes, in pairs, after the lab</p>
+  <p>
+    Trade blueprints with the person next to you. You are not marking their work. You
+    are looking for the three things that make a blueprint useless to somebody else:
+  </p>
+  <ol>
+    <li><b>Could you start work from this?</b> Take any step they marked AI-ready. Do they say what the agent is given and what it produces? If you would have to ask a question first, write down the question.</li>
+    <li><b>Would you know if it went wrong?</b> Take one of their gates. Does it name one person and say what happens on failure? A team name or a blank failure column both mean nobody owns it.</li>
+    <li><b>Where is that number from?</b> Pick a figure in their section 5 and ask which command produced it. If they cannot show you, it is an estimate wearing a number&apos;s clothes.</li>
+  </ol>
+  <p>
+    Write your three answers at the bottom of their blueprint and hand it back. Fix what
+    you agree with before you commit.
+  </p>
+
   <h2>Passing bar</h2>
   <div class="bar">
-    Every insertion point has a gate. Every gate names a single role and says what
-    happens when the check fails. Every metric in section 5 has a number that came from
-    the CSV. If a facilitator asks "where did this number come from", you can show them
-    the command.
+    Every AI-ready and AI-assisted step has a gate after it. Every gate names one role
+    and says what happens when the check fails. Every metric in section 5 has a number
+    that came from the CSV. If a facilitator asks where a number came from, you can show
+    them the command.
   </div>
 
   <h2>If something breaks</h2>
@@ -487,9 +436,9 @@ git commit -m "Week 1: workflow blueprint for intake"</code></pre>
       </tr>
       <tr>
         <td><code>copy</code> or <code>type</code> says the path does not exist</td>
-        <td>You are not in the repository root. Run <code>cd</code> to the folder that
-            contains <code>CLAUDE.md</code>, then try again. The report script finds its
-            own data from anywhere, but these two commands do not.</td>
+        <td>You are not in the repository root. <code>cd</code> to the folder containing
+            <code>CLAUDE.md</code> and try again. The report script finds its own data
+            from anywhere; these two commands do not.</td>
       </tr>
       <tr>
         <td>Claude Code cannot see the files</td>
@@ -498,10 +447,10 @@ git commit -m "Week 1: workflow blueprint for intake"</code></pre>
     </tbody>
   </table>
 
-  <footer>
+  <p class="foot">
     Helios Group is fictional. All data in this repository is synthetic.
     Week 1 of the Claude Code Capability Program.
-  </footer>
+  </p>
 </main>
 
 <script>
