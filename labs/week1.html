@@ -285,18 +285,50 @@ Answer as a table, nothing else.</code></pre>
     <b>Human-only</b> — keep AI out of the decision.
   </div>
   <p>
-    Open <code>docs/process/requirement-intake.md</code> and go through all sixteen
-    steps. Categorise each one in section 2 of your blueprint and write your own
-    one-line reason. <b>&quot;It would be faster&quot; is not a reason</b> — say what
-    makes the step bounded and checkable, or what makes it a judgement call.
+    <b>First, get the table built for you.</b> Typing sixteen rows by hand is not the
+    skill. Give Claude Code this — it produces the empty grid, not the answers:
   </p>
-  <p>Then make Claude argue with you, not do it for you:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">prompt</span>
       <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>Here is my categorisation of the sixteen intake steps. For each row, argue the
-opposite case in one sentence. Where my reason is really just "it would be
-faster", say so plainly. Do not rewrite my table.</code></pre>
+<pre><code>Read docs/process/requirement-intake.md and open week1/blueprint.md.
+In section 2 of week1/blueprint.md, replace the empty table with one row for
+each of the sixteen intake steps. Columns: #, Step, Bounded?, Checkable?,
+Reversible?, Category, Reason.
+Fill in only the # and Step columns from the narrative. Leave the other five
+columns empty for me to complete. Do not categorise anything yourself.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Sixteen rows in <code>week1/blueprint.md</code>, numbered and
+    named, with five blank columns. If Claude filled in the categories, tell it to
+    clear them — that judgement is the exercise.
+  </div>
+
+  <p>
+    <b>Now do the thinking.</b> Work down the table in VS Code. For each step, answer
+    the three questions with yes or no, then let those answers decide the category:
+    all three yes is <b>AI-ready</b>, mixed is <b>AI-assisted</b>, and a judgement call
+    or anything irreversible is <b>human-only</b>. Write a one-line reason for each.
+    <b>&quot;It would be faster&quot; is not a reason</b> — say what makes the step
+    bounded and checkable, or what makes it a judgement call.
+  </p>
+
+  <p>
+    <b>Then have Claude challenge you.</b> Save the file first so it can read your work:
+  </p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Read section 2 of week1/blueprint.md, which I have now filled in.
+For each of the sixteen rows, argue the opposite case in one sentence.
+Where my reason is really just "it would be faster" restated, say so plainly.
+Where I marked a step AI-ready but being wrong is not actually reversible,
+say so.
+Do not edit the file and do not rewrite my table. Reply as a list only.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Sixteen counter-arguments in the chat, your file untouched. Change
+    your own rows only where you actually agree.
   </div>
   <div class="watch">
     <b>Watch for.</b> Steps that are queues, not tasks. Step 8 is the ticket waiting
@@ -391,8 +423,11 @@ type docs\design\HEL-142-hld.md</code></pre>
 1. median working hours from created to closed
 2. percentage of tickets with rework_count above zero
 3. the three most common rework_reason values with counts
-Show the numbers only. Then tell me which of those rework reasons the gates I
-have added would most likely reduce, and why.</code></pre>
+Show those numbers only, as a short list.
+
+Then read section 4 of week1/blueprint.md, which lists the gates I have added.
+For each rework reason above, say which of my gates would catch it and which
+would not. Be specific about the gate, and say plainly if none of them would.</code></pre>
   </div>
   <div class="expect">
     <b>Check these against your step 1 output.</b> If they disagree, Claude is wrong —

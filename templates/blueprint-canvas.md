@@ -22,9 +22,13 @@ treated differently.
 
 ## 2. Step classification
 
-| # | Step | AI-ready / AI-assisted / human-only | One-line justification |
-|---|---|---|---|
-|  |  |  |  |
+Answer the three tests, then let them decide the category. All three yes is
+AI-ready. Mixed is AI-assisted. A judgement call, or anything irreversible, is
+human-only.
+
+| # | Step | Bounded? | Checkable? | Reversible? | Category | Reason |
+|---|---|---|---|---|---|---|
+|  |  |  |  |  |  |  |
 
 "It is faster" is not a justification. Say what makes the task bounded and
 verifiable, or what makes it a judgement call.

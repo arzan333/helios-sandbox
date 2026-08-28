@@ -257,6 +257,16 @@ check(len(_nocd) == 0,
 check("takes over this PowerShell window" in lab,
       "week1.html does not warn that Claude Code occupies the terminal")
 
+# Every prompt must be runnable on its own. A prompt that says "my table" without
+# naming the file it lives in cannot be executed in one shot.
+_prompts = re.findall(
+    r'<span class="snippet__lang">prompt</span>.*?<pre><code>(.*?)</code></pre>',
+    lab, re.S)
+for _i, _b in enumerate(_prompts, 1):
+    _txt = html.unescape(_b)
+    _refs = re.findall(r'(?:docs|data|apps|templates|week1)/[A-Za-z0-9_./-]+', _txt)
+    check(len(_refs) > 0, f"prompt {_i} in week1.html names no file for Claude to read")
+
 readme = (ROOT / "README.md").read_text(encoding="utf-8")
 check("baseline-capture.md" in readme, "README does not mention the baseline capture step")
 
