@@ -3,13 +3,13 @@ template: AI-Native Workflow Blueprint
 week: 1
 ---
 
-# Workflow blueprint — <workflow name>
+# Workflow blueprint — request to release
 
-Author: <your name>  ·  Date: <date>  ·  Scenario: <intake | defect_triage | release_notes | change_approval>
+Author: <your name>  ·  Date: <date>  ·  Workflow: request to release
 
 ## 1. Stage durations
 
-From `data/helios-tickets.csv`, filtered to your workflow.
+From `data/helios-tickets.csv`, filtered to request_to_release.
 
 | Transition | Median hours | P90 hours | Wait or work? |
 |---|---|---|---|

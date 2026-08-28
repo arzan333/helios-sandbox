@@ -18,7 +18,7 @@ detail kept in a referenced file rather than inlined here.
 python apps/insight/report.py stages --workflow <workflow>
 ```
 
-Valid workflow values: `intake`, `defect_triage`, `release_notes`,
+Valid workflow values: `request_to_release`, `defect_triage`, `release_notes`,
 `developer_onboarding`, `change_approval`. Omit `--workflow` for all tickets.
 
 ## How to read the result

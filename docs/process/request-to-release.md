@@ -6,7 +6,7 @@ review_date: 2026-05-03
 source_system: Helios delivery
 ---
 
-# Requirement intake, current state
+# Request to release, current state
 
 How a request becomes deployed change at Helios Group today. Sixteen steps, five
 roles, three queues. This is the process as it actually runs, not as anyone would
@@ -24,7 +24,7 @@ Matching data: `data/helios-tickets.csv`, filtered to `workflow = intake`.
 | Quality Engineer | Two engineers sharing one test environment |
 | Release Manager | One, part time |
 
-## The sixteen steps
+## The sixteen steps, request to release
 
 1. **Request raised.** A stakeholder opens a ticket. There is no template, so
    quality varies from a paragraph to a single sentence.
@@ -71,7 +71,7 @@ Matching data: `data/helios-tickets.csv`, filtered to `workflow = intake`.
 Run the report yourself rather than taking this section on trust:
 
 ```
-python apps/insight/report.py stages --workflow intake
+python apps/insight/report.py stages --workflow request_to_release
 ```
 
 Two waits dominate. Neither is work being done; both are queues.

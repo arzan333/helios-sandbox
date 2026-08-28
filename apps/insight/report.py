@@ -133,7 +133,7 @@ def main() -> None:
     parser.add_argument("report", choices=["stages", "orders"])
     parser.add_argument(
         "--workflow",
-        help="filter the stage report, e.g. intake or defect_triage",
+        help="filter the stage report, e.g. request_to_release or defect_triage",
     )
     args = parser.parse_args()
 

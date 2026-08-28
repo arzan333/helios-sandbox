@@ -60,7 +60,7 @@ REQUIRED = [
     "data/helios-tickets.csv",
     "data/entity-map.md",
     "docs/helios-landscape.md",
-    "docs/process/requirement-intake.md",
+    "docs/process/request-to-release.md",
     "docs/design/HEL-142-hld.md",
     "labs/week1.html",
     "rubrics/hld.md",
@@ -113,7 +113,7 @@ for row in rows:
 check(out_of_order == 0, f"{out_of_order} rows have stage timestamps out of order")
 
 workflows = {r["workflow"] for r in rows}
-for required_workflow in ["intake", "defect_triage", "release_notes", "change_approval"]:
+for required_workflow in ["request_to_release", "defect_triage", "release_notes", "change_approval"]:
     check(
         required_workflow in workflows,
         f"workflow '{required_workflow}' is offered in the lab but absent from the CSV",
@@ -136,7 +136,7 @@ for path in backlog:
 FRONT_MATTER_REQUIRED = [
     "data/entity-map.md",
     "docs/helios-landscape.md",
-    "docs/process/requirement-intake.md",
+    "docs/process/request-to-release.md",
     "docs/process/defect-triage.md",
     "docs/process/release-notes.md",
     "docs/process/change-approval.md",
@@ -174,7 +174,7 @@ for doc in doc_files:
 # ----------------------------------------------------- lab book references
 lab = (ROOT / "labs" / "week1.html").read_text(encoding="utf-8")
 for referenced in [
-    "docs/process/requirement-intake.md",
+    "docs/process/request-to-release.md",
     "templates/blueprint-canvas.md",
     "templates/self-check-8.md",
     "data/helios-tickets.csv",
@@ -201,7 +201,7 @@ for needed, why in [
     ("The three categories.", "the AI-ready definition at point of use"),
     ("What a gate is", "the gate definition at point of use"),
     ("Queue or effort.", "the queue vs effort definition at point of use"),
-    ("needs a gate after it", "the rule that AI steps require a gate"),
+    ("gets a gate after it", "the rule that AI steps require a gate"),
     ("Challenge", "the swap and critique challenge"),
     ("Escalation trigger", "the full gate column set"),
     ("A target without a number is a wish", "the metrics discipline line"),

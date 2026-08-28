@@ -56,7 +56,7 @@ cd apps/billing && javac -d out $(find src/main/java -name "*.java") && java -cp
 cd apps/shop && npm install && npm run dev
 
 # Reports
-python apps/insight/report.py stages --workflow intake
+python apps/insight/report.py stages --workflow request_to_release
 ```
 
 Billing is optional. If it is not running, OrderCore calculates invoices locally

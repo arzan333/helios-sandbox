@@ -25,7 +25,7 @@ OUT = Path(__file__).resolve().parents[1] / "data" / "helios-tickets.csv"
 
 WORKFLOWS = {
     # name              share  systems
-    "intake":           (0.34, ["OrderCore", "Shop", "Insight", "Billing"]),
+    "request_to_release":           (0.34, ["OrderCore", "Shop", "Insight", "Billing"]),
     "defect_triage":    (0.30, ["OrderCore", "Shop", "Billing"]),
     "release_notes":    (0.14, ["OrderCore", "Shop"]),
     "developer_onboarding": (0.10, ["OrderCore"]),
@@ -38,16 +38,16 @@ WORKFLOWS = {
 PINNED = {
     "HEL-018": ("defect_triage", "Invoice total ignores line level discount", "Billing"),
     "HEL-035": ("defect_triage", "Cart badge count wrong after removing an item", "Shop"),
-    "HEL-061": ("intake", "Support split shipment on order confirmation", "OrderCore"),
+    "HEL-061": ("request_to_release", "Support split shipment on order confirmation", "OrderCore"),
     "HEL-077": ("defect_triage", "Order search times out beyond 500 results", "OrderCore"),
     "HEL-089": ("release_notes", "Compile release notes for the monthly drop", "OrderCore"),
     "HEL-104": ("change_approval", "Approve schema change on the orders table", "OrderCore"),
     "HEL-118": ("defect_triage", "Currency rounding differs between Shop and Billing", "Billing"),
     "HEL-133": ("defect_triage", "Duplicate confirmation email on retry", "OrderCore"),
-    "HEL-142": ("intake", "Show estimated delivery window in the cart", "Shop"),
+    "HEL-142": ("request_to_release", "Show estimated delivery window in the cart", "Shop"),
     "HEL-166": ("developer_onboarding", "Onboard a new developer to OrderCore", "OrderCore"),
-    "HEL-181": ("intake", "Allow partial refund against a paid invoice", "Billing"),
-    "HEL-207": ("intake", "Add discount code field to the order API", "OrderCore"),
+    "HEL-181": ("request_to_release", "Allow partial refund against a paid invoice", "Billing"),
+    "HEL-207": ("request_to_release", "Add discount code field to the order API", "OrderCore"),
 }
 
 OWNERS = ["Business Analyst", "Developer", "Architect", "Quality Engineer", "Release Manager"]
@@ -79,7 +79,7 @@ GAPS = {
 STAGES = list(GAPS.keys())
 
 TITLES = {
-    "intake": [
+    "request_to_release": [
         "Support split shipment on order confirmation",
         "Add customer purchase order reference to checkout",
         "Show estimated delivery window in the cart",
@@ -137,7 +137,7 @@ def pick_workflow(rng: random.Random) -> str:
         running += share
         if roll <= running:
             return name
-    return "intake"
+    return "request_to_release"
 
 
 def main() -> None:

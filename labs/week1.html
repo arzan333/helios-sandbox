@@ -130,8 +130,8 @@
     truth.
   </p>
   <p>
-    The process you are redesigning is <b>requirement intake</b>: the sixteen steps
-    between a request arriving and a developer being able to start building. Every
+    The process you are redesigning is <b>request to release</b>: the sixteen steps
+    between someone asking for a change and it being live. Every
     change to this codebase travels that path, including the one you will make in
     Week 3.
   </p>
@@ -139,7 +139,7 @@
   <h3>The data you will analyse</h3>
   <p>
     <code>data/helios-tickets.csv</code> holds 210 tickets from the last six months,
-    91 of them intake. Each row records the moment a ticket entered every stage, plus
+    91 of them request-to-release. Each row records the moment a ticket entered every stage, plus
     whether it went backwards and why. One real row:
   </p>
   <div class="snippet">
@@ -201,6 +201,11 @@ mkdir week1 -Force
 if (-not (Test-Path week1\blueprint.md)) { copy templates\blueprint-canvas.md week1\blueprint.md }</code></pre>
   </div>
 
+  <p>
+    Open <code>week1\blueprint.md</code> and replace <code>&lt;your name&gt;</code> and
+    <code>&lt;date&gt;</code> on the header line. Claude will flag them if you forget.
+  </p>
+
   <p><b>d.</b> Check the three things above worked. Run this and read the output:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
@@ -233,16 +238,19 @@ claude</code></pre>
   </div>
 
   <div class="step">
-    <span class="step__n">1</span><span class="step__t">Analyse the data and find the bottlenecks</span>
+    <span class="step__n">1</span><span class="step__t">Find where the process loses its time</span>
     <span class="step__time">0–9 min</span>
   </div>
-  <p>First get the ground truth, so you can check Claude against it. Use a second
-     terminal, not the one running Claude Code:</p>
+  <p>
+    The process has sixteen steps. Before deciding anything about them, find out which ones
+    actually consume the time. Run this in a second terminal, not the one running
+    Claude Code:
+  </p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
-python apps/insight/report.py stages --workflow intake</code></pre>
+python apps/insight/report.py stages --workflow request_to_release</code></pre>
   </div>
   <div class="expect">
     <b>Expected.</b> Eleven stage transitions with a median and p90, the three longest
@@ -254,8 +262,8 @@ python apps/insight/report.py stages --workflow intake</code></pre>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">prompt</span>
       <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>Read data/helios-tickets.csv and docs/process/requirement-intake.md.
-For the intake workflow only, give me the three longest stage transitions by
+<pre><code>Read data/helios-tickets.csv and docs/process/request-to-release.md.
+For the request_to_release workflow only, give me the three longest stage transitions by
 median duration. For each one, say whether it is a queue (the ticket is waiting
 for a person or an environment) or effort (someone is actively working), and
 cite the step number from the narrative that explains it.
@@ -269,11 +277,14 @@ Answer as a table, nothing else.</code></pre>
     three waits, it has guessed instead of reading. Make it justify each against the
     narrative.
   </div>
-  <p><b>Write into section 1</b> of your blueprint: the three transitions, their
-     medians, and queue or effort for each.</p>
+  <p>
+    <b>Write into section 1</b> of your blueprint: the three worst transitions, their
+    medians, and whether each is a queue or effort. You now know where the process is slow
+    and why. Step 2 is where you decide what to do about it.
+  </p>
 
   <div class="step">
-    <span class="step__n">2</span><span class="step__t">Categorise every step</span>
+    <span class="step__n">2</span><span class="step__t">Decide what AI can touch</span>
     <span class="step__time">9–19 min</span>
   </div>
   <div class="card">
@@ -285,15 +296,19 @@ Answer as a table, nothing else.</code></pre>
     <b>Human-only</b> — keep AI out of the decision.
   </div>
   <p>
-    <b>First, get the table built for you.</b> Typing sixteen rows by hand is not the
-    skill. Give Claude Code this — it produces the empty grid, not the answers:
+    Now go through the process step by step and decide, for each one, whether AI can do it,
+    help with it, or must stay out of it.
+  </p>
+  <p>
+    Typing sixteen rows by hand is not the skill, so have Claude build the empty grid
+    first:
   </p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">prompt</span>
       <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>Read docs/process/requirement-intake.md and open week1/blueprint.md.
+<pre><code>Read docs/process/request-to-release.md and open week1/blueprint.md.
 In section 2 of week1/blueprint.md, replace the empty table with one row for
-each of the sixteen intake steps. Columns: #, Step, Bounded?, Checkable?,
+each of the sixteen steps. Columns: #, Step, Bounded?, Checkable?,
 Reversible?, Category, Reason.
 Fill in only the # and Step columns from the narrative. Leave the other five
 columns empty for me to complete. Do not categorise anything yourself.</code></pre>
@@ -319,8 +334,10 @@ columns empty for me to complete. Do not categorise anything yourself.</code></p
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">prompt</span>
       <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>Read section 2 of week1/blueprint.md, which I have now filled in.
-For each of the sixteen rows, argue the opposite case in one sentence.
+<pre><code>Read section 2 of week1/blueprint.md.
+If the Category column is still empty, stop and tell me - I have not saved my
+work yet.
+Otherwise, for each filled row, argue the opposite case in one sentence.
 Where my reason is really just "it would be faster" restated, say so plainly.
 Where I marked a step AI-ready but being wrong is not actually reversible,
 say so.
@@ -337,10 +354,14 @@ Do not edit the file and do not rewrite my table. Reply as a list only.</code></
   </div>
 
   <div class="step">
-    <span class="step__n">3</span><span class="step__t">Redesign the workflow</span>
+    <span class="step__n">3</span><span class="step__t">Write down the new process</span>
     <span class="step__time">19–26 min</span>
   </div>
-  <p>Pick one pattern and commit to it:</p>
+  <p>
+    You have just decided which of the sixteen steps AI touches. Section 3 is where you
+    say what the process becomes as a result — the same process, rewritten.
+  </p>
+  <p>Pick the pattern that fits and commit to it:</p>
   <table>
     <thead><tr><th>Pattern</th><th>Use when the process is about</th></tr></thead>
     <tbody>
@@ -350,9 +371,9 @@ Do not edit the file and do not rewrite my table. Reply as a list only.</code></
     </tbody>
   </table>
   <p>
-    In section 3, state what <b>disappears</b>, what <b>merges</b> and what is
-    <b>untouched</b>. Being explicit about what you are not changing is half the value
-    — it is how a reviewer knows you thought about it.
+    In section 3, list which steps <b>disappear</b>, which <b>merge</b>, and which are
+    <b>untouched</b>. Naming what you are not changing matters as much — it shows you
+    considered a step and chose to leave it alone.
   </p>
   <div class="watch">
     <b>Anti-pattern.</b> AI at the approval step. AI drafts and analyses; a named human
@@ -360,7 +381,7 @@ Do not edit the file and do not rewrite my table. Reply as a list only.</code></
   </div>
 
   <div class="step">
-    <span class="step__n">4</span><span class="step__t">Insert the approval gates</span>
+    <span class="step__n">4</span><span class="step__t">Add the human sign-offs</span>
     <span class="step__time">26–36 min</span>
   </div>
   <div class="card">
@@ -369,9 +390,12 @@ Do not edit the file and do not rewrite my table. Reply as a list only.</code></
     written answer to what happens when they say no.
   </div>
   <p>
-    <b>Every step you marked AI-ready or AI-assisted needs a gate after it.</b> That is
-    the rule this week exists to teach: AI output is not accepted, it is validated. You
-    need at least two gates. Fill in section 4 with all five columns:
+    Your new process has AI doing work that a person used to do. Every one of those
+    steps needs someone to check the output before it moves on.
+  </p>
+  <p>
+    <b>Every step you marked AI-ready or AI-assisted gets a gate after it.</b> At least
+    two in total. Fill in section 4 — all five columns, no blanks:
   </p>
   <table>
     <thead><tr><th>Column</th><th>What it must say</th></tr></thead>
@@ -412,14 +436,17 @@ type docs\design\HEL-142-hld.md</code></pre>
   </details>
 
   <div class="step">
-    <span class="step__n">5</span><span class="step__t">Set target metrics</span>
+    <span class="step__n">5</span><span class="step__t">Set the numbers you are aiming at</span>
     <span class="step__time">36–42 min</span>
   </div>
-  <p>Get today&apos;s numbers from the data, not from the narrative:</p>
+  <p>
+    A redesign nobody measures is an opinion. Get today&apos;s numbers from the data so
+    you can tell later whether any of this worked:
+  </p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">prompt</span>
       <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>From data/helios-tickets.csv, for the intake workflow only, calculate:
+<pre><code>From data/helios-tickets.csv, for the request_to_release workflow only, calculate:
 1. median working hours from created to closed
 2. percentage of tickets with rework_count above zero
 3. the three most common rework_reason values with counts
@@ -436,20 +463,24 @@ would not. Be specific about the gate, and say plainly if none of them would.</c
   <p>
     Put both numbers in section 5 with a target beside each, and say how each will be
     measured. <b>A target without a number is a wish.</b> Read the rework reasons as a
-    list of information intake failed to collect — that is what your gates are aimed at.
+    list of information the process failed to collect — that is what your gates are aimed at.
   </p>
 
   <div class="step">
     <span class="step__n">6</span><span class="step__t">Self-check and commit</span>
     <span class="step__time">42–45 min</span>
   </div>
-  <p>Run the eight-point check in <code>templates/self-check-8.md</code>. Fix anything that fails, then:</p>
+  <p>
+    Your blueprint is finished. Check it against
+    <code>templates/self-check-8.md</code> — eight questions, every answer must be yes.
+    Fix anything that fails, then commit:
+  </p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
 git add week1/blueprint.md
-git commit -m "Week 1: requirement intake workflow blueprint"</code></pre>
+git commit -m "Week 1: request-to-release workflow blueprint"</code></pre>
   </div>
   <div class="watch">
     <b>Local only.</b> Do not push. Nothing in this programme leaves your machine.
