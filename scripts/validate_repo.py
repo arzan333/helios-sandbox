@@ -199,6 +199,7 @@ for needed, why in [
     ("What a blueprint actually is", "the explanation of what a blueprint is for"),
     ("One process, not the whole project", "the scope framing"),
     ("Nothing runs at the end of today", "the expectation-setting on automation"),
+    ("You will not transcribe anything", "the no-manual-transcription principle"),
     ("blueprint-defect-triage.md", "the link to the worked example"),
     ("The process you are analysing", "the process framing"),
     ("The three categories.", "the AI-ready definition at point of use"),
@@ -213,7 +214,7 @@ for needed, why in [
 
 # The canvas must be created before it is first referenced.
 canvas_created = lab.find("blueprint-canvas.md")
-canvas_used = lab.find("section 1</b> of your blueprint")
+canvas_used = lab.find("section 1 of week1/blueprint.md")
 check(canvas_created != -1 and canvas_used != -1 and canvas_created < canvas_used,
       "week1.html references the canvas before creating it")
 check("&lt;" not in lab.split("<pre>")[0], "unescaped markup before the first snippet")

@@ -144,6 +144,14 @@
     worth doing properly rather than quickly.
   </div>
   <div class="card">
+    <b>You will not transcribe anything.</b> Claude fills in every number and builds
+    every table. What you type are the five judgement calls this lab exists to teach:
+    which steps AI can take, what changed as a result, who signs off, what
+    &quot;good&quot; means at each gate, and the targets you are willing to be held to.
+    If you find yourself copying figures by hand, stop — there is a prompt for it.
+  </div>
+
+  <div class="card">
     <b>See a finished one first — two minutes.</b><br>
     Open <code>docs/examples/blueprint-defect-triage.md</code>. It is a completed
     blueprint for a different Helios process. Yours will look like that. You cannot
@@ -306,10 +314,24 @@ Answer as a table, nothing else.</code></pre>
     three waits, it has guessed instead of reading. Make it justify each against the
     narrative.
   </div>
+  <p>Now have it record the answer, so you are not copying numbers by hand:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Write your answer into section 1 of week1/blueprint.md.
+Fill the table with the three longest transitions: Transition, Median h, P90 h,
+and Queue or effort. Take the numbers from data/helios-tickets.csv for the
+request_to_release workflow only.
+Below the table, fill in the "Three worst by median" line.
+Change nothing else in the file.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Check it against the report on screen.</b> Same three transitions, same numbers.
+    If they differ, the report is right — tell Claude to correct the file.
+  </div>
   <p>
-    <b>Write into section 1</b> of your blueprint: the three worst transitions, with the
-    median and p90 the report gave you, and whether each is a queue or effort. You now know where the process is slow
-    and why. Step 2 is where you decide what to do about it.
+    You now know where the process is slow and why. Step 2 is where you decide what to
+    do about it.
   </p>
 
   <div class="step">
@@ -555,10 +577,25 @@ would not. Be specific about the gate, and say plainly if none of them would.</c
     the report reads the whole file, and it is the ground truth.
   </div>
   <p>
-    Put the cycle time and rework rate in section 5 with a target beside each, and say how each will be
-    measured. <b>A target without a number is a wish.</b> Read the rework reasons as a
-    list of information the process failed to collect — that is what your gates are aimed at.
+    Read the rework reasons as a list of information the process failed to collect —
+    that is what your gates are aimed at. Now have Claude record today&apos;s numbers,
+    then set the targets yourself:
   </p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Fill in section 5 of week1/blueprint.md.
+For "Cycle time, created to closed" and "Rework rate", put the real figures from
+data/helios-tickets.csv for the request_to_release workflow in the
+"Today (from the data)" column, and put the exact command that produces each one
+in the "How it will be measured" column.
+Leave the Target column empty for every row - that is my decision.
+Change nothing else in the file.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Today&apos;s numbers and the measuring command filled in, Target
+    blank. Now write a target next to each. <b>A target without a number is a wish.</b>
+  </div>
 
   <div class="step">
     <span class="step__n">6</span><span class="step__t">Self-check and commit</span>
