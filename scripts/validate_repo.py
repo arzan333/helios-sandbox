@@ -183,9 +183,29 @@ for referenced in [
     "docs/design/HEL-142-hld.md",
     "docs/helios-landscape.md",
 ]:
-    check(referenced in lab, f"week1.html does not reference {referenced}")
+    # Windows snippets legitimately use backslashes, so accept either separator.
+    variants = (referenced, referenced.replace("/", "\\"))
+    check(any(v in lab for v in variants),
+          f"week1.html does not reference {referenced}")
 
 check(lab.count("snippet__copy") >= 6, "week1.html should have at least 6 copy buttons")
+
+# Step 0 must give participants everything needed to reach step 1 unaided.
+for needed, why in [
+    ("git clone https://github.com/arzan333/helios-sandbox.git", "the clone command"),
+    ("git checkout -b", "the branch command"),
+    ("git config core.hooksPath .githooks", "the push guard"),
+    ("baseline-capture.md", "the baseline capture step"),
+    ("Set up your working copy", "the step 0 heading"),
+    ("The situation", "the Helios orientation"),
+]:
+    check(needed in lab, f"week1.html is missing {why}")
+
+# The canvas must be created before it is first referenced.
+canvas_created = lab.find("blueprint-canvas.md")
+canvas_used = lab.find("section 1 of your canvas")
+check(canvas_created != -1 and canvas_used != -1 and canvas_created < canvas_used,
+      "week1.html references the canvas before creating it")
 check("&lt;" not in lab.split("<pre>")[0], "unescaped markup before the first snippet")
 
 # Copy blocks must be plain ASCII, or paste breaks in a terminal.
