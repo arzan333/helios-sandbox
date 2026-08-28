@@ -302,6 +302,16 @@ for _term in ["queue", "effort", "AI-ready", "AI-assisted", "human-only",
     check(_term.lower() in _lab_plain.lower(), f"lab never uses the term '{_term}'")
     check(_term.lower() in _ex.lower(), f"worked example never uses the term '{_term}'")
 
+# No step may rely on the participant typing a table from scratch. Every step
+# must contain at least one runnable block.
+_parts = re.split(
+    r'<div class="step">\s*<span class="step__n">(\d)</span><span class="step__t">([^<]+)</span>',
+    lab)
+for _i in range(1, len(_parts), 3):
+    _num, _title, _body = _parts[_i], _parts[_i + 1], _parts[_i + 2]
+    _runnable = len(re.findall(r'"snippet__lang">(?:powershell|prompt)<', _body))
+    check(_runnable > 0, f"step {_num} '{_title}' has nothing for the participant to run")
+
 readme = (ROOT / "README.md").read_text(encoding="utf-8")
 check("baseline-capture.md" in readme, "README does not mention the baseline capture step")
 

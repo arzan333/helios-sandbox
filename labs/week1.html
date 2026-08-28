@@ -370,11 +370,42 @@ Do not edit the file and do not rewrite my table. Reply as a list only.</code></
       <tr><td>Who does it now</td><td><b>Person</b> · <b>AI</b> · <b>AI, person checks</b></td></tr>
     </tbody>
   </table>
+  <p>Have Claude build the grid from your own step 2 verdicts:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Read section 2 of week1/blueprint.md.
+In section 3 of the same file, replace the empty table with one row for each of
+the sixteen steps. Columns: #, Step, Change, Who does it now.
+Fill in the # and Step columns from section 2.
+Fill in "Who does it now" from my Category column: AI-ready becomes AI,
+AI-assisted becomes "AI, person checks", human-only becomes Person.
+Leave the Change column empty for every row - that decision is mine.
+Do not change section 2.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Sixteen rows with Step and Who does it now filled, Change blank.
+  </div>
+
   <p>
-    Ask yourself the knock-on question as you go. If step 6 is now AI-drafted, does
-    step 5 still need to be separate? If step 3 is AI-ready, is anyone still tagging
-    components by hand? That is where steps disappear and merge.
+    <b>Now fill in the Change column yourself.</b> Most rows are
+    <b>Unchanged</b>. You are looking for the few that are not — where handing a step
+    to AI makes a neighbouring step pointless. Ask Claude to find the candidates:
   </p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Read section 2 of week1/blueprint.md and docs/process/request-to-release.md.
+List only the steps where my AI-ready or AI-assisted verdict makes a neighbouring
+step redundant or mergeable, and say which neighbour and why, in one line each.
+If there are none, say so.
+Do not edit any file.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A short list, usually two or three candidates. Decide which you
+    accept, then write <code>Removed</code> or <code>Merged into step N</code> in the
+    Change column for those rows and <code>Unchanged</code> for the rest.
+  </div>
   <div class="watch">
     <b>Most steps should say Unchanged.</b> If half your list is Removed, you have
     redesigned a process you do not work in. Leaving a step alone is a decision, and
@@ -422,7 +453,28 @@ Do not edit the file and do not rewrite my table. Reply as a list only.</code></
     </tbody>
   </table>
 
-  <p>Now test your instinct on a real document that passed the existing review:</p>
+  <p>Have Claude lay out the rows you need, from your own verdicts:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Read sections 2 and 3 of week1/blueprint.md.
+In section 4 of the same file, replace the empty table with one row for every
+step I marked AI-ready or AI-assisted in section 2.
+Fill in only "Placed after step" with that step number and name.
+Leave Gate, Owner role, Pass criteria, Failure handling and Escalation trigger
+empty for me to write.
+Do not change sections 2 or 3.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> One row per AI step, with only the step number filled. If you have
+    fewer than two rows, go back to section 2 — you have handed almost nothing to AI.
+  </div>
+  <p>
+    <b>Now write the five remaining columns yourself.</b> This is the judgement the week
+    is about: who signs, what &quot;good&quot; means, and what happens when it is not.
+  </p>
+
+  <p>To calibrate before you write them, read a design document that passed the existing review:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
