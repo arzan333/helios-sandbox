@@ -17,7 +17,8 @@ repository is synthetic. Nothing here comes from a real client.
    The second line installs a `pre-push` hook that refuses every push. Your work
    stays on your machine.
 3. Fill in `templates/baseline-capture.md`.
-4. Open `labs/week1.html` in a browser and work through it.
+4. Open `labs/week1.html` in a browser and work through it. Week 2 is `labs/week2.html`
+   followed by `labs/week2-activity.html`.
 
 **Commits stay local.** Nothing in this programme is ever pushed.
 
@@ -28,7 +29,8 @@ apps/          four small services - see below
 data/          delivery dataset and entity map
 docs/          process narratives and design documents
 helios-backlog/  tickets in Jira export shape
-labs/          self-paced lab books, one per week
+labs/          self-paced lab books, one per week (week2.html is the lab, week2-activity.html the hands-on)
+prompts/       week 2 lab prompts and the prompt pack (see prompts/README.md)
 rubrics/       design review rubrics
 scripts/       dataset generator and repo validator
 setup/         workstation setup script
@@ -79,6 +81,9 @@ cd apps/ordercore && python -m pytest      # 11 tests
 cd apps/billing   && mvn -q test           # 19 tests
 cd apps/shop      && npm run lint
 python scripts/validate_repo.py            # 161 repo consistency checks
+python scripts/validate_week2.py           # week 2 assets and lab books
+# Week 2 tooling: scripts/ledger.py (token ledger), scripts/estimate_tokens.py,
+# scripts/score.py (rubric scoring on a stronger model via claude -p)
 ```
 
 ## Regenerating the dataset

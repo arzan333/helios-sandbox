@@ -10,6 +10,8 @@ Capability Program. Everything here is fictional.
 - `docs/` — process narratives and design documents.
 - `helios-backlog/` — tickets in Jira export shape.
 - `labs/` — self-paced lab books, one per week. Open them in a browser.
+- `prompts/` — Week 2 lab prompts and the bloated prompt pack with rubrics. Never edit the v0 files.
+- `docs/specs/` — the OrderCore functional specification (Word, plus a plain-text export).
 - `rubrics/` — design review rubrics.
 - `templates/` — canvases and checklists participants fill in.
 

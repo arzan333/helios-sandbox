@@ -1,0 +1,316 @@
+OrderCore - Functional Specification
+
+Helios Group. Order management platform. Functional specification covering the OrderCore service and its interfaces to Shop, Billing and Insight.
+
+Status: DRAFT for review. Version 0.9. Owner: Priya Raman (Product). Last edited 12 January 2026.
+
+This document is the functional reference for OrderCore. It describes what the service does today (v1.0.0) and the changes currently in analysis. It does not describe how the service is built; the technical design lives with the Architect.
+
+Document control
+
+Table 1 - Version history
+Version	Date	Author	Change
+0.1	14 Aug 2025	P. Raman	First outline, sections 1-5 only
+0.4	02 Oct 2025	P. Raman	Added invoice and pricing (section 6), lifecycle table
+0.6	11 Nov 2025	M. Osei	Search and reporting, NFR table, glossary
+0.8	18 Dec 2025	P. Raman	Cart and delivery window added after HEL-142 raised
+0.9	12 Jan 2026	P. Raman	Notifications, open items, bank holiday appendix. Circulated for review
+
+Reviewers: Architect (design authority), Business Analyst, Quality Engineer lead, Release Manager. Review comments to be returned within ten working days of circulation. Comments received after the review window will be held for version 1.0.
+
+1. Introduction
+
+1.1 Purpose
+
+The purpose of this document is to describe the functional behaviour of OrderCore, the order management API operated by the Helios Group delivery team. It is intended to be the single reference for what the service does, so that analysts writing requirements, developers making changes, and testers writing test cases are all working from the same description. Where this document and the running system disagree, the disagreement should be raised as a defect against one or the other; it should not be silently resolved by editing this document.
+
+The document is written for people who already understand what an order is and how Helios sells to its wholesale customers. It does not explain the business. It does explain the rules the system applies to the business.
+
+1.2 Scope
+
+In scope: the OrderCore HTTP API, the order lifecycle, the order and order line data model, invoice retrieval through the Billing service, order search as exposed to Insight, the notification rules for order confirmation, and the planned cart delivery window feature (section 7).
+
+Also in scope, at a functional level only: the interface contract between OrderCore and Billing, because a change on one side without the other is the most common way a pricing defect reaches production.
+
+Out of scope
+
+The Shop user interface itself (only the data it needs from OrderCore is described here). The Billing calculation rules beyond the tax rate (owned by the Billing specification). Payment collection, which Helios does not do in-house. Warehouse and stock management systems, which are referenced but not specified. Authentication and user management, which OrderCore does not perform in v1.
+
+Anything not listed as in scope should be assumed out of scope. Anything that is unclear should be raised as a question in section 11 rather than assumed.
+
+2 Background
+
+Helios Group sells consumer cleaning and household products to wholesale customers. Orders are placed by account managers on behalf of customers, or directly by larger customers through the Shop front end. Every order is priced by the Billing service and invoiced at dispatch. OrderCore sits between the Shop and Billing and is the system of record for what was ordered.
+
+OrderCore has been live since 2024. It replaced a spreadsheet-driven process in which orders were keyed twice, once by sales and once by finance. The most common defects in the old process were pricing discrepancies caused by rounding differences between the two copies. For that reason OrderCore, Billing and Shop all hold money as a whole number of pence and never as a decimal. That rule is repeated in several places in this document because it has been broken more than once.
+
+2.1 Stakeholders
+
+Table 2 - Stakeholders and their interest
+Role	Interest in OrderCore	Contact for
+Product Manager	Feature scope, priority, this document	Requirement questions
+Business Analyst	Requirements and acceptance criteria	Acceptance criteria sign-off
+Architect	Design authority, cross-system changes	Contract changes with Billing
+Developer (OrderCore)	Build and low-level design	Behaviour of the running service
+Quality Engineer	Test coverage, test data	Test environment, regression
+Release Manager	Monthly drop, release notes	Release scope and dates
+Warehouse operations	Stock location, dispatch cut-offs	Delivery window inputs (section 7)
+Finance	Invoice accuracy	Tax and rounding
+
+The RACI for each activity is maintained separately by the Architect in the landscape document and is not repeated here. Where this table and the RACI disagree, the RACI is authoritative.
+
+SECTION 3 - SYSTEM CONTEXT
+
+3.1 Systems
+
+OrderCore is one of four systems maintained by the delivery team. The Shop is a React application used to review orders. Billing is a Java service that calculates invoices. Insight is a set of Python scripts that produce reports over delivery data and order totals. OrderCore itself is a Python service exposing a small HTTP API.
+
+The Shop calls OrderCore. OrderCore calls Billing. Insight calls OrderCore for order totals and reads the delivery dataset directly for stage reporting. No other system calls OrderCore in v1. The warehouse system does not exist as a system; warehouse operations work from a spreadsheet, which becomes relevant in section 7.
+
+Figure 1 - The order list screen in Shop, showing data returned by GET /orders
+
+3.2 Integration with Billing
+
+OrderCore does not calculate invoices itself. When an invoice is requested, OrderCore sends the order lines to Billing and returns the Billing response to the caller. The two services use different field naming conventions: OrderCore uses snake_case (for example unit_price_pence) and Billing uses camelCase (unitPricePence). The translation between the two happens inside OrderCore.
+
+If Billing cannot be reached, OrderCore calculates the invoice locally using the same tax rate, and marks the result with source = fallback. This is deliberate. It keeps the Shop working when Billing is down. It also means a broken contract between the two services can look like it is working, because the fallback quietly produces a number. Testers must check the source field before trusting a total. This is described again in section 6.2 because it matters.
+
+4. Order lifecycle
+
+4.1 Statuses
+
+An order is always in exactly one of four statuses: pending, confirmed, shipped or cancelled. A new order is created as pending. Confirmation is a business action taken by an account manager or by the customer in the Shop. Shipping is recorded when the warehouse dispatches. Cancellation is possible from pending or confirmed but not from shipped.
+
+Table 3 - Permitted status transitions
+From	To	Triggered by	Notes
+(new)	pending	POST /orders	Default status for every new order
+pending	confirmed	Account manager or customer	Confirmation email sent (section 9)
+pending	cancelled	Account manager	No email in v1
+confirmed	shipped	Warehouse dispatch	Invoice raised at this point
+confirmed	cancelled	Account manager	Requires a reason code, not yet implemented
+shipped	(none)	-	Terminal. Refunds are a separate process (HEL-181)
+cancelled	(none)	-	Terminal
+
+Transitions not listed are not permitted and the service should reject them. In v1.0.0 the API does not yet expose a status change endpoint; statuses are changed by the seed data and by operational scripts. This is a known gap and is tracked as an open item.
+
+4.1.1 Cancellation rules
+
+A cancelled order keeps its lines and its customer for reporting. It is never deleted. A cancelled order cannot be invoiced; a request for the invoice of a cancelled order should return an error rather than a zero invoice, because a zero invoice has been mistaken for a real one in the past.
+
+4.2 Creating an order
+
+An order is created with POST /orders. The caller supplies the customer name, an optional currency (default GBP) and at least one order line. The service allocates the order identifier. Identifiers have the form ORD-nnnn and are allocated sequentially from ORD-1001. The caller never supplies an identifier and any identifier in the request body is ignored.
+
+Validation on creation: the customer must be non-empty; there must be at least one line; each line must have a non-empty SKU, a quantity greater than zero and a unit price of zero or more pence. A request failing validation is rejected with HTTP 422 and no order is created. A request passing validation returns HTTP 201 and the created order, including its allocated identifier and its status of pending.
+
+Note that a unit price of zero is permitted. Free-of-charge lines exist (samples, replacements) and must be orderable. A negative unit price is never permitted; credits are handled by Billing, not by negative lines.
+
+5. Order data model
+
+Fields
+
+An order carries the fields below. All monetary amounts are integers in pence. The currency field exists for future use; only GBP is supported in v1 and every seeded order uses it.
+
+Table 4 - Order fields
+Field	Type	Required	Description
+order_id	string	yes (allocated)	ORD-nnnn, allocated by the service
+customer	string	yes	Customer account name as displayed in Shop
+status	enum	yes	pending, confirmed, shipped, cancelled
+currency	string	no	ISO code. Default GBP. Only GBP supported in v1
+lines	list of order line	yes, at least one	See 5.2
+subtotal_pence	integer	derived	Sum of line totals. Not stored, calculated
+
+5.2 Order line
+
+Each line has a SKU (required, non-empty), a description (optional, defaults to empty), a quantity (integer, greater than zero) and a unit price in pence (integer, zero or more). The line total is quantity multiplied by unit price and is derived, not stored. There is no line-level discount field in v1. Requests that include a discount on a line are not rejected; the field is ignored. This has caused at least one defect report (HEL-018) in which a negotiated price was expected to be honoured. Until HEL-207 delivers an order-level discount, the negotiated price must be entered as the unit price.
+
+SKUs follow the pattern HG-<family>-<size>, for example HG-CLEAN-500 for the 500ml surface cleaner. The pattern is a convention, not a validation rule; OrderCore accepts any non-empty string.
+
+6. Invoice and pricing
+
+An invoice is requested with GET /orders/{id}/invoice. OrderCore forwards the order to Billing and returns the calculated subtotal, tax and total, all in pence, together with the currency and a source field. Requesting the invoice of an order that does not exist returns HTTP 404.
+
+6.1 Tax
+
+Tax is charged at the UK standard rate of 20 percent on the order subtotal. Tax is calculated on the whole order, not per line, and is rounded to the nearest penny once. Per-line tax with per-line rounding was the cause of the discrepancies in the old spreadsheet process and is not to be reintroduced. The total is subtotal plus tax.
+
+The rate is a whole percentage and is configured in Billing. It is also present in the OrderCore fallback (section 6.2). The two must agree. A change to the rate is a cross-system change and requires the Architect's approval.
+
+6.2 Fallback
+
+When Billing is unreachable, times out, or returns a response OrderCore cannot parse, OrderCore calculates the invoice itself using the same rules and returns it with source = fallback and a note describing why. The Shop displays fallback totals in the same way as Billing totals. There is no visual indicator in v1; this is an accepted risk for the training environment and an open item for production.
+
+Figure 2 - Order detail in Shop with the totals panel. The source field is not shown to the user
+
+Testers should treat any invoice with source = fallback as suspect when validating a Billing change, because it proves nothing about Billing.
+
+6.3 Invoice examples
+
+The examples below show the request OrderCore makes to Billing and the response it returns to the caller, for seeded order ORD-1001 (24 units of HG-CLEAN-500 at 249 pence and 6 units of HG-CLOTH-10 at 899 pence). They are illustrative and are not a contract document; the contract is the code and its tests.
+
+Request to Billing (POST /invoice): {"orderId": "ORD-1001", "currency": "GBP", "lines": [{"sku": "HG-CLEAN-500", "quantity": 24, "unitPricePence": 249}, {"sku": "HG-CLOTH-10", "quantity": 6, "unitPricePence": 899}]}
+
+Response from Billing: {"orderId": "ORD-1001", "currency": "GBP", "subtotalPence": 11370, "taxPence": 2274, "totalPence": 13644}
+
+Response from OrderCore to the caller (GET /orders/ORD-1001/invoice): {"order_id": "ORD-1001", "currency": "GBP", "subtotal_pence": 11370, "tax_pence": 2274, "total_pence": 13644, "source": "billing", "note": null}
+
+The same request with Billing stopped returns identical figures with source = fallback and a note such as Billing unavailable (ConnectError); calculated locally. The figures are identical because both sides apply the same rule. If they ever differ, the tax rate has been changed on one side only, and that is a Critical defect.
+
+Rounding. The tax on ORD-1001 is exactly 2274 pence. For a subtotal of 11375 pence the tax would be 2275 pence (2275.0 exactly). For a subtotal of 11373 pence the tax is 2274.6, which rounds to 2275. Rounding is to the nearest penny, half away from zero. Both Billing and the fallback must produce the same answer for every subtotal from 0 to 99,999,999 pence; the Quality Engineer keeps a table of boundary cases for this.
+
+7. Cart and delivery window
+
+7.1 Business need
+
+Customers call the contact centre to ask when an order will arrive. The information needed to answer exists across OrderCore (what was ordered) and the warehouse spreadsheet (where the stock is and when the carrier collects), but it is never shown to the customer before checkout. Ticket HEL-142 asks for an estimated delivery window to be shown on the cart page before the customer confirms. Marketing have asked for the window to read as a confident statement, not a hedged one.
+
+This section specifies the rules for calculating and displaying the window. It does not specify where the stock location data will be held in production; that decision is open (see 7.5).
+
+7.2 Calculation rules
+
+The delivery window is a range of two dates, an earliest arrival date and a latest arrival date, calculated for the order as a whole. It is calculated from three inputs: the dispatch date, the destination region, and the transit days for that region.
+
+Dispatch date. Orders placed before the carrier cut-off on a working day dispatch the same day. Orders placed at or after the cut-off, or on a non-working day, dispatch on the next working day. The carrier cut-off is 16:00 local time on weekdays. Working days are Monday to Friday excluding the bank holidays listed in Appendix B. The cut-off is the same for both warehouses in v1.
+
+Stock location. Each SKU is held at one primary warehouse, either Leeds or Bristol. If every line on the order is held at the same warehouse, that warehouse dispatches. If the lines are split across warehouses, the order dispatches as one consignment from the warehouse holding the majority of lines and the dispatch date is delayed by one working day for the internal transfer. Split shipment (HEL-061) is a separate feature and is out of scope here.
+
+Transit. The earliest arrival date is the dispatch date plus the minimum transit days for the destination region; the latest arrival date is the dispatch date plus the maximum transit days. Transit days are working days. Regions and transit days are given in Table 5. The destination region is derived from the delivery postcode, which in v1 is held on the customer account, not on the order.
+
+Table 5 - Transit days by destination region
+Region	Postcode areas (indicative)	Min transit days	Max transit days
+UK mainland	All except those below	2	3
+Scottish Highlands and Islands	IV, HS, KW, ZE, PA20-PA78, PH17-PH50	3	5
+Northern Ireland	BT	3	4
+Isle of Man and Channel Islands	IM, GY, JE	4	6
+
+Worked example. An order for two SKUs, both held in Leeds, placed at 10:30 on Monday 16 March 2026 for a mainland address, dispatches on Monday 16 March and arrives between Wednesday 18 March and Thursday 19 March. The same order placed at 16:30 dispatches on Tuesday 17 March and arrives between Thursday 19 March and Friday 20 March. If one of the two SKUs were held in Bristol, the dispatch date would move one working day later in each case.
+
+7.3 Display
+
+The window is shown on the cart page above the confirm control, and again on the order detail screen after confirmation. It is shown as a single line in the form Arrives 18-20 March. When the earliest and latest dates fall in different months the month is shown for both dates: Arrives 30 April - 2 May. When the earliest and latest dates are the same the line reads Arrives 18 March. The year is never shown.
+
+The wording is fixed. The line never contains the words estimated, approximately, around, or should. This is the Marketing requirement from HEL-142 and is not negotiable at the Shop level; if the calculation cannot be made confidently, the line is not shown at all rather than hedged.
+
+The window is recalculated every time the cart contents change, because adding a line held at the other warehouse changes the dispatch date. It is not recalculated after confirmation; the window shown at confirmation is the one recorded against the order.
+
+Figure 3 - Cart page mock-up showing the delivery window line above the confirm control
+
+7.4 When the window cannot be calculated
+
+If the stock location for any SKU on the order is unknown, or the customer account has no delivery postcode, or the postcode does not map to a region in Table 5, the delivery window line is not shown. In its place the cart shows the text Delivery estimate unavailable - our team will confirm after you order. This fallback text is the only permitted alternative to a window. The confirm control remains available; a missing window never blocks an order.
+
+The reason the window could not be calculated is recorded for reporting (Insight) but is not shown to the customer.
+
+7.5 Data sources - not yet decided
+
+The stock location per SKU and the carrier cut-off are held today in a spreadsheet maintained by warehouse operations. Nobody has decided where that data should live for this feature. The options discussed are: import the spreadsheet into OrderCore on a schedule; hold the data in Billing alongside pricing; or build a small stock-location service. The high-level design for HEL-142 assumes an import but has not been approved. Until this is decided, acceptance criteria for the feature should state the rule and leave the source open.
+
+The bank holiday list in Appendix B is currently a pasted image from the government website. It will need to be held as data before the calculation can be implemented.
+
+8. Order search and reporting
+
+GET /orders returns all orders, optionally filtered by status using a query parameter. Results are sorted by order identifier. There is no paging in v1; the seeded dataset is small enough that this has not mattered, but Insight has reported (HEL-077) that searches returning more than 500 results time out against a production-sized dataset. Paging is an open item.
+
+Insight uses two reports. The stages report reads the delivery dataset directly and does not call OrderCore. The orders report calls GET /orders and then GET /orders/{id}/invoice for every order, which means it makes one call per order plus one; this is acceptable for the training dataset and would not be for production.
+
+GET /health returns the service status and the number of orders currently held. It is used by the Shop to decide whether to show the order list or a maintenance message.
+
+8.1 API reference
+
+OrderCore exposes five endpoints in v1.0.0. All request and response bodies are JSON. All field names in OrderCore requests and responses are snake_case. There is no authentication in v1; the service is reachable only from the internal network and from the Shop proxy.
+
+GET /health. Returns {"status": "ok", "service": "ordercore", "orders": n} where n is the number of orders currently held. Always returns HTTP 200 when the service is up. Used by Shop and by the deployment pipeline as a readiness check.
+
+GET /orders. Returns a JSON array of orders sorted by order_id. Accepts an optional status query parameter; when present, only orders with exactly that status are returned. An unknown status value returns an empty array, not an error. This is a known rough edge and is recorded as an open item candidate; a tester who mistypes a status will see nothing rather than a helpful message.
+
+GET /orders/{order_id}. Returns the single order or HTTP 404 with {"detail": "Order ORD-9999 not found"}. The identifier is case-sensitive; ord-1001 is not found.
+
+POST /orders. Creates an order from a body containing customer, optional currency, and lines. Returns HTTP 201 and the created order. Validation failures return HTTP 422 with a body describing each failing field in the standard framework format. The allocated order_id is the next free number from ORD-1001 upwards; if a seeded order already holds that number the service skips it, so identifiers are unique but not necessarily contiguous.
+
+GET /orders/{order_id}/invoice. Returns the invoice as described in section 6, or HTTP 404 if the order does not exist. There is no caching; every call reaches Billing. Two calls for the same order may therefore return different source values if Billing became unavailable between them.
+
+8.2 Error responses
+
+OrderCore uses three HTTP error responses. 404 Not Found when an order identifier does not exist. 422 Unprocessable Entity when a request body fails validation; the body lists each field, the rule it failed and the value received. 500 Internal Server Error for anything unexpected, with no detail in the body. There is no 400; malformed JSON is reported as 422 by the framework.
+
+Billing being unavailable is not an error from the caller's point of view. The invoice endpoint returns 200 with a fallback invoice. This is the single most important thing for a tester to know about OrderCore and it is why the source field exists.
+
+8.3 Seed data
+
+The service starts with five seeded orders, ORD-1001 to ORD-1005, held in memory and reloaded from a JSON file on every restart. Orders created at runtime are lost on restart. This is acceptable for the training environment and would not be for production, where a database is assumed. The seeded orders cover four customers, all four statuses, and SKUs from all four product families, so that every screen in Shop has something to display and every status transition can be observed.
+
+Seed data must not be edited by hand to make a test pass. If a scenario needs a different order, create it through POST /orders in the test setup. The seed file is shared by every participant and every lab in the programme.
+
+9. Notifications
+
+A confirmation email is sent to the customer contact when an order moves from pending to confirmed. The email contains the order identifier, the lines, the subtotal, tax and total from the invoice, and, once section 7 is delivered, the delivery window recorded at confirmation. No email is sent on creation, cancellation or shipping in v1.
+
+The email must be sent exactly once per confirmation. A retry of the confirmation action must not send a second email. Duplicate confirmation emails have been reported (HEL-133) and the root cause is believed to be a retry without an idempotency check. The fix is in analysis.
+
+10. Non-functional requirements
+
+Table 6 - Non-functional requirements
+Ref	Requirement	Measure	Applies to
+NFR-1	Order list response time	GET /orders returns within 500 ms for up to 500 orders	OrderCore
+NFR-2	Invoice response time	GET /orders/{id}/invoice returns within 800 ms including the Billing call	OrderCore, Billing
+NFR-3	Delivery window calculation	Window calculated within 200 ms of a cart change, on the server	OrderCore (section 7)
+NFR-4	Fallback transparency	Every fallback invoice carries source = fallback and a note	OrderCore
+NFR-5	Money representation	All amounts are whole pence. No floating point anywhere in the chain	All systems
+NFR-6	Availability	OrderCore available 99.5 percent in business hours	OrderCore
+NFR-7	Auditability	Every status change records who and when	OrderCore (not in v1)
+
+NFR-3 is stated for the server-side calculation only. Rendering time in the Shop is a Shop concern.
+
+11 Open items and assumptions
+
+- OI-1: No status change endpoint exists in v1.0.0. Statuses change through seed data and scripts. Owner: Architect.
+- OI-2: Where stock location and carrier cut-off data will live for the delivery window (section 7.5). Owner: Product Manager, decision needed before HEL-142 build.
+- OI-3: Bank holidays are an image (Appendix B) and need to become data. Owner: Business Analyst.
+- OI-4: Paging on GET /orders (HEL-077). Owner: Developer.
+- OI-5: Fallback invoices are not visually distinguished in Shop. Accepted for training; open for production. Owner: Product Manager.
+- OI-6: Whether the delivery window is contractual or advisory. Marketing want it to read as confident; Legal have not been asked. Owner: Product Manager.
+- OI-7: Cancellation from confirmed requires a reason code that is not yet implemented. Owner: Developer.
+
+Assumptions: only GBP is used; all customers have a UK delivery address; there are exactly two warehouses; carrier cut-off is the same at both; the delivery dataset used by Insight is representative of production volumes at roughly one tenth scale.
+
+12. Testing considerations
+
+The following are stated here so that acceptance criteria and test cases written from this document are consistent. They are not themselves requirements.
+
+- Every criterion must be checkable by a tester with access to the API and the Shop. A criterion that can only be checked by reading code is a design constraint, not an acceptance criterion.
+- Money assertions are made in pence as integers. A test that compares 113.70 to a float has already failed.
+- Any test of the invoice path must assert on the source field. A green test against a fallback invoice proves nothing about Billing.
+- Delivery window tests (section 7) need a controllable clock, because the cut-off rule depends on the time of day, and a controllable calendar, because of Appendix B. Neither exists in v1; the Quality Engineer has asked for both.
+- Boundary cases for validation: quantity of 0 and 1; unit price of -1, 0 and 1; an empty lines array and a single line; an empty customer string and a one-character customer.
+- Region boundaries for Table 5: a postcode at the edge of the Highlands range (PA20 and PA19), and a BT postcode, must each be tested explicitly.
+
+Test data for the delivery window is not yet available because the stock location data source is undecided (7.5). Until it is, tests may use a stubbed location table with HG-CLEAN-500 and HG-CLOTH-10 in Leeds and HG-SOAP-250 and HG-SPRAY-750 in Bristol. This stub is a testing convenience and is not a statement about where stock actually is.
+
+13. Security and access
+
+OrderCore v1 has no authentication or authorisation. It trusts every caller. This is acceptable only because the service is not exposed outside the internal network and the training environment. Production deployment requires, at minimum: caller identity on every request, so that NFR-7 (who changed what) can be met; rate limiting on POST /orders; and a separation between read access (Shop, Insight) and write access (account managers).
+
+No personal data is held. Customer is a company account name. Contact details for notifications (section 9) are held outside OrderCore. If a future feature brings personal data into OrderCore, this section must be rewritten before that feature is built.
+
+The delivery postcode used in section 7 is treated as account data, not personal data, because customers are businesses. If the Shop is ever opened to consumers, that assumption fails.
+
+Appendix A - Glossary
+
+- Order: a request from a customer for one or more SKUs, held in OrderCore.
+- Order line: one SKU on an order with a quantity and a unit price.
+- SKU: stock keeping unit, the product identifier, pattern HG-<family>-<size>.
+- Invoice: the priced result for an order, calculated by Billing, held in pence.
+- Fallback: an invoice calculated by OrderCore because Billing could not be reached.
+- Dispatch date: the working day the carrier collects the consignment.
+- Delivery window: the earliest and latest arrival dates shown to the customer.
+- Working day: Monday to Friday excluding the bank holidays in Appendix B.
+- Cut-off: the time of day after which an order dispatches the next working day. 16:00 in v1.
+- Pence: the unit of all money in Helios systems. Never a decimal.
+
+Appendix B - Bank holidays used in delivery calculations
+
+The following dates are excluded from working days for the dispatch and transit calculations in section 7. The list is copied from the government website and covers England and Wales only. It must be refreshed each year.
+
+Figure 4 - Bank holidays, England and Wales, 2026 (pasted from the source website)
+
+Scottish and Northern Irish bank holidays differ and are not yet accounted for. This is part of open item OI-3.

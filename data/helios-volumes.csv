@@ -1,0 +1,9 @@
+work_type,prompt_pack_name,monthly_volume,basis
+code_review,code-review,110,"about 3 pull requests per ticket; 35 tickets a month from data/helios-tickets.csv"
+test_case_generation,test-cases,85,"one set per story or bug reaching build; 91 request_to_release plus 61 defect_triage tickets over six months"
+defect_triage,defect-triage,10,"61 defect_triage tickets over six months in data/helios-tickets.csv"
+impact_note,impact-note,15,"91 request_to_release tickets over six months; one note per ticket"
+release_notes,release-notes,1,"one monthly drop"
+code_explanation,explain-code,20,"planning assumption; onboarding and code walkthroughs"
+stage_summary,stage-summary,4,"one per fortnightly review plus ad hoc"
+onboarding_plan,onboarding-plan,1,"planning assumption; three joiners next month, one plan reused"

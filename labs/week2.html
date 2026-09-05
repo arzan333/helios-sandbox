@@ -1,0 +1,889 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 2 lab - One Task, Three Prompt Sizes</title>
+<style>
+:root {
+    --gray-50:#ffffff; --gray-75:#fafafa; --gray-100:#f5f5f5; --gray-200:#e1e1e1;
+    --gray-300:#cacaca; --gray-600:#6e6e6e; --gray-800:#2c2c2c; --gray-900:#1b1b1b;
+    --blue-500:#1473e6; --blue-600:#0d66d0; --green-500:#2d9d78;
+    --orange-500:#e68619; --red-500:#e34850; --accent-red:#fa0f00;
+    --radius:4px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--gray-100); color:var(--gray-800);
+    font-family:"Source Sans 3",-apple-system,"Segoe UI",Roboto,sans-serif;
+    font-size:15px; line-height:1.6;
+  }
+  header.masthead{
+    background:var(--gray-900); color:#fff; padding:14px 24px;
+    display:flex; align-items:baseline; gap:12px; position:sticky; top:0; z-index:10;
+  }
+  .masthead__mark{color:var(--accent-red); font-weight:700; font-size:18px; letter-spacing:-.02em}
+  .masthead__title{font-size:16px; font-weight:600}
+  .masthead__env{margin-left:auto; font-size:11px; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--gray-300)}
+  main{max-width:920px; margin:0 auto; padding:24px 24px 80px}
+  h1{font-size:26px; margin:8px 0 4px}
+  .sub{color:var(--gray-600); margin:0 0 24px}
+  h2{font-size:19px; margin:36px 0 4px; padding-top:16px; border-top:1px solid var(--gray-200)}
+  h3{font-size:15px; margin:22px 0 6px}
+  p,li{margin:8px 0}
+  ul,ol{padding-left:22px}
+  .card{background:var(--gray-50); border:1px solid var(--gray-200);
+    border-radius:var(--radius); padding:16px 18px; margin:16px 0}
+  .meta{display:flex; gap:24px; flex-wrap:wrap; font-size:13px; color:var(--gray-600);
+    background:var(--gray-50); border:1px solid var(--gray-200);
+    border-radius:var(--radius); padding:12px 16px}
+  .meta b{color:var(--gray-800)}
+  .step{display:flex; align-items:baseline; gap:10px; margin:28px 0 6px}
+  .step__n{flex:0 0 auto; width:26px; height:26px; border-radius:50%;
+    background:var(--blue-500); color:#fff; font-size:13px; font-weight:700;
+    display:inline-flex; align-items:center; justify-content:center}
+  .step__t{font-size:17px; font-weight:600}
+  .step__time{margin-left:auto; font-size:12px; color:var(--gray-600);
+    border:1px solid var(--gray-300); border-radius:10px; padding:1px 10px; white-space:nowrap}
+  .snippet{position:relative; margin:12px 0}
+  .snippet__bar{display:flex; align-items:center; gap:8px; background:var(--gray-800);
+    color:var(--gray-300); font-size:12px; padding:6px 10px;
+    border-radius:var(--radius) var(--radius) 0 0}
+  .snippet__lang{text-transform:uppercase; letter-spacing:.06em}
+  .snippet__copy{margin-left:auto; background:var(--blue-500); color:#fff; border:0;
+    border-radius:3px; padding:3px 12px; font:inherit; font-size:12px; cursor:pointer}
+  .snippet__copy:hover{background:var(--blue-600)}
+  .snippet__copy.done{background:var(--green-500)}
+  pre{margin:0; background:var(--gray-900); color:#f0f0f0; padding:12px 14px;
+    border-radius:0 0 var(--radius) var(--radius); overflow-x:auto;
+    font-family:"Consolas","DejaVu Sans Mono",monospace; font-size:13px; line-height:1.5;
+    white-space:pre; tab-size:2}
+  code{font-family:"Consolas","DejaVu Sans Mono",monospace; font-size:.92em;
+    background:var(--gray-200); padding:1px 5px; border-radius:3px}
+  pre code{background:none; padding:0; font-size:inherit}
+  .expect{border-left:3px solid var(--green-500); background:#eef8f4;
+    padding:10px 14px; border-radius:0 var(--radius) var(--radius) 0; margin:10px 0}
+  .expect b{color:#1a6b52}
+  .watch{border-left:3px solid var(--orange-500); background:#fff6e8;
+    padding:10px 14px; border-radius:0 var(--radius) var(--radius) 0; margin:10px 0}
+  .watch b{color:#8a5a0b}
+  .bar{border-left:3px solid var(--gray-600); background:var(--gray-75);
+    padding:12px 16px; border-radius:0 var(--radius) var(--radius) 0; margin:16px 0}
+  table{width:100%; border-collapse:collapse; margin:12px 0; font-size:14px}
+  th{text-align:left; background:var(--gray-100); border-bottom:1px solid var(--gray-300);
+    padding:8px 10px; font-size:12px; text-transform:uppercase; letter-spacing:.04em;
+    color:var(--gray-600)}
+  td{padding:8px 10px; border-bottom:1px solid var(--gray-200); vertical-align:top}
+  details{background:var(--gray-50); border:1px solid var(--gray-200);
+    border-radius:var(--radius); padding:10px 14px; margin:12px 0}
+  summary{cursor:pointer; font-weight:600; font-size:14px}
+  footer,.foot{color:var(--gray-600); font-size:13px; margin-top:48px;
+    border-top:1px solid var(--gray-200); padding-top:16px}
+
+  @media print{
+    header.masthead{position:static}
+    .snippet__copy{display:none}
+    pre{background:#fff; color:#000; border:1px solid var(--gray-300);
+      white-space:pre-wrap; word-break:break-word}
+    .snippet__bar{background:#fff; color:#000; border:1px solid var(--gray-300);
+      border-bottom:0}
+    .card,.expect,.watch,.bar,.meta,details{break-inside:avoid}
+    .step{break-after:avoid}
+    details[open] summary~*{display:block}
+    details:not([open])>summary~*{display:block}
+    body{background:#fff; font-size:11pt}
+    main{max-width:none; padding:0}
+    a[href]:after{content:" (" attr(href) ")"; font-size:.85em; color:var(--gray-600)}
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <span class="masthead__mark">Helios</span>
+  <span class="masthead__title">Week 2 lab book</span>
+  <span class="masthead__env">Training environment</span>
+</header>
+
+<main>
+  <h1>One Task, Three Prompt Sizes</h1>
+  <p class="sub">Self-paced. Follow along on your own machine, or watch and run it afterwards. Every command has a copy button.</p>
+
+  <div class="meta">
+    <span><b>Time</b> 45 minutes</span>
+    <span><b>You produce</b> a ledger of what each run cost, three scored answers, and a published page</span>
+    <span><b>Committed</b> locally, never pushed</span>
+    <span><b>Needs</b> Claude Code 2.1.211+, Python, this repository</span>
+  </div>
+
+  <div class="card">
+    <b>The job.</b> A ticket asks for a delivery estimate on the cart page. It has no
+    acceptance criteria, so nobody can build it or test it. Writing those criteria is
+    today&apos;s job - and you will do it <b>three times</b>, with three instructions
+    that ask for exactly the same thing at three very different lengths.
+    <br><br>
+    <b>The question.</b> The long instruction feels safer. Does it buy a better answer,
+    or just a more expensive one? By the end you will have your own answer, as a table.
+  </div>
+
+  <h2>The shape of the hour</h2>
+  <table>
+    <thead><tr><th>Step</th><th>What you do</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>See what a session costs before you type anything</td></tr>
+      <tr><td>2</td><td><b>Read the three instructions side by side</b>, and predict which will win</td></tr>
+      <tr><td>3</td><td>Run the long one by hand, and record what it cost</td></tr>
+      <tr><td>4</td><td>Run the other two - one command each</td></tr>
+      <tr><td>5</td><td>Have a stronger model score all three answers</td></tr>
+      <tr><td>6</td><td>Turn the winner into a page, then change it twice</td></tr>
+      <tr><td>7</td><td>Commit</td></tr>
+    </tbody>
+  </table>
+  <p>
+    Every run pays for three things: the <b>overhead</b> Claude always carries (cached
+    and cheap, but re-carried on every file it opens), the <b>input</b> - your
+    instruction plus everything it reads - and the <b>output</b>, everything it writes
+    back, which costs several times what input does.
+  </p>
+
+  <details>
+    <summary>Three other ways teams waste tokens, in one paragraph each</summary>
+    <p>
+      <b>Running the same wrong thing again.</b> Three attempts at an instruction that
+      was never going to work cost three times and teach nothing. Change the input
+      before you re-run, not just your luck.
+    </p>
+    <p>
+      <b>Letting a session grow.</b> Everything said so far is re-sent on every
+      request. Clear it when you move to an unrelated job; compact it when you need
+      the thread but not the detail.
+    </p>
+    <p>
+      <b>Handing work between sessions.</b> Whoever picks the work up starts from
+      nothing and pays for the context again. It is why a chain of four steps can cost
+      far more than the same job done once - and why next week prices a chain before
+      anyone builds one.
+    </p>
+  </details>
+
+  <div class="step">
+    <span class="step__n">0</span><span class="step__t">Set up</span>
+    <span class="step__time">before the clock starts</span>
+  </div>
+  <p><b>Why.</b> This week&apos;s files were added to the repository after you cloned it, and one Claude Code version matters.</p>
+
+  <p><b>a.</b> Check your tools. In a plain PowerShell window:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+claude --version
+python --version
+git branch --show-current</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Three lines, like these - the version numbers move, the shape does not:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
+<pre><code>2.1.260 (Claude Code)
+Python 3.11.9
+sam/foundation</code></pre></div>
+    Claude Code must be <b>2.1.211 or higher</b> and Python 3.11 or higher. The third
+    line is your own branch.
+    <br><br>
+    Lower Claude Code version? <code>claude update</code>, then open a <b>new</b>
+    window. Older builds do not reset their usage figures between runs, so every
+    measurement today would include the one before it.
+  </div>
+
+  <p><b>b.</b> Pull in this week&apos;s files. Your own work is untouched:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+git fetch origin
+git merge origin/main -m "Week 2 files"
+mkdir week2\out -Force | Out-Null
+if (-not (Test-Path week2\ledger.csv)) { copy templates\token-ledger.csv week2\ledger.csv }
+dir prompts\week2-lab</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A merge summary, then a listing ending like this:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
+<pre><code>ac-2000.md   ac-900.md   ac-320.md   rubric-acceptance-criteria.md   score.md</code></pre></div>
+    Three instructions, the scoring guide they are all measured against, and the
+    marking instruction. If the folder is missing, the merge did not happen - read the
+    git message above it.
+    <br><br>
+    Safe to run twice: it will not overwrite anything you have already recorded.
+  </div>
+
+  <p><b>c.</b> Start Claude Code. VS Code is already open; this is the only thing you need to launch:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+claude</code></pre>
+  </div>
+  <div class="watch">
+    <b>You now need two windows.</b> This one is Claude Code. Open a second terminal
+    inside VS Code with <code>Ctrl+Shift+`</code> for every <b>powershell</b> block
+    below. Each block sets its own folder, so it works in either window.
+  </div>
+
+  <div class="step">
+    <span class="step__n">1</span><span class="step__t">The bill before you type anything</span>
+    <span class="step__time">0-4 min</span>
+  </div>
+  <p><b>Why.</b> A session is not empty when it opens, and knowing what is already in it explains most of your costs later.</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">claude code</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>/context</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A coloured grid with a breakdown beside it, along these lines -
+    the exact figures depend on your model and version:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output, approximate</span></div>
+<pre><code>System prompt      ~3k tokens
+System tools      ~12k tokens
+Memory files       ~1k tokens   (the repository's own guidance)
+Messages             0 tokens
+Free space         ~180k</code></pre></div>
+    Read one thing off it: <b>tens of thousands of tokens are already loaded</b> before
+    your first word.
+    That block is cached, so it is cheap per request. It is not free, and every file
+    Claude opens is another request.
+  </div>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">claude code</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>/usage</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A <b>Session</b> block at the top, with your plan&apos;s usage bars
+    underneath:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
+<pre><code>Total cost:            $0.00
+Total duration (API):  0s
+Total code changes:    0 lines added, 0 lines removed</code></pre></div>
+    Cost at or near zero, and no <b>Usage by model</b> line yet - nothing carrying your
+    words has been sent. This block is where every figure today comes from.
+    <code>Esc</code> closes it.
+  </div>
+
+  <div class="step">
+    <span class="step__n">2</span><span class="step__t">Read the three instructions</span>
+    <span class="step__time">4-12 min</span>
+  </div>
+  <p>
+    <b>Why.</b> If you do not know what is different about them, the numbers in step 5
+    are just numbers. These eight minutes are what make the rest of the hour mean
+    something.
+  </p>
+  <p>
+    All three ask for the same deliverable: acceptance criteria for the ticket, taken
+    from the ticket itself and one section of the product spec, written to a file. What
+    differs is <b>how much they say about it</b>.
+  </p>
+
+  <h3>The long one - about 2,000 tokens</h3>
+  <p>It opens like this:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">from the long instruction</span></div>
+<pre><code>You are a world-class senior business analyst with more than twenty years of
+experience writing requirements and acceptance criteria for complex e-commerce,
+order management and logistics systems at large enterprises. You have deep
+expertise in BDD, Gherkin, Given/When/Then, INVEST, user story mapping, and
+modern agile delivery practices. You are meticulous, thorough, careful and
+detail-oriented, and you never miss an edge case...</code></pre>
+  </div>
+  <p>Then it pastes the whole ticket in - and afterwards asks Claude to go and read that same ticket:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">from the long instruction</span></div>
+<pre><code>{
+  "key": "HEL-142",
+  "summary": "Show estimated delivery window in the cart",
+  ... the whole ticket, about 30 lines ...
+}
+
+To be thorough, please also read docs/design/HEL-142-hld.md (even though I
+pasted it above, in case it has changed), data/entity-map.md,
+docs/helios-landscape.md and docs/process/request-to-release.md, so that you
+have complete and total context... It is better to read too much than too little.</code></pre>
+  </div>
+  <p>And it asks for six separate things, most of which nobody will read:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">from the long instruction</span></div>
+<pre><code>First, please write a short executive summary... Second, please explain your
+reasoning step by step... Third, please produce the acceptance criteria
+themselves... and for each one please also add a paragraph of prose explaining
+the criterion... Fourth, please add a section on risks and assumptions. Fifth,
+please add a section listing any open questions. Finally, please add a brief
+conclusion...
+
+Please write the whole thing to the file week2/ac-v2000.md... Then, in the chat,
+please give me a full summary of everything you wrote.</code></pre>
+  </div>
+  <div class="watch">
+    <b>Four kinds of waste, in one instruction.</b> A role paragraph that instructs
+    nothing. Content pasted <i>and</i> read. Four more files &quot;to be thorough&quot;.
+    And an output list that pays for reasoning, prose and a conclusion - then a full
+    recap in the chat of the file it just wrote. Reading is charged once, at input
+    rates. That recap is charged again, at output rates.
+  </div>
+
+  <h3>The medium one - about 900 tokens</h3>
+  <p>Same job. It names its inputs instead of pasting them, and says what it wants back:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">from the medium instruction</span></div>
+<pre><code>Read these inputs. Do not paste them back to me.
+
+1. helios-backlog/HEL-142.json - the ticket. Note that acceptance_criteria is
+   empty; that is what we are fixing.
+2. docs/specs/ordercore-fsd.txt - the rules for this feature are in section 7...
+3. docs/design/HEL-142-hld.md - the draft design. It is not approved. If it
+   disagrees with the specification, the specification wins...
+
+When you have written the file, reply in the chat with one line: the number of
+criteria and the number of open questions. Nothing else.</code></pre>
+  </div>
+  <p>
+    It still carries a paragraph of background, explains itself as it goes, and leaves
+    Claude to decide how much of the document to read.
+  </p>
+
+  <h3>The short one - about 320 tokens. This is all of it</h3>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">the entire short instruction</span></div>
+<pre><code>Write acceptance criteria for HEL-142 to week2/ac-v320.md.
+
+Inputs:
+- helios-backlog/HEL-142.json
+- docs/specs/ordercore-fsd.txt, section 7 only. Find the line of the heading
+  "7. Cart and delivery window" with grep, then read from that line to the
+  heading "8. Order search and reporting". Do not read the rest of the file.
+
+Output file, and nothing else:
+- Line 1: "# HEL-142 - acceptance criteria"
+- A table with columns: # | Given | When | Then | Source (FSD 7.x)
+- 6 to 9 rows. Cover: window shown before confirm; display format, one row each
+  for same month, cross month and same day, using the exact strings from 7.3 as
+  the Then; cut-off rule (before and after 16:00); region transit (one mainland,
+  one non-mainland row from Table 5); window unavailable case, with the exact
+  fallback text from 7.4; banned hedging words from 7.3.
+- "## Open questions": bullets for what the ticket or section 7 leaves
+  undecided. List, do not answer.
+
+Rules: every Then is observable by a tester on the cart screen. Where the
+specification gives an exact string, the Then is that string. Do not invent
+rules outside the ticket and section 7. Do not decide where stock data lives.
+No prose, no summary.
+
+Reply in chat with one line: number of rows and number of open questions.</code></pre>
+  </div>
+  <div class="card">
+    <b>Notice what the short one is not.</b> It is not vaguer. It is <i>more</i>
+    specific than the long one about the only things that matter - what the answer must
+    contain, and what it must not invent. What it dropped was everything that was not an
+    instruction.
+  </div>
+
+  <h3>Side by side</h3>
+  <table>
+    <thead><tr><th></th><th>Long</th><th>Medium</th><th>Short</th></tr></thead>
+    <tbody>
+      <tr><td>Who it says Claude is</td><td>Three sentences</td><td>One clause</td><td>Nothing</td></tr>
+      <tr><td>The ticket</td><td>Pasted, then read as well</td><td>Named</td><td>Named</td></tr>
+      <tr><td>The spec</td><td>A slice pasted, then &quot;read the whole document&quot;</td><td>&quot;Section 7&quot;</td><td>Find the heading, read to the next one</td></tr>
+      <tr><td>Other files</td><td>Four more, to be thorough</td><td>The draft design</td><td>None</td></tr>
+      <tr><td>Examples</td><td>Three</td><td>None</td><td>None</td></tr>
+      <tr><td>What to produce</td><td>Six sections, including reasoning and a conclusion</td><td>A list, and open questions</td><td>A table, and open questions</td></tr>
+      <tr><td>Reply in the chat</td><td>A full recap of the file</td><td>One line</td><td>One line</td></tr>
+    </tbody>
+  </table>
+  <p>
+    <b>Before you run anything, write down your prediction.</b> Which of the three will
+    produce the best answer? Most people say the long one. Step 5 tells you whether you
+    were right - and if you were not, that is the thing worth taking back to your team.
+  </p>
+  <details>
+    <summary>Read any of them in full</summary>
+    <div class="snippet">
+      <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+        <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+type prompts\week2-lab\ac-2000.md
+type prompts\week2-lab\ac-900.md
+type prompts\week2-lab\ac-320.md</code></pre>
+    </div>
+  </details>
+
+  <div class="step">
+    <span class="step__n">3</span><span class="step__t">Run the long one, by hand</span>
+    <span class="step__time">12-20 min</span>
+  </div>
+  <p>
+    <b>Why.</b> One run done the slow way, so that when a command does it for you in the
+    next step, you know exactly what it did.
+  </p>
+
+  <p><b>a.</b> Put the long instruction on the clipboard:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+Get-Content prompts\week2-lab\ac-2000.md -Raw | Set-Clipboard</code></pre>
+  </div>
+
+  <p><b>b.</b> In the Claude Code window, empty the session first:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">claude code</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>/clear</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> The conversation disappears and you are back to an empty prompt.
+    Nothing else happens - <code>/clear</code> only resets the session, and with it the
+    figures you are about to read.
+  </div>
+  <p><b>c.</b> Now paste the instruction with <code>Ctrl+V</code> and press Enter.</p>
+  <div class="expect">
+    <b>Expected.</b> The paste appears as one collapsed line -
+    <code>[Pasted text #1 +96 lines]</code> - then Claude works.
+    <b>Count the files it opens</b>: that is the part you are paying for. Say
+    <b>Yes</b> if it asks to write its answer. It finishes with a long chat summary,
+    because the instruction asked for one. Wait for the input prompt to return.
+  </div>
+  <div class="watch">
+    <b>Do not chat with it.</b> Any extra exchange lands in this run&apos;s numbers.
+    If the file got written, the run is done.
+  </div>
+
+  <p><b>d.</b> Ask what it cost. <code>/usage</code>, then select the <b>Usage by model</b> line with the mouse and copy it (<code>Ctrl+Shift+C</code>), then <code>Esc</code>:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">claude code</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>/usage</code></pre>
+  </div>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">SAMPLE - the line you just copied</span></div>
+<pre><code>claude-sonnet-5:  3.1k input, 4.8k output, 412.0k cache read, 31.2k cache write ($0.42)</code></pre>
+  </div>
+  <table>
+    <thead><tr><th>Figure</th><th>What it is</th></tr></thead>
+    <tbody>
+      <tr><td><b>input</b></td><td>Your instruction, plus everything Claude opened to answer it</td></tr>
+      <tr><td><b>output</b></td><td>Everything it wrote back, thinking and chat reply included. The expensive half</td></tr>
+      <tr><td>cache read</td><td>The standing overhead, re-read once per request. Grows with every file opened</td></tr>
+      <tr><td>cache write</td><td>Mostly a one-off for the day. Ignore it when comparing runs</td></tr>
+      <tr><td><b>cost</b></td><td>List-price arithmetic on the four numbers. Not a bill on a Team seat, but the same sum every time, so it compares</td></tr>
+    </tbody>
+  </table>
+  <p><b>e.</b> Record it. Paste your line between the single quotes:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+python scripts\ledger.py add week2\ledger.csv --prompt ac --version v2000 --usage 'PASTE YOUR LINE HERE'</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> One line back, in this shape - your five figures, not these:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
+<pre><code>Added: ac v2000  fresh 7,900 tokens (3,100 in + 4,800 out), cache read 412,000, cost $0.4200</code></pre></div>
+    That is one row in your ledger, and the whole cycle done by hand once. From here a
+    command does it, except in step 6, where the work has to stay in this session.
+  </div>
+  <div class="watch">
+    <b>Single quotes matter.</b> The line contains a dollar sign; between double quotes
+    PowerShell would treat it as a variable and swallow part of it.
+  </div>
+  <details>
+    <summary>Cannot select the text on that screen? Type the five figures instead</summary>
+    <p>Same result, read straight off the same line:</p>
+    <div class="snippet">
+      <div class="snippet__bar"><span class="snippet__lang">powershell - your five figures</span>
+        <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+python scripts\ledger.py add week2\ledger.csv --prompt ac --version v2000 --model claude-sonnet-5 --input 3.1k --output 4.8k --cache-read 412k --cache-write 31k --cost 0.42</code></pre>
+    </div>
+    <p>Use it anywhere else in this lab that asks you to paste a line - change the two names after <code>--prompt</code> and <code>--version</code>.</p>
+  </details>
+
+  <div class="step">
+    <span class="step__n">4</span><span class="step__t">Run the other two - one command each</span>
+    <span class="step__time">20-26 min</span>
+  </div>
+  <p>
+    <b>Why.</b> You have now done the cycle by hand: clear, send, read the figures,
+    record. This command does exactly that, so the rest of the hour goes on the answers
+    rather than the clerical work.
+  </p>
+  <p>The medium instruction. It points at the ticket and the spec section instead of pasting them, asks for one format, and wants a one-line reply:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+python scripts\run.py prompts\week2-lab\ac-900.md --name ac --version v900</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A short wait, then three lines:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
+<pre><code>Running ac-900.md ... this takes a moment and writes its own output file.
+Claude replied: 7 criteria, 3 open questions
+Added: ac v900  fresh 4,604 tokens (1,788 in + 2,816 out), cache read 125,540, cost $0.1389</code></pre></div>
+    The middle line is Claude&apos;s whole reply - that is what asking for one line
+    buys you. <b>Input and output should both be lower than run 1.</b>
+  </div>
+  <p>The short instruction. It tells Claude to find the one section it needs rather than read the document, and fixes the shape of the answer:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+python scripts\run.py prompts\week2-lab\ac-320.md --name ac --version v320
+python scripts\ledger.py show week2\ledger.csv</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Your three rows, then the change table:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - shape exact, figures yours</span></div>
+<pre><code>prompt        version        model           fresh      in     out  cache rd   cost $  score  scorer
+------------------------------------------------------------------------------------------------------
+ac            v2000          sonnet-5        7,900   3,100   4,800   412,000   0.4200
+ac            v900           sonnet-5        4,604   1,788   2,816   125,540   0.1389
+ac            v320           sonnet-5        1,712     612   1,100    95,000   0.0816
+
+Change from first recorded version to latest, per prompt:
+prompt          versions                  fresh tokens     cost           score
+-------------------------------------------------------------------------------
+ac              v2000 -&gt; v320                   -78.3%   -80.6%               -</code></pre></div>
+    The score column is empty until the next step. <b>Both percentages should be large
+    and negative.</b> Your figures will differ from your neighbour&apos;s; the direction
+    should not.
+    <br><br>
+    Went <i>up</i> instead? Say so - that is the most interesting result in the room,
+    and the next step decides whether it mattered.
+  </div>
+  <details>
+    <summary>Curious what the three instructions look like side by side?</summary>
+    <p>
+      <code>type prompts\week2-lab\ac-900.md</code> and
+      <code>type prompts\week2-lab\ac-320.md</code>. The short one is roughly a sixth
+      of the long one and asks for the same work.
+    </p>
+  </details>
+
+  <div class="step">
+    <span class="step__n">5</span><span class="step__t">Score the three answers</span>
+    <span class="step__time">26-34 min</span>
+  </div>
+  <p>
+    <b>Why.</b> Cheaper only counts if the answer held up. And the model that wrote an
+    answer is the last thing that should mark it, so a stronger model does the marking,
+    in a fresh session, seeing only the answer and the scoring guide - never the
+    instruction that produced it, and never this conversation.
+  </p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+python scripts\score.py week2\ac-v2000.md week2\ac-v900.md week2\ac-v320.md --record week2\ledger.csv</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A minute or so, and one block like this per answer:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - wording varies, structure does not</span></div>
+<pre><code>Scoring week2/ac-v320.md against prompts/week2-lab/rubric-acceptance-criteria.md on opus ...
+Row 1: 5 - "Then the cart shows Arrives 18-20 March"
+Row 2: 4 - "before the customer confirms"
+Row 3: 5 - "Source: 7.3"
+Row 4: 4 - "the window is not shown"
+Row 5: 2 - "stock location is imported nightly"
+TOTAL: 20/25
+-&gt; scorer claude-opus-5, cost $0.0644
+-&gt; evidence saved to week2/scores/ac-v320.md
+-&gt; recorded ac v320 = 20/25 in week2/ledger.csv</code></pre></div>
+    Five rows, each with the phrase it is based on, a total out of 25, and the model
+    that gave it. Your marks and quotes will differ.
+    <br><br>
+    Told that the scorer was not Opus? Your seat cannot reach it. Re-run the same
+    command with <code>--allow-scorer-mismatch</code> on the end, and check two rows by
+    hand below instead of one. Mention it when you show your numbers.
+  </div>
+
+  <p>
+    <b>Now your twenty seconds.</b> The guide has five rows; one of them asks whether
+    the answer invented anything. Every scorer is soft on that one, so check it:
+  </p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+code week2\scores\ac-v320.md week2\ac-v320.md</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Two tabs: the marking on the left, the answer on the right. Read
+    the &quot;nothing invented&quot; line, then skim the answer for a rule nobody
+    actually stated. In the block above, row 5 scored 2 and quoted
+    <i>&quot;stock location is imported nightly&quot;</i> - nobody decided that, so the
+    scorer was right to mark it down. You are looking for the opposite case: an
+    invented rule that still got full marks.
+  </div>
+  <p>Only if you disagree, override it. Otherwise skip straight to the table:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell - only if you disagreed; put your own number in</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+python scripts\ledger.py score week2\ledger.csv --prompt ac --version v320 --score 18 --judge opus+human</code></pre>
+  </div>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+python scripts\ledger.py show week2\ledger.csv</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Every row now carries a score and who gave it:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - shape exact, figures yours</span></div>
+<pre><code>ac            v2000          sonnet-5        7,900   3,100   4,800   412,000   0.4200     19  opus-5
+ac            v900           sonnet-5        4,604   1,788   2,816   125,540   0.1389     21  opus-5
+ac            v320           sonnet-5        1,712     612   1,100    95,000   0.0816     20  opus-5
+
+ac              v2000 -&gt; v320                   -78.3%   -80.6%  19 -&gt; 20 (105%)</code></pre></div>
+    That last line is the result of the lab: <b>tokens down 78 percent, cost down 80
+    percent, and the answer no worse.</b>
+  </div>
+  <div class="card">
+    <b>How to read it.</b> The long instruction usually scores well on coverage and
+    badly on inventing things - it read eight files and had opinions about all of them.
+    The short one usually holds, occasionally dropping one point of coverage. So: a big
+    saving for one lost point is a win. A big saving for an answer that quietly made up
+    a rule is a loss, and the instruction goes back for another pass. Either is a fine
+    outcome. Not knowing which you got is the only bad one - and with one run each,
+    what you can honestly claim is the direction, not the decimal.
+  </div>
+
+  <div class="step">
+    <span class="step__n">6</span><span class="step__t">Turn the winner into a page, then change it twice</span>
+    <span class="step__time">34-42 min</span>
+  </div>
+  <p>
+    <b>Why.</b> Deliverables get revised. Revising by asking for the whole thing again
+    pays the full price every time; changing what is already there costs a fraction.
+    This step measures that gap.
+  </p>
+  <div class="card">
+    <b>What a published page is.</b> A file in your repository that Claude puts on a
+    private web page and updates in place - same link, new version, each time. If your
+    session cannot publish, Claude just writes the file: open it in a browser and
+    refresh after each change. The lesson is the same either way.
+  </div>
+  <p>Take whichever answer scored best. In the Claude Code window, <code>/clear</code>, then paste this:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">claude code</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>/clear</code></pre>
+  </div>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt - change the file name if a different answer won</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Read week2/ac-v320.md. Build an artifact from it: one page titled
+"Delivery window - acceptance criteria", with the criteria as a table whose
+first column is an empty checkbox, then the open questions as a list under a
+heading, then a footer naming the two sources. Save it as
+week2/ac-artifact.html and publish it. Reply with one line: how many criteria.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A permission prompt to publish - say <b>Yes</b> - then:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
+<pre><code>Published: https://claude.ai/code/artifact/...
+7 criteria</code></pre></div>
+    The page opens in your browser.
+    <br><br>
+    No link? Publishing is off for your organisation. Run
+    <code>Start-Process week2\ac-artifact.html</code> and carry on; nothing else changes.
+  </div>
+  <p>Record what building it cost, the way you did in step 2 (<code>/usage</code>, copy the line):</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+python scripts\ledger.py add week2\ledger.csv --prompt artifact --version build --usage 'PASTE YOUR LINE HERE'</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> <code>Added: artifact build</code>, with an output figure in the
+    thousands - a styled page is output-heavy, and output is the expensive half.
+    (Cannot select the line? Use the typed-figures form at the end of step 3.)
+  </div>
+
+  <p><b>Change 1.</b> Do not clear - Claude needs to know which page. Paste:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>In week2/ac-artifact.html add a column "Verified by" after the "Then" column.
+Fill every row with the role accountable for acceptance criteria in the RACI
+table in docs/helios-landscape.md. Edit in place; do not rewrite the file.
+Republish. Reply with one line: the role you used.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A handful of changed lines, not a rewritten file. Same link, new
+    version - refresh and the column is there. The reply is one role:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
+<pre><code>Business Analyst</code></pre></div>
+  </div>
+  <div class="watch">
+    <b>If it rewrote the whole file</b> - you will see it writing the entire page again -
+    say: <i>Edit in place, do not rewrite.</i> A rewrite pays the whole build a second
+    time. That habit is what this step exists to break.
+  </div>
+
+  <p><b>Change 2.</b> Paste:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>In week2/ac-artifact.html, put an owner next to each open question, taken from
+the open items list in section 11 of docs/specs/ordercore-fsd.txt; write
+"unassigned" where none matches. Edit in place; do not rewrite. Republish.
+Reply with one line: how many questions got an owner.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Another small edit, and a reply of <code>2</code> or
+    <code>3</code>. The page is now on its third version, and the questions that had an
+    owner on record have one on the page.
+  </div>
+  <p>Now the comparison. <code>/usage</code>, copy the line, and record it:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+python scripts\ledger.py add week2\ledger.csv --prompt artifact --version after-2-edits --usage 'PASTE YOUR LINE HERE'
+python scripts\ledger.py show week2\ledger.csv</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A change line for the page, with a <b>positive</b> percentage:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - shape exact, figure yours</span></div>
+<pre><code>artifact        build -&gt; after-2-edits          +38.2%    +31.0%               -</code></pre></div>
+    That is what two revisions cost on top of one build - normally well under half.
+    Asking for the whole page again twice would have been about +200 percent. That gap
+    is the entire argument for changing things rather than regenerating them.
+  </div>
+
+  <div class="step">
+    <span class="step__n">7</span><span class="step__t">Commit</span>
+    <span class="step__time">42-45 min</span>
+  </div>
+  <p><b>Why.</b> Your ledger is the input to next week&apos;s cost model.</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+git add week2
+git commit -m "Week 2 lab: three prompt sizes, scored, plus artifact"
+git log --oneline -1</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> One commit, holding your ledger, the three answers, the marking
+    and the page:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
+<pre><code>a31915b Week 2 lab: three prompt sizes, scored, plus artifact</code></pre></div>
+    Nothing is pushed - it stays on this machine.
+  </div>
+
+  <h2>Challenge - how noisy is one run?</h2>
+  <p class="sub">5 minutes, in pairs, afterwards</p>
+  <p>
+    Put your table next to your neighbour&apos;s. Same instructions, same guide,
+    different numbers. Pick one row and work out why: a different set of files opened,
+    a longer reply, a different verdict? Then run the short instruction a second time
+    as <code>--version v320b</code>. The gap between your own two runs is your noise
+    floor, and any difference smaller than it is not a finding.
+  </p>
+
+  <h2>Passing bar</h2>
+  <div class="bar">
+    Five rows in your ledger, every figure measured rather than guessed. Three answers
+    scored by a stronger model than wrote them, with one row checked by you. You can
+    say in one sentence what the short instruction lost, or did not. A page built once
+    and changed twice, with the cost of the changes recorded. All committed locally.
+  </div>
+
+  <h2>If something breaks</h2>
+  <table>
+    <thead><tr><th>Symptom</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Usage figures keep growing between runs, or no usage line appears</td>
+          <td>Claude Code is older than 2.1.211. Exit, <code>claude update</code>, open a new window, restart from step 0.</td></tr>
+      <tr><td><code>Could not parse the usage line</code></td>
+          <td>Only part of the line was copied. It needs the model name and all four figures. Select the whole line and try again.</td></tr>
+      <tr><td><code>No cost found</code></td>
+          <td>Double quotes swallowed the dollar sign. Use single quotes, or add <code>--cost 0.42</code> with the total from the same screen.</td></tr>
+      <tr><td>The usage line will not select with the mouse</td>
+          <td>Type the figures instead - the collapsed note at the end of step 3 has the command.</td></tr>
+      <tr><td>The paste shows as one collapsed line and nothing happens</td>
+          <td>That is the paste, waiting. Press Enter.</td></tr>
+      <tr><td>Claude answered in the chat and wrote no file</td>
+          <td>The run still counts. Its score is 0, because the deliverable was a file: <code>python scripts\ledger.py score week2\ledger.csv --prompt ac --version v900 --score 0 --judge human</code></td></tr>
+      <tr><td><code>claude is not on PATH</code></td>
+          <td>Open a new terminal - a window opened before the install does not see it.</td></tr>
+      <tr><td>A run stops with a login or usage-limit message</td>
+          <td>Your seat has hit its limit or the login expired. The Claude Code window will say the same. Sign in or wait, then run the command again - repeating is safe.</td></tr>
+      <tr><td>The scorer was not Opus</td>
+          <td>Your seat cannot reach it. Add <code>--allow-scorer-mismatch</code>, check two rows by hand, and say so when you present.</td></tr>
+      <tr><td>No total came back from the scorer</td>
+          <td>Open the marking file in <code>week2\scores</code>, add the five numbers up, and record it with <code>ledger.py score ... --judge opus</code>.</td></tr>
+      <tr><td>Claude asks to change a file you did not expect</td>
+          <td>Yes to anything inside <code>week2</code>. No to anything outside it - this lab never edits the shared files.</td></tr>
+      <tr><td><code>Set-Clipboard</code> not recognised</td>
+          <td>Very old PowerShell. Open the file in VS Code, select all, copy, and paste into Claude Code.</td></tr>
+      <tr><td><code>cannot find path</code> for anything under <code>prompts</code></td>
+          <td>Step 0b did not merge. Run it again and read the git output.</td></tr>
+      <tr><td>Publishing does not work</td>
+          <td>It is off for your organisation. <code>Start-Process</code> the file and refresh the browser after each change.</td></tr>
+      <tr><td><code>python</code> opens the Microsoft Store</td>
+          <td>Settings &gt; Apps &gt; Advanced app settings &gt; App execution aliases: turn off <code>python.exe</code> and <code>python3.exe</code>, then reopen PowerShell.</td></tr>
+      <tr><td><code>git merge</code> refuses, citing local changes</td>
+          <td>Commit what you have: <code>git commit -am "wip"</code>, then run step 0b again.</td></tr>
+    </tbody>
+  </table>
+
+  <p class="foot">
+    Helios Group is fictional. All data in this repository is synthetic.
+    Week 2 of the Claude Code Capability Program.
+  </p>
+</main>
+
+<script>
+// Copy buttons. Text is taken from the <pre> exactly as written, so what lands on
+  // the clipboard is what is on screen - no smart quotes, no wrapped commands.
+  document.querySelectorAll('.snippet').forEach(function (block) {
+    var button = block.querySelector('.snippet__copy');
+    var pre = block.querySelector('pre');
+    if (!button || !pre) return;
+    button.addEventListener('click', function () {
+      var text = pre.innerText;
+      var done = function () {
+        button.textContent = 'Copied';
+        button.classList.add('done');
+        setTimeout(function () {
+          button.textContent = 'Copy';
+          button.classList.remove('done');
+        }, 1500);
+      };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } else {
+        fallback();
+      }
+      function fallback() {
+        var area = document.createElement('textarea');
+        area.value = text;
+        area.style.position = 'fixed';
+        area.style.opacity = '0';
+        document.body.appendChild(area);
+        area.select();
+        try { document.execCommand('copy'); done(); } catch (e) { button.textContent = 'Select manually'; }
+        document.body.removeChild(area);
+      }
+    });
+  });
+</script>
+</body>
+</html>
