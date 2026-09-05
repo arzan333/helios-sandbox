@@ -114,9 +114,9 @@ def cmd_add(args: argparse.Namespace) -> None:
             "rubric_score": args.score if args.score is not None else "",
             "notes": args.notes or "",
         })
-    print(f"Added: {args.prompt} {args.version}  fresh {fmt(inp + out)} tokens "
-          f"({fmt(inp)} in + {fmt(out)} out), cache read {fmt(cread)}, cost ${cost:.4f}"
-          + (f", score {args.score}" if args.score is not None else ""))
+    print(f"Added: {args.prompt} {args.version}  total {fmt(inp + out + cread + cwrite)} tokens "
+          f"({fmt(inp)} in, {fmt(out)} out, {fmt(cread)} cache read, {fmt(cwrite)} cache write), "
+          f"cost ${cost:.4f}" + (f", score {args.score}" if args.score is not None else ""))
 
 
 def load(path: Path) -> list[dict]:
@@ -161,12 +161,19 @@ def cmd_merge(args: argparse.Namespace) -> None:
           f"Run: python scripts/ledger.py show {out}")
 
 
+def total(row: dict) -> int:
+    """Everything the run was charged for. Caching moves tokens between the four
+    columns from run to run, so only the total (and the cost) compare like for like."""
+    return sum(int(row[k]) for k in ("input_tokens", "output_tokens",
+                                     "cache_read_tokens", "cache_write_tokens"))
+
+
 def cmd_show(args: argparse.Namespace) -> None:
     rows = load(Path(args.ledger))
     if not rows:
         sys.exit("Ledger is empty.")
-    print(f"{'prompt':<14}{'version':<15}{'model':<12}{'fresh':>9}{'in':>8}{'out':>8}{'cache rd':>10}{'cost $':>9}{'score':>7}  {'scorer':<12}")
-    print("-" * 106)
+    print(f"{'prompt':<14}{'version':<15}{'model':<12}{'in':>7}{'out':>8}{'cache rd':>10}{'cache wr':>10}{'total':>10}{'cost $':>9}{'score':>7}  {'scorer':<12}")
+    print("-" * 112)
     for r in rows:
         model = r["model"].replace("claude-", "")[:11]
         scorer = ""
@@ -174,9 +181,10 @@ def cmd_show(args: argparse.Namespace) -> None:
             part = part.strip()
             if part.startswith(("scorer=", "judge=")):
                 scorer = part.split("=", 1)[1].replace("claude-", "")[:11]
-        print(f"{r['prompt']:<14}{r['version']:<15}{model:<12}{int(r['fresh_tokens']):>9,}"
-              f"{int(r['input_tokens']):>8,}{int(r['output_tokens']):>8,}"
-              f"{int(r['cache_read_tokens']):>10,}{float(r['cost_usd']):>9.4f}{r['rubric_score']:>7}  {scorer:<12}")
+        print(f"{r['prompt']:<14}{r['version']:<15}{model:<12}{int(r['input_tokens']):>7,}"
+              f"{int(r['output_tokens']):>8,}{int(r['cache_read_tokens']):>10,}"
+              f"{int(r['cache_write_tokens']):>10,}{total(r):>10,}{float(r['cost_usd']):>9.4f}"
+              f"{r['rubric_score']:>7}  {scorer:<12}")
 
     # Deltas: compare the first version of each prompt against its latest.
     # If a version was run more than once, its most recent attempt is the one that counts.
@@ -194,12 +202,12 @@ def cmd_show(args: argparse.Namespace) -> None:
     if not multi:
         return
     print("\nChange from first recorded version to latest, per prompt:")
-    print(f"{'prompt':<16}{'versions':<24}{'fresh tokens':>14}{'cost':>9}{'score':>16}")
+    print(f"{'prompt':<16}{'versions':<24}{'total tokens':>14}{'cost':>9}{'score':>16}")
     print("-" * 79)
     t_first = t_last = c_first = c_last = 0.0
     for p, versions in multi.items():
         a, b = versions[0], versions[-1]
-        fa, fb = int(a["fresh_tokens"]), int(b["fresh_tokens"])
+        fa, fb = total(a), total(b)
         ca, cb = float(a["cost_usd"]), float(b["cost_usd"])
         if a["version"] == "v0":  # the ALL row is the hands-on activity's bar: v0 baselines only
             t_first += fa; t_last += fb; c_first += ca; c_last += cb
@@ -218,7 +226,7 @@ def cmd_show(args: argparse.Namespace) -> None:
         print("-" * 79)
         print(f"{'ALL (v0 prompts)':<40}{(t_last - t_first) / t_first * 100:>+13.1f}%"
               f"{(c_last - c_first) / c_first * 100 if c_first else 0.0:>+8.1f}%")
-        print("\nPassing bar for the hands-on activity: ALL fresh tokens down 35% or more,"
+        print("\nPassing bar for the hands-on activity: ALL cost down 35% or more,"
               "\nand no prompt's latest score below 90% of its first score.")
 
 

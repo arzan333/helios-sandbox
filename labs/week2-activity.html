@@ -121,7 +121,7 @@
     <b>What you are testing.</b> In the lab you watched someone else&apos;s three
     instructions. Now you cut your own. The claim on trial is the one every team
     argues about without evidence: <b>an instruction can be cut hard without the
-    answer getting worse.</b> You need a third off the tokens with no answer dropping
+    answer getting worse.</b> You need a third off the cost, with no answer dropping
     more than a tenth of its score. A big cut that halves the quality is not a win with
     a nice number on it - it is a regression.
   </div>
@@ -162,9 +162,9 @@ python scripts\ledger.py show week2\ledger.csv</code></pre>
     <b>Expected.</b> Your ledger from the lab, with a score and a scorer on the first
     three rows:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - figures yours</span></div>
-<pre><code>ac            v2000          sonnet-5        7,900   3,100   4,800   412,000   0.4200     19  opus-5
-ac            v900           sonnet-5        4,604   1,788   2,816   125,540   0.1389     21  opus-5
-ac            v320           sonnet-5        1,712     612   1,100    95,000   0.0816     20  opus-5</code></pre></div>
+<pre><code>ac            v2000          sonnet-5         12   6,100   402,000    34,000   442,112   0.9120     22  opus
+ac            v900           sonnet-5         10   4,200   168,000    31,000   203,210   0.4310     23  opus
+ac            v320           sonnet-5          8   3,199    76,207    29,800   109,214   0.2625     24  opus</code></pre></div>
     Nothing there? Do the lab&apos;s step 0 first - this builds on it. Claude Code
     should already be running in one window; if not, start it with
     <code>claude</code>.
@@ -193,7 +193,7 @@ dir week2\out</code></pre>
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - figures yours</span></div>
 <pre><code>Running code-review.md ... this takes a moment and writes its own output file.
 Claude replied: 14 findings: 2 Critical, 5 Warning, 7 Suggestion
-Added: code-review v0  fresh 12,480 tokens (4,100 in + 8,380 out), cache read 690,200, cost $0.5140
+Added: code-review v0  total 806,140 tokens (11 in, 8,380 out, 762,749 cache read, 35,000 cache write), cost $1.2140
 ...
 code-review-v0.md   test-cases-v0.md   defect-triage-v0.md</code></pre></div>
     Each run takes a while - these instructions tell Claude to read a dozen files and
@@ -221,15 +221,15 @@ python scripts\score.py week2\out\code-review-v0.md week2\out\test-cases-v0.md w
   <div class="expect">
     <b>Expected.</b> Three blocks like this - wording varies, structure does not:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
-<pre><code>Scoring week2/out/code-review-v0.md against prompts/prompt-pack-v0/rubrics/code-review.md on opus ...
-Row 1: 5 - "Critical: tax rate defined in two places"
-Row 2: 4 - "billing_client.py, _local_invoice"
-Row 3: 5 - "the fallback hides a broken contract"
-Row 4: 3 - "add a retry with backoff"
-Row 5: 2 - "the client leaks connection details"
+<pre><code>Scoring week2\out\code-review-v0.md against prompts\prompt-pack-v0\rubrics\code-review.md on opus ...
+1. Severity on every finding - 5 - "Critical | billing_client.py:41 | tax rate..."
+2. Findings are located - 4 - "in _local_invoice"
+3. Catches the duplicated tax rate - 5 - "defined on both sides of the boundary"
+4. Catches the masked contract failure - 3 - "the except clause is broad"
+5. No false positives - 2 - "add a retry with exponential backoff" (not a finding)
 TOTAL: 19/25
--&gt; scorer claude-opus-5, cost $0.0781
--&gt; recorded code-review v0 = 19/25 in week2/ledger.csv</code></pre></div>
+-&gt; scorer claude-opus-5, cost $0.1482
+-&gt; recorded code-review v0 = 19/25 in week2\ledger.csv</code></pre></div>
     <br><br>
     Told the scorer was not Opus? Add <code>--allow-scorer-mismatch</code> and check
     two rows by hand below rather than one.
@@ -262,9 +262,9 @@ python scripts\ledger.py show week2\ledger.csv</code></pre>
   <div class="expect">
     <b>Expected.</b> Three new rows carrying scores:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - figures yours</span></div>
-<pre><code>code-review   v0             sonnet-5       12,480   4,100   8,380   690,200   0.5140     19  opus-5
-test-cases    v0             sonnet-5        9,940   3,020   6,920   455,100   0.3820     21  opus-5
-defect-triage v0             sonnet-5        8,610   2,780   5,830   401,600   0.3310     17  opus-5</code></pre></div>
+<pre><code>code-review   v0             sonnet-5         11   8,380   762,749    35,000   806,140   1.2140     19  opus
+test-cases    v0             sonnet-5          9   6,920   488,300    33,000   528,229   0.7820     21  opus
+defect-triage v0             sonnet-5          9   5,830   430,100    32,000   467,939   0.6310     17  opus</code></pre></div>
     <b>Write those three scores down</b> - nine tenths of each is the floor your rewrite
     has to clear (here: 17.1, 18.9, 15.3).
   </div>
@@ -410,8 +410,10 @@ prompts/prompt-pack-v0/test-cases.md     week2/prompts/v1/test-cases.md      933
 prompts/prompt-pack-v0/defect-triage.md  week2/prompts/v1/defect-triage.md 1,480 -&gt; 455     -69.3%
 -----------------------------------------------------------------------------------------------
 ALL                                                                        4,363 -&gt; 1,218   -72.1%</code></pre></div>
-    If the combined line is not at least a third down, cut more now - this check costs
-    nothing, the run does.
+    This measures the instruction alone - a good early signal, but the figure that
+    counts is the <b>cost</b> after the run, because most of the saving comes from the
+    files Claude no longer opens and the answer it no longer writes. If this line is not
+    at least a third down, cut more now: the estimate is free, the run is not.
   </div>
   <div class="card">
     <b>If you finish early.</b> Take an instruction from a set that is not yours and,
@@ -439,7 +441,7 @@ python scripts\ledger.py show week2\ledger.csv</code></pre>
     three runs, three markings, and the table you came for:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - shape exact, figures yours</span></div>
 <pre><code>Change from first recorded version to latest, per prompt:
-prompt          versions                  fresh tokens     cost           score
+prompt          versions                  total tokens     cost           score
 -------------------------------------------------------------------------------
 code-review     v0 -&gt; v1                        -64.8%   -71.2%  19 -&gt; 18 (95%)
 test-cases      v0 -&gt; v1                        -52.1%   -58.4%  21 -&gt; 21 (100%)
@@ -485,15 +487,15 @@ code --diff week2\out\code-review-v0.md week2\out\code-review-v1.md</code></pre>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>Read week2/ledger.csv. Build an artifact: a page called "Prompt optimisation"
 with one row per instruction whose first version is v0, comparing that first
-row with its latest. Columns: name, tokens before, tokens after, change %,
-score before, score after, score as % of before, scorer. Add a total row.
-Save it as week2/delta-table.html and publish it. Reply with one line: the
-overall token change.</code></pre>
+row with its latest. Columns: name, cost before, cost after, cost change %, score before, score
+after, score as % of before, scorer. Add a total row. Save it as
+week2/delta-table.html and publish it. Reply with one line: the overall cost
+change.</code></pre>
   </div>
   <div class="expect">
     <b>Expected.</b> A published page, and a one-line reply:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
-<pre><code>-56.3%</code></pre></div>
+<pre><code>-63.1%</code></pre></div>
     It must <b>match the combined line in your own table</b>. If it does not, your
     ledger is right - tell Claude which rows are the before and the after.
   </div>
@@ -501,9 +503,10 @@ overall token change.</code></pre>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">prompt</span>
       <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>In week2/delta-table.html add cost before, cost after and cost change %, from
-the same rows of week2/ledger.csv, and extend the total row. Edit in place; do
-not rewrite. Republish. Reply with one line: the overall cost change.</code></pre>
+<pre><code>In week2/delta-table.html add total tokens before, total tokens after and the
+token change % - total is input plus output plus both cache columns - from the
+same rows of week2/ledger.csv. Extend the total row. Edit in place; do not
+rewrite. Republish. Reply with one line: the overall token change.</code></pre>
   </div>
   <p><b>And again</b>, to turn a per-run saving into a monthly one:</p>
   <div class="snippet">
@@ -634,7 +637,7 @@ repeated rule. Do not edit anything.</code></pre>
 
   <h2>Passing bar</h2>
   <div class="bar">
-    A third off the tokens across your three, and no answer below nine tenths of its
+    A third off the cost across your three, and no answer below nine tenths of its
     starting score. Every score given by a stronger model than wrote the answer, with
     one row checked by you. Every rewrite carries a note of what you cut and why. The
     before-and-after page built once and extended twice, never regenerated. Two
@@ -648,7 +651,9 @@ repeated rule. Do not edit anything.</code></pre>
       <tr><td>A rewrite overwrote your baseline answer</td>
           <td>The output file name still said <code>-v0</code>. Restore it with <code>git checkout -- week2/out/&lt;name&gt;-v0.md</code> if it was committed, or run the original again. Then fix the name and re-run.</td></tr>
       <tr><td>Every instruction is shorter but the combined figure barely moved</td>
-          <td>The tokens were never mostly in the instruction. Look for one that still says "read everything under" or still asks for a recap of the file it just wrote - techniques 2 and 4.</td></tr>
+          <td>The cost was never mostly in the instruction - it is in the files Claude opens and the answer it writes. Look for one that still says "read everything under", or still asks for a recap of the file it just wrote: techniques 2 and 4.</td></tr>
+      <tr><td>The <code>in</code> column shows single digits</td>
+          <td>Normal. Caching puts your instruction and its file reads into the cache columns instead. Compare on <b>total</b> and <b>cost</b> - which is what the change table already does.</td></tr>
       <tr><td>A rewrite scored below nine tenths</td>
           <td>Expected sometimes. Read the marking for the row it lost, put that one requirement back, and run once more as <code>--version v2</code>.</td></tr>
       <tr><td><code>file not found</code> when scoring</td>

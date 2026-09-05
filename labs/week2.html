@@ -473,13 +473,20 @@ Get-Content prompts\week2-lab\ac-2000.md -Raw | Set-Clipboard</code></pre>
   <table>
     <thead><tr><th>Figure</th><th>What it is</th></tr></thead>
     <tbody>
-      <tr><td><b>input</b></td><td>Your instruction, plus everything Claude opened to answer it</td></tr>
-      <tr><td><b>output</b></td><td>Everything it wrote back, thinking and chat reply included. The expensive half</td></tr>
-      <tr><td>cache read</td><td>The standing overhead, re-read once per request. Grows with every file opened</td></tr>
-      <tr><td>cache write</td><td>Mostly a one-off for the day. Ignore it when comparing runs</td></tr>
-      <tr><td><b>cost</b></td><td>List-price arithmetic on the four numbers. Not a bill on a Team seat, but the same sum every time, so it compares</td></tr>
+      <tr><td>input</td><td>Tokens sent fresh, uncached. Often tiny - see the warning below</td></tr>
+      <tr><td><b>output</b></td><td>Everything Claude wrote back, thinking and chat reply included. The expensive half, and never cached</td></tr>
+      <tr><td>cache read</td><td>Everything re-read from cache on each request: the standing overhead, your instruction, and the files it opened. Grows with every file</td></tr>
+      <tr><td>cache write</td><td>Content put into the cache for the first time - including, usually, your instruction</td></tr>
+      <tr><td><b>cost</b></td><td>List-price arithmetic across all four. Not a bill on a Team seat, but the same sum every time, so it compares</td></tr>
     </tbody>
   </table>
+  <div class="watch">
+    <b>Do not compare runs on &quot;input&quot;.</b> Caching decides which of the four
+    columns your instruction and its file reads land in, and it usually puts them in the
+    cache columns - so <code>input</code> can read as single digits even for a
+    2,000-token instruction. The two figures that compare honestly are <b>total</b>
+    (all four added up) and <b>cost</b>. Those are what the ledger compares for you.
+  </div>
   <p><b>e.</b> Record it. Paste your line between the single quotes:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
@@ -490,7 +497,7 @@ python scripts\ledger.py add week2\ledger.csv --prompt ac --version v2000 --usag
   <div class="expect">
     <b>Expected.</b> One line back, in this shape - your five figures, not these:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
-<pre><code>Added: ac v2000  fresh 7,900 tokens (3,100 in + 4,800 out), cache read 412,000, cost $0.4200</code></pre></div>
+<pre><code>Added: ac v2000  total 442,112 tokens (12 in, 6,100 out, 402,000 cache read, 34,000 cache write), cost $0.9120</code></pre></div>
     That is one row in your ledger, and the whole cycle done by hand once. From here a
     command does it, except in step 6, where the work has to stay in this session.
   </div>
@@ -505,7 +512,7 @@ python scripts\ledger.py add week2\ledger.csv --prompt ac --version v2000 --usag
       <div class="snippet__bar"><span class="snippet__lang">powershell - your five figures</span>
         <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
-python scripts\ledger.py add week2\ledger.csv --prompt ac --version v2000 --model claude-sonnet-5 --input 3.1k --output 4.8k --cache-read 412k --cache-write 31k --cost 0.42</code></pre>
+python scripts\ledger.py add week2\ledger.csv --prompt ac --version v2000 --model claude-sonnet-5 --input 12 --output 6.1k --cache-read 402k --cache-write 34k --cost 0.912</code></pre>
     </div>
     <p>Use it anywhere else in this lab that asks you to paste a line - change the two names after <code>--prompt</code> and <code>--version</code>.</p>
   </details>
@@ -530,10 +537,10 @@ python scripts\run.py prompts\week2-lab\ac-900.md --name ac --version v900</code
     <b>Expected.</b> A short wait, then three lines:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
 <pre><code>Running ac-900.md ... this takes a moment and writes its own output file.
-Claude replied: 7 criteria, 3 open questions
-Added: ac v900  fresh 4,604 tokens (1,788 in + 2,816 out), cache read 125,540, cost $0.1389</code></pre></div>
+Claude replied: 8 criteria, 4 open questions.
+Added: ac v900  total 203,210 tokens (10 in, 4,200 out, 168,000 cache read, 31,000 cache write), cost $0.4310</code></pre></div>
     The middle line is Claude&apos;s whole reply - that is what asking for one line
-    buys you. <b>Input and output should both be lower than run 1.</b>
+    buys you. <b>The total and the cost should both be well below run 1.</b>
   </div>
   <p>The short instruction. It tells Claude to find the one section it needs rather than read the document, and fixes the shape of the answer:</p>
   <div class="snippet">
@@ -546,19 +553,20 @@ python scripts\ledger.py show week2\ledger.csv</code></pre>
   <div class="expect">
     <b>Expected.</b> Your three rows, then the change table:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - shape exact, figures yours</span></div>
-<pre><code>prompt        version        model           fresh      in     out  cache rd   cost $  score  scorer
-------------------------------------------------------------------------------------------------------
-ac            v2000          sonnet-5        7,900   3,100   4,800   412,000   0.4200
-ac            v900           sonnet-5        4,604   1,788   2,816   125,540   0.1389
-ac            v320           sonnet-5        1,712     612   1,100    95,000   0.0816
+<pre><code>prompt        version        model            in     out  cache rd  cache wr     total   cost $  score  scorer
+----------------------------------------------------------------------------------------------------------------
+ac            v2000          sonnet-5         12   6,100   402,000    34,000   442,112   0.9120
+ac            v900           sonnet-5         10   4,200   168,000    31,000   203,210   0.4310
+ac            v320           sonnet-5          8   3,199    76,207    29,800   109,214   0.2625
 
 Change from first recorded version to latest, per prompt:
-prompt          versions                  fresh tokens     cost           score
+prompt          versions                  total tokens     cost           score
 -------------------------------------------------------------------------------
-ac              v2000 -&gt; v320                   -78.3%   -80.6%               -</code></pre></div>
-    The score column is empty until the next step. <b>Both percentages should be large
-    and negative.</b> Your figures will differ from your neighbour&apos;s; the direction
-    should not.
+ac              v2000 -&gt; v320                   -75.3%   -71.2%               -</code></pre></div>
+    Note the <code>in</code> column: single digits, for all three. That is caching, not
+    an error - and it is why the comparison runs on <b>total</b> and <b>cost</b>. The
+    score column fills in next. <b>Both percentages should be large and negative.</b>
+    Your figures will differ from your neighbour&apos;s; the direction should not.
     <br><br>
     Went <i>up</i> instead? Say so - that is the most interesting result in the room,
     and the next step decides whether it mattered.
@@ -591,18 +599,20 @@ python scripts\score.py week2\ac-v2000.md week2\ac-v900.md week2\ac-v320.md --re
   <div class="expect">
     <b>Expected.</b> A minute or so, and one block like this per answer:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - wording varies, structure does not</span></div>
-<pre><code>Scoring week2/ac-v320.md against prompts/week2-lab/rubric-acceptance-criteria.md on opus ...
-Row 1: 5 - "Then the cart shows Arrives 18-20 March"
-Row 2: 4 - "before the customer confirms"
-Row 3: 5 - "Source: 7.3"
-Row 4: 4 - "the window is not shown"
-Row 5: 2 - "stock location is imported nightly"
-TOTAL: 20/25
--&gt; scorer claude-opus-5, cost $0.0644
+<pre><code>Scoring week2\ac-v320.md against prompts\week2-lab\rubric-acceptance-criteria.md on opus ...
+1. Testable - 5 - "The line reads `Arrives 30 April - 2 May`"
+2. Covers FSD section 7 - 5 - "never contain the words `estimated`, `approximately`..."
+3. Traceable - 5 - "| 7.2, Table 5 |"
+4. Nothing invented - 5 - "`Delivery estimate unavailable - our team will confirm...`"
+5. Open questions surfaced - 4 - "bank holiday list is a pasted image" (OI-6 absent)
+TOTAL: 24/25
+-&gt; scorer claude-opus-5, cost $0.1519
 -&gt; evidence saved to week2/scores/ac-v320.md
--&gt; recorded ac v320 = 20/25 in week2/ledger.csv</code></pre></div>
+-&gt; recorded ac v320 = 24/25 in week2\ledger.csv</code></pre></div>
     Five rows, each with the phrase it is based on, a total out of 25, and the model
-    that gave it. Your marks and quotes will differ.
+    that gave it. That is a real result for the short instruction. Your marks and quotes
+    will differ - and the scoring itself costs something, which is the line above the
+    evidence.
     <br><br>
     Told that the scorer was not Opus? Your seat cannot reach it. Re-run the same
     command with <code>--allow-scorer-mismatch</code> on the end, and check two rows by
@@ -643,13 +653,13 @@ python scripts\ledger.py show week2\ledger.csv</code></pre>
   <div class="expect">
     <b>Expected.</b> Every row now carries a score and who gave it:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - shape exact, figures yours</span></div>
-<pre><code>ac            v2000          sonnet-5        7,900   3,100   4,800   412,000   0.4200     19  opus-5
-ac            v900           sonnet-5        4,604   1,788   2,816   125,540   0.1389     21  opus-5
-ac            v320           sonnet-5        1,712     612   1,100    95,000   0.0816     20  opus-5
+<pre><code>ac            v2000          sonnet-5         12   6,100   402,000    34,000   442,112   0.9120     22  opus
+ac            v900           sonnet-5         10   4,200   168,000    31,000   203,210   0.4310     23  opus
+ac            v320           sonnet-5          8   3,199    76,207    29,800   109,214   0.2625     24  opus
 
-ac              v2000 -&gt; v320                   -78.3%   -80.6%  19 -&gt; 20 (105%)</code></pre></div>
-    That last line is the result of the lab: <b>tokens down 78 percent, cost down 80
-    percent, and the answer no worse.</b>
+ac              v2000 -&gt; v320                   -75.3%   -71.2%  22 -&gt; 24 (109%)</code></pre></div>
+    That last line is the result of the lab: <b>three quarters fewer tokens, seventy
+    percent less cost, and the answer no worse.</b>
   </div>
   <div class="card">
     <b>How to read it.</b> The long instruction usually scores well on coverage and
@@ -710,7 +720,8 @@ python scripts\ledger.py add week2\ledger.csv --prompt artifact --version build 
   </div>
   <div class="expect">
     <b>Expected.</b> <code>Added: artifact build</code>, with an output figure in the
-    thousands - a styled page is output-heavy, and output is the expensive half.
+    thousands - a styled page is output-heavy, and output is the one column caching
+    never touches.
     (Cannot select the line? Use the typed-figures form at the end of step 3.)
   </div>
 
@@ -760,7 +771,7 @@ python scripts\ledger.py show week2\ledger.csv</code></pre>
   <div class="expect">
     <b>Expected.</b> A change line for the page, with a <b>positive</b> percentage:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - shape exact, figure yours</span></div>
-<pre><code>artifact        build -&gt; after-2-edits          +38.2%    +31.0%               -</code></pre></div>
+<pre><code>artifact        build -&gt; after-2-edits          +41.5%    +33.8%               -</code></pre></div>
     That is what two revisions cost on top of one build - normally well under half.
     Asking for the whole page again twice would have been about +200 percent. That gap
     is the entire argument for changing things rather than regenerating them.

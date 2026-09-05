@@ -76,10 +76,10 @@ try:
     r2 = subprocess.run([sys.executable, "scripts/ledger.py", "add", str(tmp), "--prompt", "t", "--version", "v1", "--model", "sonnet", "--input", "600", "--output", "2.1k", "--cache-read", "300k", "--cache-write", "48k", "--cost", "0.21"], cwd=ROOT, capture_output=True, text=True)
     r3 = subprocess.run([sys.executable, "scripts/ledger.py", "score", str(tmp), "--prompt", "t", "--version", "v0", "--score", "20"], cwd=ROOT, capture_output=True, text=True)
     r4 = subprocess.run([sys.executable, "scripts/ledger.py", "show", str(tmp)], cwd=ROOT, capture_output=True, text=True)
-    check(r1.returncode == 0 and "fresh 6,500 tokens" in r1.stdout, f"ledger add (usage line) wrong: {r1.stdout}{r1.stderr}")
-    check(r2.returncode == 0 and "fresh 2,700 tokens" in r2.stdout, f"ledger add (numbers) wrong: {r2.stdout}{r2.stderr}")
+    check(r1.returncode == 0 and "total 996,500 tokens" in r1.stdout, f"ledger add (usage line) wrong: {r1.stdout}{r1.stderr}")
+    check(r2.returncode == 0 and "total 350,700 tokens" in r2.stdout, f"ledger add (numbers) wrong: {r2.stdout}{r2.stderr}")
     check(r3.returncode == 0 and "20/25" in r3.stdout, f"ledger score wrong: {r3.stdout}{r3.stderr}")
-    check(r4.returncode == 0 and "-58.5%" in r4.stdout and "ALL" in r4.stdout, f"ledger show wrong: {r4.stdout}{r4.stderr}")
+    check(r4.returncode == 0 and "-64.8%" in r4.stdout and "ALL" in r4.stdout, f"ledger show wrong: {r4.stdout}{r4.stderr}")
     # PowerShell double-quote trap: $0 eaten
     r5 = subprocess.run([sys.executable, "scripts/ledger.py", "add", str(tmp), "--prompt", "t", "--version", "v2", "--usage", line.replace("$0.55", ".55")], cwd=ROOT, capture_output=True, text=True)
     check(r5.returncode == 0 and "$0.5500" in r5.stdout, "ledger does not survive PowerShell eating $0 in the usage line")
@@ -340,15 +340,20 @@ for frag, src in [("You are a world-class senior business analyst", "prompts/wee
 check("Side by side" in lab and lab.count("<th>Long</th>") == 1, "week2.html has no side-by-side comparison of the three")
 check("write down your prediction" in lab, "week2.html does not ask for a prediction before the runs")
 
+# Caching means "input" is not comparable; both books must say so and compare on total/cost.
+for rel, text in [("labs/week2.html", lab), ("labs/week2-activity.html", act)]:
+    check("caching" in html.unescape(text).lower() or "Caching" in html.unescape(text),
+          f"{rel} does not warn that caching hides the instruction from the input column")
+
 # Literal output shown to participants must match what the tools really print.
 for frag, why in [
-    ("Added: ac v2000  fresh 7,900 tokens (3,100 in + 4,800 out), cache read 412,000, cost $0.4200", "ledger add line"),
-    ("prompt        version        model           fresh      in     out  cache rd   cost $  score  scorer", "ledger show header"),
-    ("prompt          versions                  fresh tokens     cost           score", "ledger change header"),
+    ("Added: ac v2000  total 442,112 tokens (12 in, 6,100 out, 402,000 cache read, 34,000 cache write), cost $0.9120", "ledger add line"),
+    ("prompt        version        model            in     out  cache rd  cache wr     total   cost $  score  scorer", "ledger show header"),
+    ("prompt          versions                  total tokens     cost           score", "ledger change header"),
     ("Running ac-900.md ... this takes a moment and writes its own output file.", "runner first line"),
 ]:
     check(frag in html.unescape(lab), f"week2.html shows a {why} that no longer matches the tool")
-check("prompt          versions                  fresh tokens     cost           score" in html.unescape(act),
+check("prompt          versions                  total tokens     cost           score" in html.unescape(act),
       "week2-activity.html shows a change table that no longer matches the tool")
 
 # Setup must never destroy recorded work: any copy into week2/ is guarded.
