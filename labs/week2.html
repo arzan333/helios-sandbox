@@ -436,7 +436,24 @@ type prompts\week2-lab\ac-320.md</code></pre>
 Get-Content prompts\week2-lab\ac-2000.md -Raw | Set-Clipboard</code></pre>
   </div>
 
-  <p><b>b.</b> In the Claude Code window, empty the session first:</p>
+  <p>
+    <b>b.</b> In the Claude Code window, set the model and empty the session. Both
+    lines, one after the other:
+  </p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">claude code</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>/model sonnet</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A confirmation that the model is now Sonnet:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
+<pre><code>Set model to sonnet (claude-sonnet-5)</code></pre></div>
+    <b>Why this matters.</b> In step 5 the answers are marked by Opus, a stronger model.
+    A model must not mark its own work, so the writing is pinned to Sonnet here. If your
+    session was already on Sonnet, this changes nothing. The scoring step checks, and
+    refuses to record a score when the same model did both jobs.
+  </div>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">claude code</span>
       <button class="snippet__copy" type="button">Copy</button></div>
@@ -522,9 +539,9 @@ python scripts\ledger.py add week2\ledger.csv --prompt ac --version v2000 --mode
     <span class="step__time">20-26 min</span>
   </div>
   <p>
-    <b>Why.</b> You have now done the cycle by hand: clear, send, read the figures,
-    record. This command does exactly that, so the rest of the hour goes on the answers
-    rather than the clerical work.
+    <b>Why.</b> You have now done the cycle by hand: set the model, clear, send, read
+    the figures, record. This command does exactly that - Sonnet included - so the rest
+    of the hour goes on the answers rather than the clerical work.
   </p>
   <p>The medium instruction. It points at the ticket and the spec section instead of pasting them, asks for one format, and wants a one-line reply:</p>
   <div class="snippet">
@@ -851,6 +868,8 @@ git log --oneline -1</code></pre>
           <td>Open a new terminal - a window opened before the install does not see it.</td></tr>
       <tr><td>A run stops with a login or usage-limit message</td>
           <td>Your seat has hit its limit or the login expired. The Claude Code window will say the same. Sign in or wait, then run the command again - repeating is safe.</td></tr>
+      <tr><td><code>opus is marking its own work</code></td>
+          <td>That answer was written by Opus, so Opus cannot mark it. Re-run that one with the model pinned: add <code>--model sonnet</code> to the run command, or use <code>/model sonnet</code> before pasting, then score again.</td></tr>
       <tr><td>The scorer was not Opus</td>
           <td>Your seat cannot reach it. Add <code>--allow-scorer-mismatch</code>, check two rows by hand, and say so when you present.</td></tr>
       <tr><td>No total came back from the scorer</td>

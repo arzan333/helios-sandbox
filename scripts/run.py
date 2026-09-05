@@ -5,8 +5,9 @@
 What it does, in one step:
   1. reads the prompt file (any <!-- comment --> at the top is stripped, so your
      notes to yourself cost nothing),
-  2. runs it in a fresh Claude Code session - no memory of anything before it, so
-     the numbers belong to this prompt and nothing else,
+  2. runs it in a fresh Claude Code session on Sonnet - no memory of anything
+     before it, so the numbers belong to this prompt and nothing else, and the
+     Opus scorer is always a stronger model than the one that wrote the answer,
   3. reads the real token counts and cost back from that session,
   4. writes a row to week2/ledger.csv.
 
@@ -69,7 +70,9 @@ def main() -> None:
     ap.add_argument("--version", required=True, help="which attempt this is, e.g. v0 or v1")
     ap.add_argument("--name", help="ledger name; defaults to the prompt file name")
     ap.add_argument("--ledger", default=DEFAULT_LEDGER)
-    ap.add_argument("--model", help="only to force a model; leave it out to use your normal one")
+    ap.add_argument("--model", default="sonnet",
+                    help="model that writes the answer. Defaults to sonnet so that the Opus scorer "
+                         "is always a stronger model than the writer. Pass another alias to override.")
     ap.add_argument("--budget", type=float, default=2.0, help="stop the run if it would cost more than this")
     args = ap.parse_args()
 

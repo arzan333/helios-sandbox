@@ -147,7 +147,8 @@ for rel, text in [("labs/week2.html", lab), ("labs/week2-activity.html", act)]:
     check("scripts\\score.py" in text and "--record week2\\ledger.csv" in text, f"{rel} does not score with scripts/score.py --record")
     check("One file at a time, top to bottom, five rows" not in text, f"{rel} still asks for manual five-row scoring")
     check("--allow-scorer-mismatch" in text, f"{rel} has no fallback for a seat without Opus")
-    check("/model" not in text, f"{rel} still uses interactive /model switching; scoring goes through score.py")
+    stray = [m for m in re.findall(r"/model\s+\w+", html.unescape(text)) if m != "/model sonnet"]
+    check(not stray, f"{rel} switches models interactively ({stray[:2]}); only the sonnet pin is allowed, scoring goes through score.py")
     # A score.py call must come after the run that produced and recorded that answer.
     for m in re.finditer(r"scripts\\score\.py ([^\n<]+)", text):
         for name, ver in re.findall(r"week2\\(?:out\\)?([a-z-]+)-(v\d+)\.md", m.group(1)):
@@ -339,6 +340,16 @@ for frag, src in [("You are a world-class senior business analyst", "prompts/wee
     check(frag in (ROOT / src).read_text(encoding="utf-8"), f"{src} no longer contains the line the lab quotes")
 check("Side by side" in lab and lab.count("<th>Long</th>") == 1, "week2.html has no side-by-side comparison of the three")
 check("write down your prediction" in lab, "week2.html does not ask for a prediction before the runs")
+
+# The writer model must be pinned for the participant, not left to memory.
+rp = (ROOT / "scripts/run.py").read_text(encoding="utf-8")
+check('"--model", default="sonnet"' in rp, "run.py no longer pins the writing model to sonnet")
+check("/model sonnet" in html.unescape(lab), "week2.html does not pin the model before the hand-run")
+check("marking its own work" in html.unescape(lab), "week2.html has no troubleshooting for a same-tier scorer")
+for rel, text in [("labs/week2.html", lab), ("labs/week2-activity.html", act)]:
+    check("--model sonnet" not in re.sub(r"(?s)<table>.*?</table>", "", html.unescape(text)).replace(
+              "add <code>--model sonnet</code>", ""),
+          f"{rel} asks participants to remember a model flag; it should be the default")
 
 # score.py must refuse to let a model mark its own work.
 sc = (ROOT / "scripts/score.py").read_text(encoding="utf-8")
