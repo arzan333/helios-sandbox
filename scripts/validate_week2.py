@@ -352,7 +352,7 @@ for rel, text in [("labs/week2.html", lab), ("labs/week2-activity.html", act)]:
 
 # Literal output shown to participants must match what the tools really print.
 for frag, why in [
-    ("Added: ac v2000  total 246,203 tokens (10 in, 34,037 out, 153,752 cache read, 58,404 cache write), cost $1.5146", "ledger add line"),
+    ("Added: ac v2000  total 280,340 tokens (10 in, 21,430 out, 189,437 cache read, 69,463 cache write), cost $0.5328", "ledger add line"),
     ("prompt        version        model            in     out  cache rd  cache wr     total   cost $  score  scorer", "ledger show header"),
     ("prompt          versions                  total tokens     cost           score", "ledger change header"),
     ("Running ac-900.md ... this takes a moment and writes its own output file.", "runner first line"),

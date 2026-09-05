@@ -497,7 +497,7 @@ python scripts\ledger.py add week2\ledger.csv --prompt ac --version v2000 --usag
   <div class="expect">
     <b>Expected.</b> One line back, in this shape - your five figures, not these:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
-<pre><code>Added: ac v2000  total 246,203 tokens (10 in, 34,037 out, 153,752 cache read, 58,404 cache write), cost $1.5146</code></pre></div>
+<pre><code>Added: ac v2000  total 280,340 tokens (10 in, 21,430 out, 189,437 cache read, 69,463 cache write), cost $0.5328</code></pre></div>
     That is one row in your ledger, and the whole cycle done by hand once. From here a
     command does it, except in step 6, where the work has to stay in this session.
   </div>
@@ -512,7 +512,7 @@ python scripts\ledger.py add week2\ledger.csv --prompt ac --version v2000 --usag
       <div class="snippet__bar"><span class="snippet__lang">powershell - your five figures</span>
         <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
-python scripts\ledger.py add week2\ledger.csv --prompt ac --version v2000 --model claude-sonnet-5 --input 10 --output 34k --cache-read 154k --cache-write 58k --cost 1.5146</code></pre>
+python scripts\ledger.py add week2\ledger.csv --prompt ac --version v2000 --model claude-sonnet-5 --input 10 --output 21k --cache-read 189k --cache-write 69k --cost 0.5328</code></pre>
     </div>
     <p>Use it anywhere else in this lab that asks you to paste a line - change the two names after <code>--prompt</code> and <code>--version</code>.</p>
   </details>
@@ -538,7 +538,7 @@ python scripts\run.py prompts\week2-lab\ac-900.md --name ac --version v900</code
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
 <pre><code>Running ac-900.md ... this takes a moment and writes its own output file.
 Claude replied: 9 criteria, 5 open questions.
-Added: ac v900  total 141,880 tokens (9 in, 9,120 out, 108,900 cache read, 23,851 cache write), cost $0.5820</code></pre></div>
+Added: ac v900  total 214,600 tokens (10 in, 11,240 out, 178,900 cache read, 24,450 cache write), cost $0.2980</code></pre></div>
     The middle line is Claude&apos;s whole reply - that is what asking for one line
     buys you. <b>The total and the cost should both be well below run 1.</b>
   </div>
@@ -555,18 +555,22 @@ python scripts\ledger.py show week2\ledger.csv</code></pre>
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - shape exact, figures yours</span></div>
 <pre><code>prompt        version        model            in     out  cache rd  cache wr     total   cost $  score  scorer
 ----------------------------------------------------------------------------------------------------------------
-ac            v2000          opus-5[1m]       10  34,037   153,752    58,404   246,203   1.5146
-ac            v900           opus-5[1m]        9   9,120   108,900    23,851   141,880   0.5820
-ac            v320           opus-5[1m]        8   2,695    79,243    10,617    92,563   0.2145
+ac            v2000          sonnet-5         10  21,430   189,437    69,463   280,340   0.5328
+ac            v900           sonnet-5         10  11,240   178,900    24,450   214,600   0.2980
+ac            v320           sonnet-5         10   5,195   162,807    13,508   181,520   0.1399
 
 Change from first recorded version to latest, per prompt:
 prompt          versions                  total tokens     cost           score
 -------------------------------------------------------------------------------
-ac              v2000 -&gt; v320                   -62.4%   -85.8%               -</code></pre></div>
+ac              v2000 -&gt; v320                   -35.3%   -73.7%               -</code></pre></div>
     Note the <code>in</code> column: single digits, for all three. That is caching, not
-    an error - and it is why the comparison runs on <b>total</b> and <b>cost</b>. The
-    score column fills in next. <b>Both percentages should be large and negative.</b>
-    Your figures will differ from your neighbour&apos;s; the direction should not.
+    an error - and it is why the comparison runs on <b>total</b> and <b>cost</b>.
+    <br><br>
+    <b>Watch the cost line especially.</b> Total tokens fall by a third here, but cost
+    falls by three quarters, because the two do not move together: the expensive part
+    is the answer being written, and the short instruction asked for far less of it.
+    The score column fills in next. Your figures will differ from your
+    neighbour&apos;s; the direction should not.
     <br><br>
     Went <i>up</i> instead? Say so - that is the most interesting result in the room,
     and the next step decides whether it mattered.
@@ -600,29 +604,30 @@ python scripts\score.py week2\ac-v2000.md week2\ac-v900.md week2\ac-v320.md --re
     <b>Expected.</b> A minute or so, and one block like this per answer:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - wording varies, structure does not</span></div>
 <pre><code>Scoring week2\ac-v2000.md against prompts\week2-lab\rubric-acceptance-criteria.md on opus ...
-1 Testable - 4 - "assert the rendered text equals the exact string"
-2 Covers FSD section 7 - 5 - "displayed above the confirm control"
-3 Traceable - 3 - "Section 7.3 specifies the position"
-4 Nothing invented - 1 - "meet WCAG 2.2 AA contrast"
-5 Open questions surfaced - 4 - "Is the window contractual or advisory?"
-TOTAL: 17/25
--&gt; scorer claude-opus-5, cost $0.6130
--&gt; recorded ac v2000 = 17/25 in week2\ledger.csv
+1. Testable - 4 - "announced or otherwise discoverable"
+2. Covers FSD section 7 - 5 - "above the confirm control"
+3. Traceable - 3 - "Weekends are the simplest form of non-working day"
+4. Nothing invented - 0 - "I also added an accessibility criterion"
+5. Open questions surfaced - 3 - "Is the delivery window contractual"
+TOTAL: 15/25
+-&gt; scorer claude-opus-5, cost $0.3870
+-&gt; recorded ac v2000 = 15/25 in week2\ledger.csv
 
 Scoring week2\ac-v320.md against prompts\week2-lab\rubric-acceptance-criteria.md on opus ...
-1. Testable - 5 - "The line reads `Arrives 18-20 March`"
-2. Covers FSD section 7 - 5 - "contains none of the words `estimated`, `approximately`..."
+1. Testable - 5 - "Arrives 30 April - 2 May"
+2. Covers FSD section 7 - 5 - "contains none of the words estimated, approximately..."
 3. Traceable - 5 - "Source (FSD 7.x)"
-4. Nothing invented - 5 - "`Delivery estimate unavailable - our team will confirm...`"
-5. Open questions surfaced - 3 - "the design is not approved (7.5)"
+4. Nothing invented - 5 - "Delivery estimate unavailable - our team will confirm..."
+5. Open questions surfaced - 3 - "the bank holiday list is not decided (7.5)"
 TOTAL: 23/25
--&gt; scorer claude-opus-5, cost $0.1326
+-&gt; scorer claude-opus-5, cost $0.1225
 -&gt; recorded ac v320 = 23/25 in week2\ledger.csv</code></pre></div>
-    Real figures from a real pair of runs. Look at row 4 on the long one: <b>1 out of
-    5</b>, because it invented an accessibility requirement - WCAG contrast - that
-    nobody asked for and no document mentions. Reading four extra files &quot;to be
-    thorough&quot; did not make it more careful; it gave it more to have opinions
-    about. Your marks and quotes will differ.
+    Real figures from a real pair of runs. Look at row 4 on the long one: <b>zero out of
+    five</b>, and read the evidence the scorer quoted - <i>&quot;I also added an
+    accessibility criterion&quot;</i>. The long instruction invented a requirement
+    nobody asked for and no document mentions, then said so out loud. Being told to read
+    four extra files &quot;to be thorough&quot; did not make it careful; it gave it more
+    to have opinions about. Your marks and quotes will differ.
     <br><br>
     Told that the scorer was not Opus? Your seat cannot reach it. Re-run the same
     command with <code>--allow-scorer-mismatch</code> on the end, and check two rows by
@@ -663,13 +668,13 @@ python scripts\ledger.py show week2\ledger.csv</code></pre>
   <div class="expect">
     <b>Expected.</b> Every row now carries a score and who gave it:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - shape exact, figures yours</span></div>
-<pre><code>ac            v2000          sonnet-5         10  34,037   153,752    58,404   246,203   1.5146     17  opus-5
-ac            v900           sonnet-5          9   9,120   108,900    23,851   141,880   0.5820     21  opus-5
-ac            v320           sonnet-5          8   2,695    79,243    10,617    92,563   0.2145     23  opus-5
+<pre><code>ac            v2000          sonnet-5         10  21,430   189,437    69,463   280,340   0.5328     15  opus-5
+ac            v900           sonnet-5         10  11,240   178,900    24,450   214,600   0.2980     20  opus-5
+ac            v320           sonnet-5         10   5,195   162,807    13,508   181,520   0.1399     23  opus-5
 
-ac              v2000 -&gt; v320                   -62.4%   -85.8%  17 -&gt; 23 (135%)</code></pre></div>
-    That last line is the result of the lab: <b>sixty percent fewer tokens,
-    eighty-five percent less cost, and a better answer.</b>
+ac              v2000 -&gt; v320                   -35.3%   -73.7%  15 -&gt; 23 (153%)</code></pre></div>
+    That last line is the result of the lab: <b>three quarters less cost, and a
+    markedly better answer.</b> The instruction that tried hardest scored worst.
   </div>
   <div class="card">
     <b>How to read it.</b> The long instruction usually scores well on coverage and
