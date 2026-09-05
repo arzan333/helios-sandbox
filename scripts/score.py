@@ -113,6 +113,25 @@ def record(ledger: Path, prompt: str, version: str, score: int, note: str) -> No
         writer.writerows(rows)
 
 
+def family(model: str) -> str:
+    """opus / sonnet / haiku / fable, from names like claude-opus-5[1m]."""
+    m = re.sub(r"^claude-", "", (model or "").lower())
+    for name in ("opus", "fable", "sonnet", "haiku"):
+        if name in m:
+            return name
+    return m.split("-")[0] if m else "unknown"
+
+
+def generator_model(ledger: Path, prompt: str, version: str) -> str | None:
+    """Which model wrote the answer, according to the ledger."""
+    if not ledger.exists():
+        return None
+    with ledger.open(encoding="utf-8", newline="") as handle:
+        hits = [r for r in csv.DictReader(handle)
+                if r["prompt"] == prompt and r["version"] == version]
+    return hits[-1]["model"] if hits else None
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("outputs", nargs="+", help="output files to score, e.g. week2/out/code-review-v0.md")
@@ -158,13 +177,24 @@ def main() -> None:
                   f"or re-run with --allow-scorer-mismatch to record anyway (the note will say so).")
             exit_code = 1
             continue
+
+        wrote = generator_model(ROOT / args.record, prompt, version) if args.record else None
+        if wrote and family(wrote) == family(model) and not args.allow_scorer_mismatch:
+            print(f"!! {family(model)} is marking its own work: the answer was written by {wrote} and scored by {model}.")
+            print(f"   Re-run the answer on a smaller model, then score again:")
+            print(f"     python scripts/run.py <the prompt file> --name {prompt} --version {version} --model sonnet")
+            print(f"   Or record it as it stands with --allow-scorer-mismatch (the ledger will say same-tier).")
+            exit_code = 1
+            continue
         if total is None:
             print("!! No 'TOTAL: n/25' line found. Read the evidence file and record the score by hand with scripts/ledger.py score.")
             exit_code = 1
             continue
         if args.record:
+            same_tier = bool(wrote) and family(wrote) == family(model)
+            note = f"scorer={model}" + (" (same tier as the writer)" if same_tier else "")
             record(ROOT / args.record if not Path(args.record).is_absolute() else Path(args.record),
-                   prompt, version, total, f"scorer={model}")
+                   prompt, version, total, note)
             print(f"-> recorded {prompt} {version} = {total}/25 in {args.record}")
         print()
     sys.exit(exit_code)

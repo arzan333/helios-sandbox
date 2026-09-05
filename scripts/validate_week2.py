@@ -340,6 +340,11 @@ for frag, src in [("You are a world-class senior business analyst", "prompts/wee
 check("Side by side" in lab and lab.count("<th>Long</th>") == 1, "week2.html has no side-by-side comparison of the three")
 check("write down your prediction" in lab, "week2.html does not ask for a prediction before the runs")
 
+# score.py must refuse to let a model mark its own work.
+sc = (ROOT / "scripts/score.py").read_text(encoding="utf-8")
+check("marking its own work" in sc, "score.py no longer detects a same-tier scorer")
+check("def family(" in sc and "def generator_model(" in sc, "score.py lost the generator/scorer comparison")
+
 # Caching means "input" is not comparable; both books must say so and compare on total/cost.
 for rel, text in [("labs/week2.html", lab), ("labs/week2-activity.html", act)]:
     check("caching" in html.unescape(text).lower() or "Caching" in html.unescape(text),
@@ -347,7 +352,7 @@ for rel, text in [("labs/week2.html", lab), ("labs/week2-activity.html", act)]:
 
 # Literal output shown to participants must match what the tools really print.
 for frag, why in [
-    ("Added: ac v2000  total 442,112 tokens (12 in, 6,100 out, 402,000 cache read, 34,000 cache write), cost $0.9120", "ledger add line"),
+    ("Added: ac v2000  total 246,203 tokens (10 in, 34,037 out, 153,752 cache read, 58,404 cache write), cost $1.5146", "ledger add line"),
     ("prompt        version        model            in     out  cache rd  cache wr     total   cost $  score  scorer", "ledger show header"),
     ("prompt          versions                  total tokens     cost           score", "ledger change header"),
     ("Running ac-900.md ... this takes a moment and writes its own output file.", "runner first line"),
