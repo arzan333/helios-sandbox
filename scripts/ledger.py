@@ -121,7 +121,8 @@ def cmd_add(args: argparse.Namespace) -> None:
 
 def load(path: Path) -> list[dict]:
     if not path.exists():
-        sys.exit(f"{path} does not exist yet. Add a row first.")
+        sys.exit(f"{path} does not exist yet. Copy templates/token-ledger.csv to it, "
+                 f"or record a run with scripts/run.py.")
     with path.open(encoding="utf-8") as handle:
         return list(csv.DictReader(handle))
 
@@ -171,7 +172,8 @@ def total(row: dict) -> int:
 def cmd_show(args: argparse.Namespace) -> None:
     rows = load(Path(args.ledger))
     if not rows:
-        sys.exit("Ledger is empty.")
+        print("Ledger is empty - no runs recorded yet. That is expected before your first run.")
+        return
     print(f"{'prompt':<14}{'version':<15}{'model':<12}{'in':>7}{'out':>8}{'cache rd':>10}{'cache wr':>10}{'total':>10}{'cost $':>9}{'score':>7}  {'scorer':<12}")
     print("-" * 112)
     for r in rows:

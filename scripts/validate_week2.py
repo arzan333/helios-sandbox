@@ -146,7 +146,7 @@ check("110" == vols.get("code-review", {}).get("monthly_volume"), "activity quot
 for rel, text in [("labs/week2.html", lab), ("labs/week2-activity.html", act)]:
     check("scripts\\score.py" in text and "--record week2\\ledger.csv" in text, f"{rel} does not score with scripts/score.py --record")
     check("One file at a time, top to bottom, five rows" not in text, f"{rel} still asks for manual five-row scoring")
-    check("--allow-scorer-mismatch" in text, f"{rel} has no fallback for a seat without Opus")
+    check("not available to this account" in html.unescape(text), f"{rel} has no fallback for a seat without Opus")
     stray = [m for m in re.findall(r"/model\s+\w+", html.unescape(text)) if m != "/model sonnet"]
     check(not stray, f"{rel} switches models interactively ({stray[:2]}); only the sonnet pin is allowed, scoring goes through score.py")
     # A score.py call must come after the run that produced and recorded that answer.
@@ -341,6 +341,19 @@ for frag, src in [("You are a world-class senior business analyst", "prompts/wee
 check("Side by side" in lab and lab.count("<th>Long</th>") == 1, "week2.html has no side-by-side comparison of the three")
 check("write down your prediction" in lab, "week2.html does not ask for a prediction before the runs")
 
+# Each book must start Claude Code itself: either can be run without the other.
+for rel, text in [("labs/week2.html", lab), ("labs/week2-activity.html", act)]:
+    body = html.unescape(text)
+    first_interactive = min([body.find(m) for m in ('"snippet__lang">claude code', '"snippet__lang">prompt')
+                             if body.find(m) != -1] or [len(body)])
+    starts = re.search(r"^claude(</code></pre>)?$", body[:first_interactive], re.M)
+    check(starts is not None, f"{rel} uses Claude Code without ever starting it")
+
+# Either book must be runnable on its own: each pulls the week's files itself.
+for rel, text in [("labs/week2.html", lab), ("labs/week2-activity.html", act)]:
+    check("git merge origin/main" in html.unescape(text),
+          f"{rel} assumes the other book already pulled the week's files")
+
 # The writer model must be pinned for the participant, not left to memory.
 rp = (ROOT / "scripts/run.py").read_text(encoding="utf-8")
 check('"--model", default="sonnet"' in rp, "run.py no longer pins the writing model to sonnet")
@@ -354,12 +367,40 @@ for rel, text in [("labs/week2.html", lab), ("labs/week2-activity.html", act)]:
 # score.py must refuse to let a model mark its own work.
 sc = (ROOT / "scripts/score.py").read_text(encoding="utf-8")
 check("marking its own work" in sc, "score.py no longer detects a same-tier scorer")
+check("NO_ACCESS" in sc and "not available to this account" in sc,
+      "score.py no longer falls back when the seat cannot reach the scorer model")
 check("def family(" in sc and "def generator_model(" in sc, "score.py lost the generator/scorer comparison")
 
 # Caching means "input" is not comparable; both books must say so and compare on total/cost.
 for rel, text in [("labs/week2.html", lab), ("labs/week2-activity.html", act)]:
     check("caching" in html.unescape(text).lower() or "Caching" in html.unescape(text),
           f"{rel} does not warn that caching hides the instruction from the input column")
+
+# Every ledger row shown to participants must add up, and cost the right order of magnitude.
+for rel, text in [("labs/week2.html", lab), ("labs/week2-activity.html", act)]:
+    for m in re.finditer(r"^(\S+)\s+(v\S+|build|after-2-edits)\s+\S+\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)\s+([\d.]+)",
+                         html.unescape(text), re.M):
+        name, ver = m.group(1), m.group(2)
+        i, o, cr, cw, tot = (int(m.group(k).replace(",", "")) for k in range(3, 8))
+        cost = float(m.group(8))
+        check(i + o + cr + cw == tot,
+              f"{rel}: {name} {ver} total shows {tot:,} but the four columns add to {i + o + cr + cw:,}")
+        est = (i * 3 + o * 15 + cr * 0.30 + cw * 3.75) / 1e6
+        check(0.4 * est <= cost <= 2.2 * est,
+              f"{rel}: {name} {ver} cost ${cost} is not plausible for those token counts (~${est:.3f})")
+
+# The activity must not claim the lab is a prerequisite while also saying it is not.
+check("the lab finished" not in html.unescape(act), "week2-activity.html still lists the lab as a prerequisite")
+# Any `code` on a generated file must be preceded by a listing.
+for rel, text in [("labs/week2.html", lab), ("labs/week2-activity.html", act)]:
+    for blk in re.findall(r"<pre><code>(.*?)</code></pre>", html.unescape(text), re.S):
+        lines = [l.strip() for l in blk.splitlines()]
+        for idx, l in enumerate(lines):
+            if l.startswith("code ") and "--diff" not in l and "week2" in l:
+                safe = any(x.startswith("dir ") or "copy " in x or x.startswith("Set-Content")
+                           for x in lines[:idx])
+                check(safe, f"{rel}: `{l[:52]}` is not preceded by a listing or by the command that "
+                            f"creates the file; a missing file would open blank")
 
 # Literal output shown to participants must match what the tools really print.
 for frag, why in [
@@ -374,8 +415,13 @@ check("prompt          versions                  total tokens     cost          
 
 # Setup must never destroy recorded work: any copy into week2/ is guarded.
 for rel, text in [("labs/week2.html", lab), ("labs/week2-activity.html", act)]:
-    for line in re.findall(r"^\s*copy [^\n<]+week2\\[^\n<]+$", html.unescape(text), re.M):
-        check("Test-Path" in line, f"{rel}: unguarded copy into week2 would overwrite a participant's work: {line.strip()}")
+    for blk in re.findall(r"<pre><code>(.*?)</code></pre>", html.unescape(text), re.S):
+        lines = blk.splitlines()
+        for idx, line in enumerate(lines):
+            if re.match(r"\s*(?:copy|Set-Content) .*week2\\", line):
+                guarded = "Test-Path" in line or any("Test-Path" in x for x in lines[max(0, idx - 2):idx])
+                check(guarded, f"{rel}: unguarded write into week2 would overwrite a participant's "
+                               f"work: {line.strip()[:70]}")
 # The one manual figure-copy must have a typed fallback, or a selection problem strands the participant.
 check("--model claude-sonnet-5 --input" in lab, "week2.html has no typed-figures fallback for the manual recording")
 

@@ -114,7 +114,7 @@
     <span><b>Time</b> 45 minutes</span>
     <span><b>You produce</b> a ledger of what each run cost, three scored answers, and a published page</span>
     <span><b>Committed</b> locally, never pushed</span>
-    <span><b>Needs</b> Claude Code 2.1.211+, Python, this repository</span>
+    <span><b>Needs</b> Claude Code 2.1.211 or later, Python, this repository</span>
   </div>
 
   <div class="card">
@@ -129,15 +129,15 @@
 
   <h2>The shape of the hour</h2>
   <table>
-    <thead><tr><th>Step</th><th>What you do</th></tr></thead>
+    <thead><tr><th>Step</th><th>What you do</th><th>Time</th></tr></thead>
     <tbody>
-      <tr><td>1</td><td>See what a session costs before you type anything</td></tr>
-      <tr><td>2</td><td><b>Read the three instructions side by side</b>, and predict which will win</td></tr>
-      <tr><td>3</td><td>Run the long one by hand, and record what it cost</td></tr>
-      <tr><td>4</td><td>Run the other two - one command each</td></tr>
-      <tr><td>5</td><td>Have a stronger model score all three answers</td></tr>
-      <tr><td>6</td><td>Turn the winner into a page, then change it twice</td></tr>
-      <tr><td>7</td><td>Commit</td></tr>
+      <tr><td>1</td><td>See what a session costs before you type anything</td><td>0-4</td></tr>
+      <tr><td>2</td><td><b>Read the three instructions side by side</b>, and predict which will win</td><td>4-12</td></tr>
+      <tr><td>3</td><td>Run the long one by hand, and record what it cost</td><td>12-20</td></tr>
+      <tr><td>4</td><td>Run the other two - one command each</td><td>20-26</td></tr>
+      <tr><td>5</td><td>Have a stronger model score all three answers</td><td>26-34</td></tr>
+      <tr><td>6</td><td>Turn the winner into a page, then change it twice</td><td>34-42</td></tr>
+      <tr><td>7</td><td>Commit</td><td>42-45</td></tr>
     </tbody>
   </table>
   <p>
@@ -148,16 +148,16 @@
   </p>
 
   <details>
-    <summary>Three other ways teams waste tokens, in one paragraph each</summary>
+    <summary>Three other ways teams waste tokens, in a paragraph each</summary>
     <p>
       <b>Running the same wrong thing again.</b> Three attempts at an instruction that
       was never going to work cost three times and teach nothing. Change the input
       before you re-run, not just your luck.
     </p>
     <p>
-      <b>Letting a session grow.</b> Everything said so far is re-sent on every
-      request. Clear it when you move to an unrelated job; compact it when you need
-      the thread but not the detail.
+      <b>Letting a session grow.</b> Everything said so far is re-sent on every request.
+      Clear it when you move to an unrelated job; compact it when you need the thread
+      but not the detail.
     </p>
     <p>
       <b>Handing work between sessions.</b> Whoever picks the work up starts from
@@ -183,20 +183,20 @@ python --version
 git branch --show-current</code></pre>
   </div>
   <div class="expect">
-    <b>Expected.</b> Three lines, like these - the version numbers move, the shape does not:
+    <b>Expected.</b> Three lines like these - the numbers move, the shape does not:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
 <pre><code>2.1.260 (Claude Code)
 Python 3.11.9
-sam/foundation</code></pre></div>
+main</code></pre></div>
     Claude Code must be <b>2.1.211 or higher</b> and Python 3.11 or higher. The third
-    line is your own branch.
+    line is whatever branch you are on; any branch is fine.
     <br><br>
-    Lower Claude Code version? <code>claude update</code>, then open a <b>new</b>
+    Lower Claude Code version? Run <code>claude update</code>, then open a <b>new</b>
     window. Older builds do not reset their usage figures between runs, so every
     measurement today would include the one before it.
   </div>
 
-  <p><b>b.</b> Pull in this week&apos;s files. Your own work is untouched:</p>
+  <p><b>b.</b> Pull in this week&apos;s files and prepare your folders. Safe to run twice - it will not overwrite anything you have already recorded:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
@@ -210,12 +210,10 @@ dir prompts\week2-lab</code></pre>
   <div class="expect">
     <b>Expected.</b> A merge summary, then a listing ending like this:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
-<pre><code>ac-2000.md   ac-900.md   ac-320.md   rubric-acceptance-criteria.md   score.md</code></pre></div>
-    Three instructions, the scoring guide they are all measured against, and the
-    marking instruction. If the folder is missing, the merge did not happen - read the
-    git message above it.
-    <br><br>
-    Safe to run twice: it will not overwrite anything you have already recorded.
+<pre><code>ac-2000.md   ac-320.md   ac-900.md   rubric-acceptance-criteria.md   score.md</code></pre></div>
+    Three instructions, the guide they are all marked against, and the marking
+    instruction. If the folder is missing, the merge did not happen - read the git
+    message above it.
   </div>
 
   <p><b>c.</b> Start Claude Code. VS Code is already open; this is the only thing you need to launch:</p>
@@ -235,15 +233,15 @@ claude</code></pre>
     <span class="step__n">1</span><span class="step__t">The bill before you type anything</span>
     <span class="step__time">0-4 min</span>
   </div>
-  <p><b>Why.</b> A session is not empty when it opens, and knowing what is already in it explains most of your costs later.</p>
+  <p><b>Why.</b> A session is not empty when it opens, and what is already in it explains most of your costs later.</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">claude code</span>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>/context</code></pre>
   </div>
   <div class="expect">
-    <b>Expected.</b> A coloured grid with a breakdown beside it, along these lines -
-    the exact figures depend on your model and version:
+    <b>Expected.</b> A coloured grid with a breakdown beside it, along these lines - the
+    exact figures depend on your model and version:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output, approximate</span></div>
 <pre><code>System prompt      ~3k tokens
 System tools      ~12k tokens
@@ -251,9 +249,8 @@ Memory files       ~1k tokens   (the repository's own guidance)
 Messages             0 tokens
 Free space         ~180k</code></pre></div>
     Read one thing off it: <b>tens of thousands of tokens are already loaded</b> before
-    your first word.
-    That block is cached, so it is cheap per request. It is not free, and every file
-    Claude opens is another request.
+    your first word. That block is cached, so it is cheap per request - but every file
+    Claude opens is another request that carries it again.
   </div>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">claude code</span>
@@ -436,24 +433,22 @@ type prompts\week2-lab\ac-320.md</code></pre>
 Get-Content prompts\week2-lab\ac-2000.md -Raw | Set-Clipboard</code></pre>
   </div>
 
-  <p>
-    <b>b.</b> In the Claude Code window, set the model and empty the session. Both
-    lines, one after the other:
-  </p>
+  <p><b>b.</b> In the Claude Code window, set the model:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">claude code</span>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>/model sonnet</code></pre>
   </div>
   <div class="expect">
-    <b>Expected.</b> A confirmation that the model is now Sonnet:
+    <b>Expected.</b> A confirmation:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
-<pre><code>Set model to sonnet (claude-sonnet-5)</code></pre></div>
-    <b>Why this matters.</b> In step 5 the answers are marked by Opus, a stronger model.
-    A model must not mark its own work, so the writing is pinned to Sonnet here. If your
-    session was already on Sonnet, this changes nothing. The scoring step checks, and
-    refuses to record a score when the same model did both jobs.
+<pre><code>Set model to Sonnet 5 and saved as your default for new sessions</code></pre></div>
+    <b>Why this matters.</b> In step 5 the answers are marked by a stronger model. A
+    model must not mark its own work, so the writing is pinned to Sonnet here. If you
+    were already on Sonnet, nothing changes.
   </div>
+
+  <p><b>c.</b> Empty the session:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">claude code</span>
       <button class="snippet__copy" type="button">Copy</button></div>
@@ -464,20 +459,35 @@ Get-Content prompts\week2-lab\ac-2000.md -Raw | Set-Clipboard</code></pre>
     Nothing else happens - <code>/clear</code> only resets the session, and with it the
     figures you are about to read.
   </div>
-  <p><b>c.</b> Now paste the instruction with <code>Ctrl+V</code> and press Enter.</p>
+
+  <p><b>d.</b> Paste the instruction with <code>Ctrl+V</code> and press Enter.</p>
   <div class="expect">
     <b>Expected.</b> The paste appears as one collapsed line -
     <code>[Pasted text #1 +96 lines]</code> - then Claude works.
-    <b>Count the files it opens</b>: that is the part you are paying for. Say
-    <b>Yes</b> if it asks to write its answer. It finishes with a long chat summary,
-    because the instruction asked for one. Wait for the input prompt to return.
+    <b>Count the files it opens</b>: that is the part you are paying for. Say <b>Yes</b>
+    if it asks to write its answer. It finishes with a long chat summary, because the
+    instruction asked for one. Wait for the input prompt to return.
   </div>
   <div class="watch">
     <b>Do not chat with it.</b> Any extra exchange lands in this run&apos;s numbers.
-    If the file got written, the run is done.
   </div>
 
-  <p><b>d.</b> Ask what it cost. <code>/usage</code>, then select the <b>Usage by model</b> line with the mouse and copy it (<code>Ctrl+Shift+C</code>), then <code>Esc</code>:</p>
+  <p><b>e.</b> Check the file was actually written. This takes two seconds and saves ten minutes later:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+dir week2\ac-v2000.md</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> One file, several kilobytes.
+    <br><br>
+    <code>cannot find path</code> means Claude answered in the chat instead of writing
+    the file. That run still counts and still cost you something - record it below, and
+    it scores zero in step 5, because the deliverable was a file.
+  </div>
+
+  <p><b>f.</b> Ask what it cost. Type <code>/usage</code>, select the <b>Usage by model</b> line with the mouse, copy it with <code>Ctrl+Shift+C</code>, then press <code>Esc</code>:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">claude code</span>
       <button class="snippet__copy" type="button">Copy</button></div>
@@ -485,7 +495,7 @@ Get-Content prompts\week2-lab\ac-2000.md -Raw | Set-Clipboard</code></pre>
   </div>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">SAMPLE - the line you just copied</span></div>
-<pre><code>claude-sonnet-5:  3.1k input, 4.8k output, 412.0k cache read, 31.2k cache write ($0.42)</code></pre>
+<pre><code>claude-sonnet-5:  10 input, 21.4k output, 189.4k cache read, 69.5k cache write ($0.5328)</code></pre>
   </div>
   <table>
     <thead><tr><th>Figure</th><th>What it is</th></tr></thead>
@@ -504,7 +514,8 @@ Get-Content prompts\week2-lab\ac-2000.md -Raw | Set-Clipboard</code></pre>
     2,000-token instruction. The two figures that compare honestly are <b>total</b>
     (all four added up) and <b>cost</b>. Those are what the ledger compares for you.
   </div>
-  <p><b>e.</b> Record it. Paste your line between the single quotes:</p>
+
+  <p><b>g.</b> Record it. Paste your line between the single quotes:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
@@ -519,8 +530,8 @@ python scripts\ledger.py add week2\ledger.csv --prompt ac --version v2000 --usag
     command does it, except in step 6, where the work has to stay in this session.
   </div>
   <div class="watch">
-    <b>Single quotes matter.</b> The line contains a dollar sign; between double quotes
-    PowerShell would treat it as a variable and swallow part of it.
+    <b>Single quotes, not double.</b> The line contains a dollar sign; between double
+    quotes PowerShell treats it as a variable and swallows part of it.
   </div>
   <details>
     <summary>Cannot select the text on that screen? Type the five figures instead</summary>
@@ -557,7 +568,7 @@ python scripts\run.py prompts\week2-lab\ac-900.md --name ac --version v900</code
 Claude replied: 9 criteria, 5 open questions.
 Added: ac v900  total 214,600 tokens (10 in, 11,240 out, 178,900 cache read, 24,450 cache write), cost $0.2980</code></pre></div>
     The middle line is Claude&apos;s whole reply - that is what asking for one line
-    buys you. <b>The total and the cost should both be well below run 1.</b>
+    buys you. <b>The total and the cost should both be below the long run.</b>
   </div>
   <p>The short instruction. It tells Claude to find the one section it needs rather than read the document, and fixes the shape of the answer:</p>
   <div class="snippet">
@@ -565,10 +576,12 @@ Added: ac v900  total 214,600 tokens (10 in, 11,240 out, 178,900 cache read, 24,
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
 python scripts\run.py prompts\week2-lab\ac-320.md --name ac --version v320
+dir week2\ac-v*.md
 python scripts\ledger.py show week2\ledger.csv</code></pre>
   </div>
   <div class="expect">
-    <b>Expected.</b> Your three rows, then the change table:
+    <b>Expected.</b> <b>Three files listed</b> - if one is missing, that run answered in
+    the chat and scores zero in step 5. Then your three rows and the change table:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - shape exact, figures yours</span></div>
 <pre><code>prompt        version        model            in     out  cache rd  cache wr     total   cost $  score  scorer
 ----------------------------------------------------------------------------------------------------------------
@@ -584,22 +597,10 @@ ac              v2000 -&gt; v320                   -35.3%   -73.7%              
     an error - and it is why the comparison runs on <b>total</b> and <b>cost</b>.
     <br><br>
     <b>Watch the cost line especially.</b> Total tokens fall by a third here, but cost
-    falls by three quarters, because the two do not move together: the expensive part
-    is the answer being written, and the short instruction asked for far less of it.
-    The score column fills in next. Your figures will differ from your
-    neighbour&apos;s; the direction should not.
-    <br><br>
-    Went <i>up</i> instead? Say so - that is the most interesting result in the room,
-    and the next step decides whether it mattered.
+    falls by three quarters, because the two do not move together: the expensive part is
+    the answer being written, and the short instruction asked for far less of it. The
+    score column fills in next.
   </div>
-  <details>
-    <summary>Curious what the three instructions look like side by side?</summary>
-    <p>
-      <code>type prompts\week2-lab\ac-900.md</code> and
-      <code>type prompts\week2-lab\ac-320.md</code>. The short one is roughly a sixth
-      of the long one and asks for the same work.
-    </p>
-  </details>
 
   <div class="step">
     <span class="step__n">5</span><span class="step__t">Score the three answers</span>
@@ -607,9 +608,9 @@ ac              v2000 -&gt; v320                   -35.3%   -73.7%              
   </div>
   <p>
     <b>Why.</b> Cheaper only counts if the answer held up. And the model that wrote an
-    answer is the last thing that should mark it, so a stronger model does the marking,
-    in a fresh session, seeing only the answer and the scoring guide - never the
-    instruction that produced it, and never this conversation.
+    answer is the last thing that should mark it, so a stronger one does the marking, in
+    a fresh session, seeing only the answer and the guide - never the instruction that
+    produced it, and never your conversation.
   </p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
@@ -628,53 +629,47 @@ python scripts\score.py week2\ac-v2000.md week2\ac-v900.md week2\ac-v320.md --re
 5. Open questions surfaced - 3 - "Is the delivery window contractual"
 TOTAL: 15/25
 -&gt; scorer claude-opus-5, cost $0.3870
--&gt; recorded ac v2000 = 15/25 in week2\ledger.csv
-
-Scoring week2\ac-v320.md against prompts\week2-lab\rubric-acceptance-criteria.md on opus ...
-1. Testable - 5 - "Arrives 30 April - 2 May"
-2. Covers FSD section 7 - 5 - "contains none of the words estimated, approximately..."
-3. Traceable - 5 - "Source (FSD 7.x)"
-4. Nothing invented - 5 - "Delivery estimate unavailable - our team will confirm..."
-5. Open questions surfaced - 3 - "the bank holiday list is not decided (7.5)"
-TOTAL: 23/25
--&gt; scorer claude-opus-5, cost $0.1225
--&gt; recorded ac v320 = 23/25 in week2\ledger.csv</code></pre></div>
-    Real figures from a real pair of runs. Look at row 4 on the long one: <b>zero out of
-    five</b>, and read the evidence the scorer quoted - <i>&quot;I also added an
-    accessibility criterion&quot;</i>. The long instruction invented a requirement
-    nobody asked for and no document mentions, then said so out loud. Being told to read
-    four extra files &quot;to be thorough&quot; did not make it careful; it gave it more
-    to have opinions about. Your marks and quotes will differ.
+-&gt; evidence saved to week2/scores/ac-v2000.md
+-&gt; recorded ac v2000 = 15/25 in week2\ledger.csv</code></pre></div>
+    Five rows, each with the phrase it is based on, a total out of 25, and the model
+    that gave it. Your marks and quotes will differ.
     <br><br>
-    Told that the scorer was not Opus? Your seat cannot reach it. Re-run the same
-    command with <code>--allow-scorer-mismatch</code> on the end, and check two rows by
-    hand below instead of one. Mention it when you show your numbers.
+    <b>If your account has no Opus</b>, it says so, marks with your usual model instead
+    and carries on. The score still counts - the marking is blind either way - but the
+    ledger records it as same-tier, so check two rows by hand below rather than one.
+    <br><br>
+    <b>A file reported as not found</b> means that run wrote nothing. Score it zero -
+    the command is in the troubleshooting table.
   </div>
 
   <p>
-    <b>Now your twenty seconds.</b> The guide has five rows; one of them asks whether
-    the answer invented anything. Every scorer is soft on that one, so check it:
+    <b>Now your twenty seconds.</b> The guide has five rows; one asks whether the answer
+    invented anything. Every scorer is soft on that one, so check it:
   </p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
-code week2\scores\ac-v320.md week2\ac-v320.md</code></pre>
+dir week2\scores
+code week2\scores\ac-v2000.md week2\ac-v2000.md</code></pre>
   </div>
   <div class="expect">
-    <b>Expected.</b> Two tabs: the marking on the left, the answer on the right. Read
-    the &quot;nothing invented&quot; line, then skim the answer for a rule nobody
-    actually stated. In the block above, row 5 scored 2 and quoted
-    <i>&quot;stock location is imported nightly&quot;</i> - nobody decided that, so the
-    scorer was right to mark it down. You are looking for the opposite case: an
-    invented rule that still got full marks.
+    <b>Expected.</b> A listing with one marking per answer - if one is missing, that
+    answer was never scored, and opening it would create a blank file. Then two tabs:
+    the marking on the left, the answer on the right. Read
+    the &quot;nothing invented&quot; line, then look in the answer for a rule nobody
+    stated - a data source, a time zone, a performance target, an accessibility
+    requirement. In the block above it scored <b>zero</b>, and the quoted evidence was
+    the answer&apos;s own words: <i>&quot;I also added an accessibility criterion&quot;</i>.
+    You are looking for the opposite case - something invented that still got full
+    marks.
   </div>
   <p>Only if you disagree, override it. Otherwise skip straight to the table:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell - only if you disagreed; put your own number in</span>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
-python scripts\ledger.py score week2\ledger.csv --prompt ac --version v320 --score 18 --judge opus+human</code></pre>
+python scripts\ledger.py score week2\ledger.csv --prompt ac --version v2000 --score 13 --judge opus+human</code></pre>
   </div>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
@@ -690,17 +685,17 @@ ac            v900           sonnet-5         10  11,240   178,900    24,450   2
 ac            v320           sonnet-5         10   5,195   162,807    13,508   181,520   0.1399     23  opus-5
 
 ac              v2000 -&gt; v320                   -35.3%   -73.7%  15 -&gt; 23 (153%)</code></pre></div>
-    That last line is the result of the lab: <b>three quarters less cost, and a
-    markedly better answer.</b> The instruction that tried hardest scored worst.
+    That last line is the result of the lab: <b>three quarters less cost, and a markedly
+    better answer.</b> The instruction that tried hardest scored worst.
   </div>
   <div class="card">
-    <b>How to read it.</b> The long instruction usually scores well on coverage and
-    badly on inventing things - it read eight files and had opinions about all of them.
-    The short one usually holds, occasionally dropping one point of coverage. So: a big
-    saving for one lost point is a win. A big saving for an answer that quietly made up
-    a rule is a loss, and the instruction goes back for another pass. Either is a fine
-    outcome. Not knowing which you got is the only bad one - and with one run each,
-    what you can honestly claim is the direction, not the decimal.
+    <b>Reading the trade.</b> The usual pattern: the long instruction covers the ground
+    but invents things, because it read eight files and formed opinions about all of
+    them. The short one holds, occasionally dropping a point of coverage. Name the row
+    it lost. A big saving for one lost point is a win. A big saving for an answer that
+    quietly made up a rule is a loss, and the instruction goes back for another pass.
+    Either is a fine outcome. Not knowing which you got is the only bad one - and with
+    one run each, what you can honestly claim is the direction, not the decimal.
   </div>
 
   <div class="step">
@@ -708,9 +703,9 @@ ac              v2000 -&gt; v320                   -35.3%   -73.7%  15 -&gt; 23 
     <span class="step__time">34-42 min</span>
   </div>
   <p>
-    <b>Why.</b> Deliverables get revised. Revising by asking for the whole thing again
-    pays the full price every time; changing what is already there costs a fraction.
-    This step measures that gap.
+    <b>Why.</b> Deliverables get revised. Asking for the whole thing again pays full
+    price every time; changing what is already there costs a fraction. This step
+    measures that gap.
   </p>
   <div class="card">
     <b>What a published page is.</b> A file in your repository that Claude puts on a
@@ -718,7 +713,7 @@ ac              v2000 -&gt; v320                   -35.3%   -73.7%  15 -&gt; 23 
     session cannot publish, Claude just writes the file: open it in a browser and
     refresh after each change. The lesson is the same either way.
   </div>
-  <p>Take whichever answer scored best. In the Claude Code window, <code>/clear</code>, then paste this:</p>
+  <p>Take whichever answer scored best. In the Claude Code window, clear the session, then paste the instruction below:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">claude code</span>
       <button class="snippet__copy" type="button">Copy</button></div>
@@ -737,13 +732,14 @@ week2/ac-artifact.html and publish it. Reply with one line: how many criteria.</
     <b>Expected.</b> A permission prompt to publish - say <b>Yes</b> - then:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
 <pre><code>Published: https://claude.ai/code/artifact/...
-7 criteria</code></pre></div>
-    The page opens in your browser.
+9 criteria</code></pre></div>
+    The page opens in your browser. <code>Ctrl+]</code> opens the latest artifact if it
+    did not.
     <br><br>
-    No link? Publishing is off for your organisation. Run
+    No link printed? Publishing is off for your organisation. Run
     <code>Start-Process week2\ac-artifact.html</code> and carry on; nothing else changes.
   </div>
-  <p>Record what building it cost, the way you did in step 2 (<code>/usage</code>, copy the line):</p>
+  <p>Record what building it cost - <code>/usage</code>, copy the line, as in step 3:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
@@ -754,10 +750,9 @@ python scripts\ledger.py add week2\ledger.csv --prompt artifact --version build 
     <b>Expected.</b> <code>Added: artifact build</code>, with an output figure in the
     thousands - a styled page is output-heavy, and output is the one column caching
     never touches.
-    (Cannot select the line? Use the typed-figures form at the end of step 3.)
   </div>
 
-  <p><b>Change 1.</b> Do not clear - Claude needs to know which page. Paste:</p>
+  <p><b>Change 1.</b> Do <b>not</b> clear - Claude needs to know which page. Paste:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">prompt</span>
       <button class="snippet__copy" type="button">Copy</button></div>
@@ -788,10 +783,10 @@ the open items list in section 11 of docs/specs/ordercore-fsd.txt; write
 Reply with one line: how many questions got an owner.</code></pre>
   </div>
   <div class="expect">
-    <b>Expected.</b> Another small edit, and a reply of <code>2</code> or
-    <code>3</code>. The page is now on its third version, and the questions that had an
-    owner on record have one on the page.
+    <b>Expected.</b> Another small edit, and a reply of <code>2</code> or <code>3</code>.
+    The page is now on its third version.
   </div>
+
   <p>Now the comparison. <code>/usage</code>, copy the line, and record it:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
@@ -823,8 +818,8 @@ git commit -m "Week 2 lab: three prompt sizes, scored, plus artifact"
 git log --oneline -1</code></pre>
   </div>
   <div class="expect">
-    <b>Expected.</b> One commit, holding your ledger, the three answers, the marking
-    and the page:
+    <b>Expected.</b> One commit, holding your ledger, the three answers, the marking and
+    the page:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
 <pre><code>a31915b Week 2 lab: three prompt sizes, scored, plus artifact</code></pre></div>
     Nothing is pushed - it stays on this machine.
@@ -834,18 +829,18 @@ git log --oneline -1</code></pre>
   <p class="sub">5 minutes, in pairs, afterwards</p>
   <p>
     Put your table next to your neighbour&apos;s. Same instructions, same guide,
-    different numbers. Pick one row and work out why: a different set of files opened,
-    a longer reply, a different verdict? Then run the short instruction a second time
-    as <code>--version v320b</code>. The gap between your own two runs is your noise
-    floor, and any difference smaller than it is not a finding.
+    different numbers. Pick one row and work out why: a different set of files opened, a
+    longer reply, a different verdict? Then run the short instruction a second time as
+    <code>--version v320b</code>. The gap between your own two runs is your noise floor,
+    and any difference smaller than it is not a finding.
   </p>
 
   <h2>Passing bar</h2>
   <div class="bar">
     Five rows in your ledger, every figure measured rather than guessed. Three answers
-    scored by a stronger model than wrote them, with one row checked by you. You can
-    say in one sentence what the short instruction lost, or did not. A page built once
-    and changed twice, with the cost of the changes recorded. All committed locally.
+    scored, with one row checked by you. You can say in one sentence what the short
+    instruction lost, or did not. A page built once and changed twice, with the cost of
+    the changes recorded. All committed locally.
   </div>
 
   <h2>If something breaks</h2>
@@ -854,26 +849,26 @@ git log --oneline -1</code></pre>
     <tbody>
       <tr><td>Usage figures keep growing between runs, or no usage line appears</td>
           <td>Claude Code is older than 2.1.211. Exit, <code>claude update</code>, open a new window, restart from step 0.</td></tr>
+      <tr><td>A run answered in the chat and wrote no file</td>
+          <td>It still counts. Record its figures, then score it zero: <code>python scripts\ledger.py score week2\ledger.csv --prompt ac --version v2000 --score 0 --judge human</code>. To try again, re-run it with <code>scripts\run.py</code>.</td></tr>
       <tr><td><code>Could not parse the usage line</code></td>
-          <td>Only part of the line was copied. It needs the model name and all four figures. Select the whole line and try again.</td></tr>
+          <td>Only part of the line was copied. It needs the model name and all four figures. Select the whole line, or use the typed-figures form in step 3.</td></tr>
       <tr><td><code>No cost found</code></td>
-          <td>Double quotes swallowed the dollar sign. Use single quotes, or add <code>--cost 0.42</code> with the total from the same screen.</td></tr>
+          <td>Double quotes swallowed the dollar sign. Use single quotes, or add <code>--cost 0.5328</code> with the total from the same screen.</td></tr>
       <tr><td>The usage line will not select with the mouse</td>
           <td>Type the figures instead - the collapsed note at the end of step 3 has the command.</td></tr>
       <tr><td>The paste shows as one collapsed line and nothing happens</td>
           <td>That is the paste, waiting. Press Enter.</td></tr>
-      <tr><td>Claude answered in the chat and wrote no file</td>
-          <td>The run still counts. Its score is 0, because the deliverable was a file: <code>python scripts\ledger.py score week2\ledger.csv --prompt ac --version v900 --score 0 --judge human</code></td></tr>
+      <tr><td><code>opus is not available to this account</code></td>
+          <td>Nothing to do - it marks with your usual model instead and records the result as same-tier. Check two rows by hand rather than one.</td></tr>
+      <tr><td><code>opus is marking its own work</code></td>
+          <td>That answer was written by Opus, so Opus cannot mark it. Re-run that one with <code>scripts\run.py</code>, which pins Sonnet, then score again.</td></tr>
       <tr><td><code>claude is not on PATH</code></td>
           <td>Open a new terminal - a window opened before the install does not see it.</td></tr>
       <tr><td>A run stops with a login or usage-limit message</td>
-          <td>Your seat has hit its limit or the login expired. The Claude Code window will say the same. Sign in or wait, then run the command again - repeating is safe.</td></tr>
-      <tr><td><code>opus is marking its own work</code></td>
-          <td>That answer was written by Opus, so Opus cannot mark it. Re-run that one with the model pinned: add <code>--model sonnet</code> to the run command, or use <code>/model sonnet</code> before pasting, then score again.</td></tr>
-      <tr><td>The scorer was not Opus</td>
-          <td>Your seat cannot reach it. Add <code>--allow-scorer-mismatch</code>, check two rows by hand, and say so when you present.</td></tr>
+          <td>Your seat hit its limit or the login expired. The Claude Code window shows the same. Sign in or wait, then run the command again - repeating is safe.</td></tr>
       <tr><td>No total came back from the scorer</td>
-          <td>Open the marking file in <code>week2\scores</code>, add the five numbers up, and record it with <code>ledger.py score ... --judge opus</code>.</td></tr>
+          <td>Open the marking file in <code>week2\scores</code>, add the five numbers up, and record it with <code>ledger.py score</code>.</td></tr>
       <tr><td>Claude asks to change a file you did not expect</td>
           <td>Yes to anything inside <code>week2</code>. No to anything outside it - this lab never edits the shared files.</td></tr>
       <tr><td><code>Set-Clipboard</code> not recognised</td>

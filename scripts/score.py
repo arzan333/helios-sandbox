@@ -60,17 +60,34 @@ def build_prompt(rubric: Path, output: Path) -> str:
                     .replace("OUTPUT_FILE", output.relative_to(ROOT).as_posix()))
 
 
-def run_claude(prompt: str, model: str, effort: str) -> dict:
+NO_ACCESS = re.compile(r"may not have access|does not exist or you may not|error_status\D*404", re.I)
+
+
+def _call(exe: str, prompt: str, model: str, effort: str) -> subprocess.CompletedProcess:
+    cmd = [exe, "-p", "--model", model, "--effort", effort, "--output-format", "json",
+           "--allowedTools", "Read,Grep,Glob", "--max-budget-usd", "0.75", "--no-session-persistence"]
+    return subprocess.run(cmd, input=prompt, capture_output=True, text=True, cwd=ROOT, encoding="utf-8")
+
+
+def run_claude(prompt: str, model: str, effort: str) -> tuple[dict, str]:
+    """Score with `model`. If the seat cannot reach it, fall back to the session default
+    and say so, rather than failing in the middle of a lab."""
     exe = shutil.which("claude")
     if not exe:
         sys.exit("claude is not on PATH. Open a new terminal, or run claude --version to check the install.")
-    cmd = [exe, "-p", "--model", model, "--effort", effort, "--output-format", "json",
-           "--allowedTools", "Read,Grep,Glob", "--max-budget-usd", "0.75", "--no-session-persistence"]
-    proc = subprocess.run(cmd, input=prompt, capture_output=True, text=True, cwd=ROOT, encoding="utf-8")
+    proc = _call(exe, prompt, model, effort)
     if proc.returncode != 0:
-        sys.exit(f"claude -p failed (exit {proc.returncode}):\n{proc.stderr.strip() or proc.stdout.strip()}")
+        blob = (proc.stdout or "") + (proc.stderr or "")
+        if NO_ACCESS.search(blob):
+            print(f"   {model} is not available to this account. Scoring with your usual model instead.")
+            print(f"   The score still counts - it is blind either way - but it will be marked same-tier"
+                  f" if that model also wrote the answer.")
+            proc = _call(exe, prompt, "sonnet", effort)
+            model = "sonnet"
+        if proc.returncode != 0:
+            sys.exit(f"claude -p failed (exit {proc.returncode}):\n{(proc.stderr or proc.stdout).strip()[:600]}")
     try:
-        return json.loads(proc.stdout)
+        return json.loads(proc.stdout), model
     except json.JSONDecodeError:
         sys.exit(f"claude -p did not return JSON. First 300 characters:\n{proc.stdout[:300]}")
 
@@ -152,7 +169,8 @@ def main() -> None:
             continue
         rubric, prompt, version = rubric_for(output)
         print(f"Scoring {output.relative_to(ROOT)} against {rubric.relative_to(ROOT)} on {args.model} ...", flush=True)
-        payload = run_claude(build_prompt(rubric, output), args.model, args.effort)
+        payload, used = run_claude(build_prompt(rubric, output), args.model, args.effort)
+        fell_back = used != args.model
         text = payload.get("result") or ""
         model = scorer_model(payload)
         cost = payload.get("total_cost_usd")
@@ -172,6 +190,9 @@ def main() -> None:
         print(f"-> evidence saved to {evidence.relative_to(ROOT).as_posix()}")
 
         stronger = any(k in model.lower() for k in ("opus", "fable"))
+        if not stronger and fell_back:
+            print(f"!! Recording a same-tier score: this account has no stronger model available.")
+            args.allow_scorer_mismatch = True
         if not stronger and not args.allow_scorer_mismatch:
             print(f"!! The scorer was {model}, not Opus. Not recording. Check that Opus is available to your seat, "
                   f"or re-run with --allow-scorer-mismatch to record anyway (the note will say so).")
@@ -179,6 +200,8 @@ def main() -> None:
             continue
 
         wrote = generator_model(ROOT / args.record, prompt, version) if args.record else None
+        if wrote and family(wrote) == family(model) and fell_back:
+            args.allow_scorer_mismatch = True
         if wrote and family(wrote) == family(model) and not args.allow_scorer_mismatch:
             print(f"!! {family(model)} is marking its own work: the answer was written by {wrote} and scored by {model}.")
             print(f"   Re-run the answer on a smaller model, then score again:")

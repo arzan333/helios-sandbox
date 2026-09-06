@@ -114,12 +114,12 @@
     <span><b>Time</b> 45 minutes + 15 optional</span>
     <span><b>You produce</b> three rewritten instructions, a before-and-after table, and two sentences of findings</span>
     <span><b>Committed</b> locally, never pushed</span>
-    <span><b>Needs</b> Claude Code 2.1.211+, Python, the lab finished</span>
+    <span><b>Needs</b> Claude Code 2.1.211+, Python, this repository</span>
   </div>
 
   <div class="card">
-    <b>What you are testing.</b> In the lab you watched someone else&apos;s three
-    instructions. Now you cut your own. The claim on trial is the one every team
+    <b>What you are testing.</b> The lab compared three instructions somebody else
+    wrote. Now you cut your own. The claim on trial is the one every team
     argues about without evidence: <b>an instruction can be cut hard without the
     answer getting worse.</b> You need a third off the cost, with no answer dropping
     more than a tenth of its score. A big cut that halves the quality is not a win with
@@ -149,28 +149,40 @@
     <span class="step__n">0</span><span class="step__t">Set up</span>
     <span class="step__time">before the clock starts</span>
   </div>
-  <p><b>Why.</b> Two minutes now, or a confusing error in six.</p>
+  <p>
+    <b>Why.</b> Two minutes now, or a confusing error in six. This also pulls the
+    week&apos;s files, so it works whether or not you did the lab.
+  </p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+git fetch origin
+git merge origin/main -m "Week 2 files"
 mkdir week2\out -Force | Out-Null
 mkdir week2\prompts\v1 -Force | Out-Null
-python scripts\ledger.py show week2\ledger.csv</code></pre>
+if (-not (Test-Path week2\ledger.csv)) { copy templates\token-ledger.csv week2\ledger.csv }
+python scripts\ledger.py show week2\ledger.csv
+claude</code></pre>
   </div>
   <div class="expect">
     <b>Expected.</b> Your ledger from the lab, with a score and a scorer on the first
     three rows:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - figures yours</span></div>
-<pre><code>ac            v2000          sonnet-5         12   6,100   402,000    34,000   442,112   0.9120     22  opus
-ac            v900           sonnet-5         10   4,200   168,000    31,000   203,210   0.4310     23  opus
-ac            v320           sonnet-5          8   3,199    76,207    29,800   109,214   0.2625     24  opus</code></pre></div>
-    Nothing there? Do the lab&apos;s step 0 first - this builds on it. Claude Code
-    should already be running in one window; if not, start it with
-    <code>claude</code>.
+<pre><code>ac            v2000          sonnet-5         10  21,430   189,437    69,463   280,340   0.5328     15  opus-5
+ac            v900           sonnet-5         10  11,240   178,900    24,450   214,600   0.2980     20  opus-5
+ac            v320           sonnet-5         10   5,195   162,807    13,508   181,520   0.1399     23  opus-5</code></pre></div>
+    Did not do the lab? It will say the ledger is empty. That is fine - nothing here
+    depends on the lab having been run.
     <br><br>
-    Every run today is written by Sonnet and marked by Opus - the runner pins that for
-    you, so a model never marks its own work.
+    The last line starts Claude Code, which takes over this window. Open a second
+    terminal in VS Code with <code>Ctrl+Shift+`</code> for every
+    <b>powershell</b> block below; each one sets its own folder, so it works in either
+    window.
+    <br><br>
+    Every run today is written by Sonnet and marked by Opus where your account has it,
+    so a model does not mark its own work. If it does not, the scorer says so and uses
+    your usual model instead - nothing to set up either way.
   </div>
 
   <div class="step">
@@ -196,7 +208,7 @@ dir week2\out</code></pre>
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - figures yours</span></div>
 <pre><code>Running code-review.md ... this takes a moment and writes its own output file.
 Claude replied: 14 findings: 2 Critical, 5 Warning, 7 Suggestion
-Added: code-review v0  total 806,140 tokens (11 in, 8,380 out, 762,749 cache read, 35,000 cache write), cost $1.2140
+Added: code-review v0  total 806,139 tokens (10 in, 8,380 out, 762,749 cache read, 35,000 cache write), cost $0.4860
 ...
 code-review-v0.md   test-cases-v0.md   defect-triage-v0.md</code></pre></div>
     Each run takes a while - these instructions tell Claude to read a dozen files and
@@ -234,19 +246,23 @@ TOTAL: 19/25
 -&gt; scorer claude-opus-5, cost $0.1482
 -&gt; recorded code-review v0 = 19/25 in week2\ledger.csv</code></pre></div>
     <br><br>
-    Told the scorer was not Opus? Add <code>--allow-scorer-mismatch</code> and check
-    two rows by hand below rather than one.
+    <b>No Opus on your account?</b> It says so, scores with your usual model instead
+    and carries on. The ledger marks it same-tier - check two rows by hand rather than
+    one.
   </div>
   <p>Open one marking next to its answer and check the row about inventing things:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+dir week2\scores
 code week2\scores\code-review-v0.md week2\out\code-review-v0.md</code></pre>
   </div>
   <div class="expect">
-    <b>Expected.</b> Two tabs. Each guide ends with the facts a correct answer should
-    contain - use them. In the block above, row 5 scored 2 and quoted an invented
+    <b>Expected.</b> A listing with one marking per answer, then two tabs. If a marking
+    is missing, that answer was never scored - do not open it, or the editor creates a
+    blank file with that name. Each guide ends with the facts a correct answer should
+    contain; use them. In the block above, row 5 scored 2 and quoted an invented
     finding, so the scorer caught it. You are looking for the opposite: something made
     up that still got full marks. If you find one, lower it:
   </div>
@@ -265,9 +281,9 @@ python scripts\ledger.py show week2\ledger.csv</code></pre>
   <div class="expect">
     <b>Expected.</b> Three new rows carrying scores:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - figures yours</span></div>
-<pre><code>code-review   v0             sonnet-5         11   8,380   762,749    35,000   806,140   1.2140     19  opus
-test-cases    v0             sonnet-5          9   6,920   488,300    33,000   528,229   0.7820     21  opus
-defect-triage v0             sonnet-5          9   5,830   430,100    32,000   467,939   0.6310     17  opus</code></pre></div>
+<pre><code>code-review   v0             sonnet-5         10   8,380   762,749    35,000   806,139   0.4860     19  opus-5
+test-cases    v0             sonnet-5         10   6,920   488,300    33,000   528,230   0.3750     21  opus-5
+defect-triage v0             sonnet-5         10   5,830   430,100    32,000   467,940   0.3360     17  opus-5</code></pre></div>
     <b>Write those three scores down</b> - nine tenths of each is the floor your rewrite
     has to clear (here: 17.1, 18.9, 15.3).
   </div>
@@ -450,7 +466,7 @@ code-review     v0 -&gt; v1                        -64.8%   -71.2%  19 -&gt; 18 
 test-cases      v0 -&gt; v1                        -52.1%   -58.4%  21 -&gt; 21 (100%)
 defect-triage   v0 -&gt; v1                        -47.9%   -55.0%  17 -&gt; 15 (88%)
 -------------------------------------------------------------------------------
-ALL (v0 prompts)                                -56.3%   -63.1%</code></pre></div>
+ALL (v0 prompts)                                -56.7%   -62.6%</code></pre></div>
     Read it row by row. Two cleared the bar. The third scored 88 percent of where it
     started, which is below nine tenths - that one goes back, and the note below says
     how.
@@ -498,7 +514,7 @@ change.</code></pre>
   <div class="expect">
     <b>Expected.</b> A published page, and a one-line reply:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
-<pre><code>-63.1%</code></pre></div>
+<pre><code>-62.6%</code></pre></div>
     It must <b>match the combined line in your own table</b>. If it does not, your
     ledger is right - tell Claude which rows are the before and the after.
   </div>
@@ -545,7 +561,9 @@ place; do not rewrite. Republish. Reply with one line: the monthly total.</code>
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
-Set-Content week2\findings.md "# Week 2 findings`n`nBiggest saving, with the number: `n`nA cut I had to put back (or nearly did): `n"
+if (-not (Test-Path week2\findings.md)) {
+  Set-Content week2\findings.md "# Week 2 findings`n`nBiggest saving, with the number: `n`nA cut I had to put back (or nearly did): `n"
+}
 code week2\findings.md</code></pre>
   </div>
   <div class="expect">
@@ -661,8 +679,8 @@ repeated rule. Do not edit anything.</code></pre>
           <td>Expected sometimes. Read the marking for the row it lost, put that one requirement back, and run once more as <code>--version v2</code>.</td></tr>
       <tr><td><code>file not found</code> when scoring</td>
           <td>That run answered in the chat instead of writing a file. Score it zero: <code>python scripts\ledger.py score week2\ledger.csv --prompt &lt;name&gt; --version v1 --score 0 --judge human</code></td></tr>
-      <tr><td>The scorer was not Opus</td>
-          <td>Your seat cannot reach it. Add <code>--allow-scorer-mismatch</code>, and check two rows by hand per answer.</td></tr>
+      <tr><td><code>opus is not available to this account</code></td>
+          <td>Nothing to do - it falls back to your usual model and records the result as same-tier. Check two rows by hand per answer.</td></tr>
       <tr><td>A run stops with a usage-limit message</td>
           <td>Your seat has hit its limit. Wait for the reset shown in <code>/usage</code>, then run the same command again - repeating is safe.</td></tr>
       <tr><td><code>No ledger row for ...</code></td>
