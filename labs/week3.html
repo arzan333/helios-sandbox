@@ -1,0 +1,884 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 3 lab - Ship a Small Change, Then Gate It</title>
+<style>
+:root {
+    --gray-50:#ffffff; --gray-75:#fafafa; --gray-100:#f5f5f5; --gray-200:#e1e1e1;
+    --gray-300:#cacaca; --gray-600:#6e6e6e; --gray-800:#2c2c2c; --gray-900:#1b1b1b;
+    --blue-500:#1473e6; --blue-600:#0d66d0; --green-500:#2d9d78;
+    --orange-500:#e68619; --red-500:#e34850; --accent-red:#fa0f00;
+    --radius:4px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--gray-100); color:var(--gray-800);
+    font-family:"Source Sans 3",-apple-system,"Segoe UI",Roboto,sans-serif;
+    font-size:15px; line-height:1.6;
+  }
+  header.masthead{
+    background:var(--gray-900); color:#fff; padding:14px 24px;
+    display:flex; align-items:baseline; gap:12px; position:sticky; top:0; z-index:10;
+  }
+  .masthead__mark{color:var(--accent-red); font-weight:700; font-size:18px; letter-spacing:-.02em}
+  .masthead__title{font-size:16px; font-weight:600}
+  .masthead__env{margin-left:auto; font-size:11px; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--gray-300)}
+  main{max-width:920px; margin:0 auto; padding:24px 24px 80px}
+  h1{font-size:26px; margin:8px 0 4px}
+  .sub{color:var(--gray-600); margin:0 0 24px}
+  h2{font-size:19px; margin:36px 0 4px; padding-top:16px; border-top:1px solid var(--gray-200)}
+  h3{font-size:15px; margin:22px 0 6px}
+  p,li{margin:8px 0}
+  ul,ol{padding-left:22px}
+  .card{background:var(--gray-50); border:1px solid var(--gray-200);
+    border-radius:var(--radius); padding:16px 18px; margin:16px 0}
+  .meta{display:flex; gap:24px; flex-wrap:wrap; font-size:13px; color:var(--gray-600);
+    background:var(--gray-50); border:1px solid var(--gray-200);
+    border-radius:var(--radius); padding:12px 16px}
+  .meta b{color:var(--gray-800)}
+  .step{display:flex; align-items:baseline; gap:10px; margin:28px 0 6px}
+  .step__n{flex:0 0 auto; width:26px; height:26px; border-radius:50%;
+    background:var(--blue-500); color:#fff; font-size:13px; font-weight:700;
+    display:inline-flex; align-items:center; justify-content:center}
+  .step__t{font-size:17px; font-weight:600}
+  .step__time{margin-left:auto; font-size:12px; color:var(--gray-600);
+    border:1px solid var(--gray-300); border-radius:10px; padding:1px 10px; white-space:nowrap}
+  .snippet{position:relative; margin:12px 0}
+  .snippet__bar{display:flex; align-items:center; gap:8px; background:var(--gray-800);
+    color:var(--gray-300); font-size:12px; padding:6px 10px;
+    border-radius:var(--radius) var(--radius) 0 0}
+  .snippet__lang{text-transform:uppercase; letter-spacing:.06em}
+  .snippet__copy{margin-left:auto; background:var(--blue-500); color:#fff; border:0;
+    border-radius:3px; padding:3px 12px; font:inherit; font-size:12px; cursor:pointer}
+  .snippet__copy:hover{background:var(--blue-600)}
+  .snippet__copy.done{background:var(--green-500)}
+  pre{margin:0; background:var(--gray-900); color:#f0f0f0; padding:12px 14px;
+    border-radius:0 0 var(--radius) var(--radius); overflow-x:auto;
+    font-family:"Consolas","DejaVu Sans Mono",monospace; font-size:13px; line-height:1.5;
+    white-space:pre; tab-size:2}
+  code{font-family:"Consolas","DejaVu Sans Mono",monospace; font-size:.92em;
+    background:var(--gray-200); padding:1px 5px; border-radius:3px}
+  pre code{background:none; padding:0; font-size:inherit}
+  .expect{border-left:3px solid var(--green-500); background:#eef8f4;
+    padding:10px 14px; border-radius:0 var(--radius) var(--radius) 0; margin:10px 0}
+  .expect b{color:#1a6b52}
+  .watch{border-left:3px solid var(--orange-500); background:#fff6e8;
+    padding:10px 14px; border-radius:0 var(--radius) var(--radius) 0; margin:10px 0}
+  .watch b{color:#8a5a0b}
+  .bar{border-left:3px solid var(--gray-600); background:var(--gray-75);
+    padding:12px 16px; border-radius:0 var(--radius) var(--radius) 0; margin:16px 0}
+  table{width:100%; border-collapse:collapse; margin:12px 0; font-size:14px}
+  th{text-align:left; background:var(--gray-100); border-bottom:1px solid var(--gray-300);
+    padding:8px 10px; font-size:12px; text-transform:uppercase; letter-spacing:.04em;
+    color:var(--gray-600)}
+  td{padding:8px 10px; border-bottom:1px solid var(--gray-200); vertical-align:top}
+  details{background:var(--gray-50); border:1px solid var(--gray-200);
+    border-radius:var(--radius); padding:10px 14px; margin:12px 0}
+  summary{cursor:pointer; font-weight:600; font-size:14px}
+  footer,.foot{color:var(--gray-600); font-size:13px; margin-top:48px;
+    border-top:1px solid var(--gray-200); padding-top:16px}
+
+  @media print{
+    header.masthead{position:static}
+    .snippet__copy{display:none}
+    pre{background:#fff; color:#000; border:1px solid var(--gray-300);
+      white-space:pre-wrap; word-break:break-word}
+    .snippet__bar{background:#fff; color:#000; border:1px solid var(--gray-300);
+      border-bottom:0}
+    .card,.expect,.watch,.bar,.meta,details{break-inside:avoid}
+    .step{break-after:avoid}
+    details[open] summary~*{display:block}
+    details:not([open])>summary~*{display:block}
+    body{background:#fff; font-size:11pt}
+    main{max-width:none; padding:0}
+    a[href]:after{content:" (" attr(href) ")"; font-size:.85em; color:var(--gray-600)}
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <span class="masthead__mark">Helios</span>
+  <span class="masthead__title">Week 3 lab book</span>
+  <span class="masthead__env">Training environment</span>
+</header>
+
+<main>
+  <h1>Ship a Small Change, Then Gate It</h1>
+  <p class="sub">Self-paced. Follow along on your own machine, or watch and run it afterwards. Every command has a copy button.</p>
+
+  <div class="meta">
+    <span><b>Time</b> 45 minutes</span>
+    <span><b>You produce</b> an impact note, one change across Python and Java, a gate rubric of your own, and a score you gave yourself</span>
+    <span><b>Committed</b> locally, never pushed</span>
+    <span><b>Needs</b> Claude Code 2.1.211 or later, Python 3.11, a JDK, VS Code, this repository</span>
+  </div>
+
+  <div class="card">
+    <b>The job.</b> HEL-207 adds an optional discount to an order. Sales agree a
+    percentage with a wholesale customer, OrderCore carries it, and Billing takes it
+    off the subtotal before tax. Six acceptance criteria, already written. It is a
+    small change - and it crosses the one place in Helios where Python calls Java.
+    <br><br>
+    <b>The question.</b> Nobody is going to review this today. So how do you know it
+    is finished? By the end you will have a gate you wrote yourself, a score you gave
+    yourself against it, and a rework you did because the score said so.
+  </div>
+
+  <h2>The shape of the hour</h2>
+  <table>
+    <thead><tr><th>Step</th><th>What you do</th><th>Time</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><b>Plan before you generate</b> - an impact note from the entity map, checked against the code</td><td>0-7</td></tr>
+      <tr><td>2</td><td>Pick the model tier, and name what no model gets a vote in</td><td>7-12</td></tr>
+      <tr><td>3</td><td>The Python side, in one small diff</td><td>12-22</td></tr>
+      <tr><td>4</td><td>The Java side, so the contract is whole</td><td>22-30</td></tr>
+      <tr><td>5</td><td>Run the two gates that are not opinions</td><td>30-34</td></tr>
+      <tr><td>6</td><td>Adapt the design rubric into your gate, and score yourself with it</td><td>34-42</td></tr>
+      <tr><td>7</td><td>Rework what failed, then one commit</td><td>42-45</td></tr>
+    </tbody>
+  </table>
+  <p>
+    Three of those seven steps happen before any code is written, and one of them is
+    you reading the code rather than the map. That ratio is the lesson. The eighteen
+    minutes in steps 3 and 4 are mostly spent reading two diffs; the generating itself
+    is the short part.
+  </p>
+
+  <details>
+    <summary>Why this ticket, of all the tickets</summary>
+    <p>
+      <b>It crosses a language boundary.</b> OrderCore names its fields in
+      <code>snake_case</code>, Billing in <code>camelCase</code>, and the translation
+      lives in one file. Change one side only and nothing throws.
+    </p>
+    <p>
+      <b>It has a fallback that hides the failure.</b> When Billing cannot be reached,
+      OrderCore works the invoice out locally and marks it. A half-changed contract
+      therefore looks like a working invoice with the wrong total on it.
+    </p>
+    <p>
+      <b>It is small enough to finish.</b> Four files in Python, three in Java. If a
+      gate cannot be run on a change this size, it will never be run on a big one.
+    </p>
+  </details>
+
+  <div class="step">
+    <span class="step__n">0</span><span class="step__t">Set up</span>
+    <span class="step__time">before the clock starts</span>
+  </div>
+  <p><b>Why.</b> This week&apos;s files were added to the repository after you cloned it, and one Claude Code version matters.</p>
+
+  <p><b>a.</b> Check your tools. In a plain PowerShell window:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+claude --version
+python --version
+git branch --show-current</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Three lines like these - the numbers move, the shape does not:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
+<pre><code>2.1.260 (Claude Code)
+Python 3.11.9
+main</code></pre></div>
+    Claude Code must be <b>2.1.211 or higher</b> and Python 3.11 or higher. The third
+    line is whatever branch you are on; any branch is fine, and yours will differ.
+    <br><br>
+    <b>Why that version.</b> It is the one this programme standardised on in Week 2,
+    where the usage figures had to reset between runs. Nothing in this lab needs a
+    feature newer than that, so any higher number is fine.
+  </div>
+
+  <p><b>b.</b> Pull in this week&apos;s files, install what OrderCore needs, and make your folder. Safe to run twice:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+git fetch origin
+git merge origin/main -m "Week 3 files"
+mkdir week3 -Force | Out-Null
+python -m pip install -r apps\ordercore\requirements.txt ruff
+dir data\model-pricing.csv helios-backlog\HEL-207.json rubrics\lld.md</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A merge summary, a run of pip lines, then three files found.
+    PowerShell prints a Mode, LastWriteTime, Length and Name table for each one; the
+    three names are the part that matters, and the dates and sizes are yours:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - names only, and the pip wording varies</span></div>
+<pre><code>Requirement already satisfied: fastapi
+Requirement already satisfied: pytest
+model-pricing.csv
+HEL-207.json
+lld.md</code></pre></div>
+    First time on this machine, pip says <code>Successfully installed</code> and lists
+    more. That line matters: step 5 runs the OrderCore test suite and the linter, which
+    need <code>fastapi</code>, <code>httpx</code>, <code>pytest</code> and
+    <code>ruff</code> installed for this Python.
+    <br><br>
+    <code>model-pricing.csv</code> is the file to watch. It is new this week, so
+    <code>cannot find path</code> on it means the merge brought nothing. Read the git
+    message above the error, and tell your facilitator - the week&apos;s files may not
+    have been published yet.
+  </div>
+
+  <p><b>c.</b> Start Claude Code. VS Code is already open; this is the only thing you need to launch:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+claude</code></pre>
+  </div>
+  <div class="watch">
+    <b>You now need two windows.</b> This one is Claude Code. Open a second terminal
+    inside VS Code with <code>Ctrl+Shift+`</code> for every <b>powershell</b> block
+    below. Each block sets its own folder, so it works in either window.
+  </div>
+
+  <div class="step">
+    <span class="step__n">1</span><span class="step__t">Plan before you generate</span>
+    <span class="step__time">0-7 min</span>
+  </div>
+  <p>
+    <b>Why.</b> A change that crosses two languages goes wrong in the file nobody
+    opened. Seven minutes deciding what must change is cheaper than an afternoon
+    finding out what did not.
+  </p>
+
+  <p><b>a.</b> Read the ticket yourself first, not through a model:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+type helios-backlog\HEL-207.json</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> The whole ticket, about thirty lines. These six are the ones you
+    are measured against, and they are identical for everybody:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - the acceptance_criteria block</span></div>
+<pre><code>"An order can carry an optional discount_percent between 0 and 50",
+"Billing applies the discount to the subtotal before tax is calculated",
+"Tax is charged on the discounted subtotal, not the original subtotal",
+"A discount above 50 or below 0 is rejected with a 422",
+"Orders without a discount behave exactly as they do today",
+"The Shop totals panel shows the discount as its own row when present"</code></pre></div>
+    Note the last one. It is a React change, and this lab does not do it. Part c is
+    where you write that down rather than forget it.
+    <br><br>
+    <b>Two things in that file will trip you if you skim.</b> The summary line says
+    &quot;discount <i>code</i> field&quot;, and every criterion underneath it describes
+    a <i>percentage</i>. The criteria are the contract; the summary is a title somebody
+    typed once. And <code>expected_outputs</code> asks for a low-level design note in
+    the shared design folder. This programme keeps your work in <code>week3</code>, so
+    your change notes and the gate rubric you build in step 6 stand in for it - which
+    is a scope decision, and belongs in the note you are about to write.
+  </div>
+
+  <p><b>b.</b> Have Claude write the impact note. In the Claude Code window:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Read helios-backlog/HEL-207.json and data/entity-map.md, then open every file
+the map names under Order and under Invoice and pricing.
+
+Write week3/impact-note.md:
+- A table, columns File | Change needed | Why. One row for every file that must
+  change to deliver HEL-207, and one row for every file the map names that does
+  NOT need to change, with "no change" in the middle column.
+- A section "## Where the map is wrong": any file that must change and is not in
+  the map's list of three places, and any file the map implies but the code does
+  not need.
+- A section "## Out of scope today": the acceptance criteria this change will
+  not deliver, and why.
+
+Decide from the code you have just read, not from the map. Write no code yet.
+Reply with one line: how many files must change.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A one-line reply. The number should be <b>7</b>:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
+<pre><code>7 files must change</code></pre></div>
+    A different number is not automatically wrong, but it means you and Claude
+    disagree about something, and part c is where you find out which of you is right.
+  </div>
+
+  <p><b>c.</b> Now the part only you can do. Open the note and check it against the code:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+dir week3\impact-note.md
+code week3\impact-note.md apps\ordercore\app\store.py apps\ordercore\app\main.py</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Three tabs. Check the note says all four of these, and correct it
+    in the editor where it does not:
+    <table>
+      <thead><tr><th>What the note should say</th><th>How you check it in ten seconds</th></tr></thead>
+      <tbody>
+        <tr><td>Seven files must change: <code>models.py</code>, <code>store.py</code>, <code>billing_client.py</code>, <code>test_orders.py</code>, <code>InvoiceCalculator.java</code>, <code>BillingServer.java</code>, <code>BillingServerTest.java</code></td>
+            <td>Each one either names an invoice field, builds an order, or asserts on a total</td></tr>
+        <tr><td><code>main.py</code> needs no change</td>
+            <td>Open the tab. It names <code>order_id</code> and <code>status</code> in a route path and a filter, and no invoice or order <i>body</i> field at all. Every route takes a whole model in and hands a whole model back, so a new field rides through untouched</td></tr>
+        <tr><td>The entity map&apos;s list of three places leaves out <code>store.py</code></td>
+            <td>The map does name <code>store.py</code>, under Order storage. But its cross-system section says a change to invoice fields must be made in three places, and lists <code>models.py</code> and <code>billing_client.py</code> for the Python side. Open the tab: <code>store.py</code> builds the order by naming each field, so a new field is silently dropped there and the list is the thing that is wrong</td></tr>
+        <tr><td><code>OrderDetail.jsx</code> is in the map and is out of scope today</td>
+            <td>That is acceptance criterion six. The lab stops at the Python and the Java sides</td></tr>
+      </tbody>
+    </table>
+    The map says of itself that it is maintained by hand and is occasionally stale.
+    The gap is not a missing file - it is a summary two sections lower that has fallen
+    behind the tables above it, which is the most common way a map goes wrong. Finding
+    it is the exercise; the note is only where you write it down.
+  </div>
+  <div class="watch">
+    <b>Do not fix the entity map.</b> It is a shared file and this lab never edits
+    shared files. Record the gap in your note and move on.
+  </div>
+
+  <div class="step">
+    <span class="step__n">2</span><span class="step__t">Pick the tier, and name what no model decides</span>
+    <span class="step__time">7-12 min</span>
+  </div>
+  <p>
+    <b>Why.</b> The model you reach for out of habit is a cost decision you never
+    made, and some of the work in this lab should not go to a model at all.
+  </p>
+  <p>Three tiers, priced in <code>data/model-pricing.csv</code> as at 1 September 2026:</p>
+  <table>
+    <thead><tr><th>Tier</th><th>Model</th><th>Input, per million</th><th>Output, per million</th><th>What it is for</th></tr></thead>
+    <tbody>
+      <tr><td><b>fast</b></td><td>Haiku 4.5</td><td>$1.00</td><td>$5.00</td><td>Classification, extraction, routing. High volume, low judgement</td></tr>
+      <tr><td><b>balanced</b></td><td>Sonnet 5</td><td>$3.00</td><td>$15.00</td><td>The default. Synthesis, drafting, code changes, most day-to-day work</td></tr>
+      <tr><td><b>deep</b></td><td>Opus 5</td><td>$15.00</td><td>$75.00</td><td>Design reasoning, adversarial review, marking other models&apos; work</td></tr>
+    </tbody>
+  </table>
+  <p>
+    Deep costs fifteen times what fast does on the way in, and fifteen times on the
+    way out. Today&apos;s job is a code change with a written specification in front of
+    it and a test suite behind it. That is drafting against a fixed target, which is
+    the balanced tier&apos;s description word for word. Set it:
+  </p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">claude code</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>/model sonnet</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> One confirmation line:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
+<pre><code>Set model to Sonnet 5 and saved as your default for new sessions</code></pre></div>
+    If you were already on Sonnet, nothing changes. The wording varies a little
+    between Claude Code versions; the tier is the part that matters.
+  </div>
+  <div class="card">
+    <b>When not to use AI at all.</b> Three questions get asked in this lab, and no
+    model gets a vote in any of them:
+    <ul>
+      <li><b>Did the tests pass?</b> <code>pytest</code> already answered. Its answer
+        is not an opinion and cannot be improved by a second one.</li>
+      <li><b>Is the lint clean?</b> <code>ruff</code> already answered, against a
+        ruleset pinned in <code>ruff.toml</code> so that everybody sees the same
+        findings.</li>
+      <li><b>Do the field names match on both sides of the boundary?</b> A contract
+        test answers, by failing.</li>
+    </ul>
+    Asking a model to confirm any of the three is redundant verification, the fifth
+    row of <code>templates/anti-pattern-checklist.md</code>: paying for a second and
+    less reliable answer to a question that is already settled. This week&apos;s
+    hands-on audits a real workflow against all six rows of that list.
+  </div>
+
+  <div class="step">
+    <span class="step__n">3</span><span class="step__t">The Python side</span>
+    <span class="step__time">12-22 min</span>
+  </div>
+  <p>
+    <b>Why.</b> One concern, one small diff. A change you can read in a minute is a
+    change you can gate; a hundred-line diff gets waved through.
+  </p>
+
+  <p><b>a.</b> Paste this into Claude Code. It is long because it is specific, not because it is polite:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Implement the OrderCore half of HEL-207. Read week3/impact-note.md first and
+follow it.
+
+apps/ordercore/app/models.py
+- Order and NewOrder each gain discount_percent: int, default 0, ge=0, le=50.
+- Invoice gains discount_pence: int, default 0.
+
+apps/ordercore/app/store.py
+- add() must carry discount_percent from the payload onto the new Order.
+
+apps/ordercore/app/billing_client.py
+- The outgoing payload gains "discountPercent": order.discount_percent.
+- The response parse gains discount_pence, read from body["discountPence"].
+- _local_invoice applies the discount to the subtotal before tax:
+      discount = (subtotal * order.discount_percent + 50) // 100
+      taxable  = subtotal - discount
+  and tax is charged on taxable, not on subtotal.
+- While you are in that function, the existing tax line reads
+  round(subtotal * TAX_RATE_PERCENT / 100), which goes through a float. Make it
+  (taxable * TAX_RATE_PERCENT + 50) // 100 so the whole function is integer
+  arithmetic and matches roundHalfUp on the Java side. It returns the same
+  numbers; the house rule is that money is never a float.
+
+apps/ordercore/tests/test_orders.py - add exactly these four tests, no others:
+- test_create_order_accepts_a_discount
+- test_create_order_accepts_the_fifty_percent_boundary
+- test_create_order_rejects_a_discount_above_fifty
+- test_invoice_applies_discount_before_tax
+
+The last one: create an order through POST /orders - none of the seeded orders
+carries a discount - with 100 units at 189 pence and discount_percent 10, then
+fetch its invoice with Billing unreachable. It must give subtotal 18900,
+discount 1890, tax 3402 and total 20412.
+
+Change nothing else, and leave the Java side alone for now. Then write
+week3/change-python.md: one line per file saying what changed and why, and the
+four test names. Reply with one line: the files you touched.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Four files edited, then a one-line reply:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
+<pre><code>models.py, store.py, billing_client.py, tests/test_orders.py</code></pre></div>
+    Say <b>Yes</b> to each edit inside <code>apps/ordercore</code>. Say <b>No</b> to
+    anything outside it - nothing else needs to change yet.
+  </div>
+
+  <p><b>b.</b> Read the diff before you trust it. This is what a small change is for:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+git diff --stat apps/ordercore</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Four files and about sixty changed lines, most of them tests:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - file names exact, line counts vary</span></div>
+<pre><code> apps/ordercore/app/billing_client.py |  9 ++++++--
+ apps/ordercore/app/models.py         |  3 +++
+ apps/ordercore/app/store.py          |  1 +
+ apps/ordercore/tests/test_orders.py  | 45 ++++++++++++++++++++++++++++++++++
+ 4 files changed, 56 insertions(+), 2 deletions(-)</code></pre></div>
+    The <b>four file names must match</b>. The line counts move by a few either way
+    depending on how Claude lays the code out, and that is fine.
+    <br><br>
+    A fifth file in that list is the thing to stop for. <code>main.py</code> appearing
+    means a route was changed that did not need changing; ask Claude to put the file
+    back. More than about eighty changed lines usually means it rewrote a file
+    instead of editing it.
+  </div>
+
+  <div class="step">
+    <span class="step__n">4</span><span class="step__t">The Java side</span>
+    <span class="step__time">22-30 min</span>
+  </div>
+  <p>
+    <b>Why.</b> Half a contract is worse than none. If only Python changes, Billing
+    keeps returning the old total, OrderCore quietly falls back to its own
+    calculation, and the invoice looks fine while being wrong by the discount.
+  </p>
+
+  <p><b>a.</b> The other half:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Implement the Billing half of HEL-207.
+
+apps/billing/src/main/java/com/helios/billing/InvoiceCalculator.java
+- Add MAX_DISCOUNT_PERCENT = 50 beside TAX_RATE_PERCENT.
+- Invoice gains a discountPence field, set in the constructor and written by
+  toJson between subtotalPence and taxPence.
+- calculate takes a fourth argument, discountPercent. Reject below 0 or above
+  MAX_DISCOUNT_PERCENT with IllegalArgumentException. Work out
+  discount = roundHalfUp(subtotal * discountPercent, 100), take it off the
+  subtotal, and charge tax on what is left.
+- Keep the existing three-argument calculate as an overload that delegates with
+  a discount of 0, so the current callers and tests still compile.
+
+apps/billing/src/main/java/com/helios/billing/BillingServer.java
+- invoiceFromRequest reads an optional discountPercent, defaulting to 0, and
+  passes it to calculate.
+
+apps/billing/src/test/java/com/helios/billing/BillingServerTest.java
+- Add two cases: appliesTheDiscountBeforeTax and aDiscountAboveFiftyIsRejected.
+  The first sends 100 units at 189 pence with discountPercent 10 and expects
+  discountPence 1890, taxPence 3402 and totalPence 20412 - the same figures the
+  Python test uses.
+
+No new runtime dependency in Billing. When you have finished, compile the main
+sources with javac and tell me whether it built. Then write
+week3/change-java.md: one line per file, and the figures both languages now
+agree on. Reply with one line: whether it compiled.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Claude edits three files, runs the compiler itself, and replies:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
+<pre><code>compiled clean, no errors</code></pre></div>
+    Compiling needs the JDK, which is on your workstation. Nothing here needs Maven
+    or the network. The exact wording of the reply is Claude&apos;s; the word you are
+    looking for is that it built.
+  </div>
+  <div class="watch">
+    <b>The overload is a judgement, not a formality.</b> Four cases in
+    <code>InvoiceCalculatorTest.java</code> call the three-argument
+    <code>calculate</code>. Keep it and that file compiles untouched; drop it and the
+    file stops compiling until every one of those calls is edited. Keeping it also
+    means a future caller can skip the discount without noticing. You chose the
+    smaller diff over the louder failure. Put that sentence in
+    <code>week3/change-java.md</code> - your rubric asks for it in step 6.
+  </div>
+
+  <p><b>b.</b> The second diff:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+git diff --stat apps/billing</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Three files. Git shortens the long package paths with dots:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - file names exact, line counts vary</span></div>
+<pre><code> .../java/com/helios/billing/BillingServer.java     |  6 +++++-
+ .../java/com/helios/billing/InvoiceCalculator.java | 24 +++++++++++++++++---
+ .../java/com/helios/billing/BillingServerTest.java | 18 ++++++++++++++++++
+ 3 files changed, 44 insertions(+), 4 deletions(-)</code></pre></div>
+    <code>Json.java</code> must not appear. Nothing about one more whole-number field
+    needs the parser to change.
+    <br><br>
+    Git only shortens a path when the table is too wide for it, so you may see the
+    three paths printed in full instead. Same three files either way.
+  </div>
+
+  <div class="step">
+    <span class="step__n">5</span><span class="step__t">The two gates that are not opinions</span>
+    <span class="step__time">30-34 min</span>
+  </div>
+  <p>
+    <b>Why.</b> Everything after this step is judgement. These two commands are the
+    only answers today that do not depend on anybody agreeing with them.
+  </p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+python -m pytest apps/ordercore/tests
+python -m ruff check apps/ordercore</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Fifteen dots, then two lines:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - the counts are exact, the timing is yours</span></div>
+<pre><code>...............                                                          [100%]
+15 passed in 6.41s
+All checks passed!</code></pre></div>
+    <b>Fifteen, not eleven.</b> Eleven tests were already there and four are yours. A
+    count of eleven means Claude wrote no tests; twelve or thirteen means it wrote
+    fewer than the four you asked for. The seconds are yours and vary run to run.
+  </div>
+  <div class="watch">
+    <b>A failing test is information, not a setback.</b> Read the assertion line
+    before you do anything else. <code>tax_pence</code> coming back as 3780 rather
+    than 3402 means the discount was worked out and then not taken off before tax -
+    which is acceptance criterion three, caught by the gate that exists for it.
+  </div>
+  <div class="card">
+    <b>What these two gates do not cover, said plainly.</b> Two things, and the second
+    is the one that matters.
+    <ul>
+      <li>The Java tests are JUnit and run under Maven, which is not installed on the
+        workstation. <code>BillingServerTest.java</code> is written today and not run
+        today. What was executed on the Java side is the compile in step 4.</li>
+      <li><b>Nothing at all tests what actually crosses the wire.</b> The Java test
+        builds its own request string, so it never sees what
+        <code>billing_client.py</code> sends. All four of your Python tests reach the
+        fallback, which works the discount out locally, so none of them sees what
+        Billing replies. Both sides are tested. The sentence between them is not.</li>
+    </ul>
+    That second gap is a fact about your change, not a mood. Write both into your
+    rubric&apos;s evidence column in the next step rather than pretending them away,
+    and expect the contract row to cost you a point. A gate that lies about its own
+    coverage is worse than no gate. The challenge at the end of this book shows you
+    the gap live, in about a minute.
+  </div>
+
+  <div class="step">
+    <span class="step__n">6</span><span class="step__t">Your rubric, and your own score against it</span>
+    <span class="step__time">34-42 min</span>
+  </div>
+  <p>
+    <b>Why.</b> A rubric you copied is a checklist. A rubric you adapted to this
+    change is a gate, because adapting it forces you to decide what evidence would
+    satisfy you before you go looking for it.
+  </p>
+
+  <p><b>a.</b> Take your own copy of the design rubric. It is not overwritten if you already have one:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+if (-not (Test-Path week3\gate-rubric.md)) { copy rubrics\lld.md week3\gate-rubric.md }
+dir week3\gate-rubric.md
+code week3\gate-rubric.md</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> One file, then one tab. It holds five criteria scored 0, 1 or 2,
+    a pass threshold of 8 of 10 with no criterion at 0, and four house rules:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">week3/gate-rubric.md - the five rows you are adapting</span></div>
+<pre><code>1  Contracts
+2  Error handling
+3  Tests
+4  Security and validation
+5  Standards conformance</code></pre></div>
+    Everybody starts from the same five. What you do next is yours, and no two
+    participants should end up with the same file.
+  </div>
+
+  <p><b>b.</b> Three edits, by hand, in that tab. This is the typing you came here to do:</p>
+  <ol>
+    <li><b>Retitle it</b> for HEL-207, so it reads as a gate for this change rather
+      than as a general document.</li>
+    <li><b>Add a sixth criterion</b> for what this ticket is actually about: the
+      discount range. Score 0 if the range is enforced on neither side, 1 if on one,
+      2 if on both with a test that names the boundary. Raise the threshold to
+      <b>10 of 12</b> and keep the rule that no criterion may sit at 0.</li>
+    <li><b>Make the evidence column concrete, and add a Score column.</b> The
+      rubric ships with an &quot;Evidence required&quot; column already filled in, but
+      generically: &quot;the contract test&quot;, &quot;test names&quot;, &quot;lint
+      output&quot;. Replace each one with the actual artefact from your change - the
+      test name, the command whose output you would paste, the file you would point
+      at - and add a Score column to write into. Deciding what would convince you,
+      before you look, is the only thing that stops a self-score being a rubber
+      stamp.</li>
+  </ol>
+  <!-- hand-edit: rewrite week3/gate-rubric.md Low-level HEL-207 -->
+  <div class="watch">
+    <b>Row 1 is the one to be strict about.</b> It reads &quot;both sides changed and
+    a contract test covers it&quot;. You changed both sides. The Java contract test
+    exists and was not run today. Decide now, in writing, whether that is a 1 or a 2,
+    and hold yourself to your own answer in a moment.
+  </div>
+
+  <p><b>c.</b> Now hand the change to Claude and ask it to fail you:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Read week3/gate-rubric.md, then week3/change-python.md and week3/change-java.md,
+then every source file those two name.
+
+Score my change against every row of my rubric, 0, 1 or 2, and for each row
+quote the exact evidence my rubric asks for, taken from the code or from the
+tests. Where you cannot find that evidence in the files, score 0 and say what is
+missing. Do not credit an intention.
+
+Add one line under the table naming any constant that is now written down on
+both sides of the boundary, the way data/entity-map.md warns about the tax
+rate. Say where it would go wrong if only one copy changed.
+
+Write week3/gate-score.md: the scored table, the total, whether it clears my
+threshold, and a "## Rework" section listing only the smallest changes that
+would clear it. Score it the way a reviewer who wants to reject it would.
+Reply with one line: the total and the verdict.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A total out of 12 and a verdict:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - your total will differ</span></div>
+<pre><code>10/12 - passes, but criterion 2 sits at 1</code></pre></div>
+    <b>A clean pass on the first attempt is the suspicious result</b>, not the good
+    one. <b>Contracts should cost you a point</b>, and if it did not, score it again
+    yourself: both sides changed, but no test anywhere watches what crosses between
+    them, which is the second bullet in the step 5 card. Error handling usually costs
+    the other one, because a discount above 50 is rejected with a 422 whose message
+    nobody wrote.
+    <br><br>
+    Read the evidence column, not the total. A row that scored 2 with no quotation
+    beside it did not score 2 - it was assumed. Lower it yourself in
+    <code>week3/gate-score.md</code>. It is your gate.
+  </div>
+
+  <div class="step">
+    <span class="step__n">7</span><span class="step__t">Rework, then one commit</span>
+    <span class="step__time">42-45 min</span>
+  </div>
+  <p>
+    <b>Why.</b> A gate that never sends anything back is decoration. Fix the smallest
+    thing that failed, prove it with the gate that is not an opinion, and commit once.
+  </p>
+
+  <p><b>a.</b> Fix only what the score said, and nothing else:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Work through the Rework section of week3/gate-score.md and nothing beyond it.
+Keep the diff small. If an item would need a new file, or a change outside
+apps/ordercore and apps/billing, stop and tell me instead of doing it.
+
+Then append a "## Rework done" section to week3/gate-score.md: one line per
+item, what you changed and which rubric row it was for. Reply with one line:
+the rows you moved.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A short reply naming rows, not files:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - yours will differ</span></div>
+<pre><code>row 2 from 1 to 2</code></pre></div>
+    If nothing failed, say so in the file and move on. Reworking nothing is a valid
+    outcome. Not knowing whether you needed to is not.
+  </div>
+
+  <p><b>b.</b> Re-run the gate, then commit the change and its evidence as one thing:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+python -m pytest apps/ordercore/tests
+python -m ruff check apps/ordercore
+git add apps week3
+git commit -m "HEL-207: optional order discount, applied before tax"
+git log --oneline -1</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> The gate green again, then one commit:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - the hash and the branch name are yours</span></div>
+<pre><code>...............                                                          [100%]
+15 passed in 6.38s
+All checks passed!
+[main 7c41e0d] HEL-207: optional order discount, applied before tax
+7c41e0d HEL-207: optional order discount, applied before tax</code></pre></div>
+    Sixteen dots rather than fifteen if your rework added a test, which is the usual
+    way the contract row gets its point back. One commit, one concern - the house rule
+    your own rubric checks. Nothing is pushed; a hook blocks it, and you would not
+    want to anyway.
+  </div>
+
+  <h2>Challenge - break the contract on purpose</h2>
+  <p class="sub">5 minutes, afterwards</p>
+  <p>
+    Ask Claude to remove <code>discountPercent</code> from the outgoing payload in
+    <code>billing_client.py</code> and change nothing else, then run the tests again.
+    Put it back afterwards with
+    <code>git checkout -- apps/ordercore/app/billing_client.py</code>.
+  </p>
+  <p>
+    <b>All fifteen still pass.</b> That is the result, and it is the uncomfortable
+    one. Every test that reaches the client takes the fallback, which works the
+    discount out locally from the order it already has, so none of them notices that
+    Billing was told nothing. The Java test does not notice either: it builds its own
+    request string and never sees what Python sent. A live Billing service would
+    return a total with no discount in it, and the Shop would show that total.
+  </p>
+  <p>
+    <b>Two things would have caught it</b>, and neither is in your change.
+    <code>request_invoice</code> takes a <code>client</code> argument precisely so a
+    test can stand one in and assert on the payload it was handed. Or an end-to-end
+    run with Billing actually started. Pick one, add it, and watch the contract row of
+    your rubric move. Then write the general version down somewhere your team will
+    read it: a green suite is evidence about what it covers, and no evidence at all
+    about what it does not.
+  </p>
+
+  <h2>Passing bar</h2>
+  <div class="bar">
+    An impact note naming seven files to change and at least one place the entity map
+    is wrong. The change made across Python and Java in two diffs you read. Fifteen
+    tests passing and the linter clean, both run by you rather than reported to you by
+    a model. A gate rubric with six criteria and an evidence column you filled in
+    before scoring. A score you gave yourself against it. One rework item done, or a
+    written reason there were none. One local commit holding the code and the evidence
+    together.
+  </div>
+
+  <h2>If something breaks</h2>
+  <table>
+    <thead><tr><th>Symptom</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><code>cannot find path</code> for <code>data\model-pricing.csv</code></td>
+          <td>Step 0b did not merge. That file is new this week, which is why it is the one to watch. Run the step again and read the git output above the error; if the merge succeeds and the file is still absent, the week&apos;s files have not been published and your facilitator has to do that first.</td></tr>
+      <tr><td><code>git merge</code> refuses, citing local changes</td>
+          <td>Commit what you have: <code>git commit -am "wip"</code>, then run step 0b again.</td></tr>
+      <tr><td>The impact note names four or five files</td>
+          <td>Claude read the map&apos;s cross-system section, which lists three places, and stopped there. Tell it to open every file in the two tables above that section and decide from the code.</td></tr>
+      <tr><td><code>git diff --stat</code> lists <code>main.py</code></td>
+          <td>A route was changed that did not need changing. <code>git checkout -- apps/ordercore/app/main.py</code>, then carry on.</td></tr>
+      <tr><td>Only eleven tests run</td>
+          <td>Claude wrote no tests. Send step 3a again; the four names are in it.</td></tr>
+      <tr><td><code>tax_pence</code> is 3780 instead of 3402</td>
+          <td>Tax was charged on the full subtotal. The discount has to come off before the tax line, in <code>_local_invoice</code> and in <code>calculate</code>.</td></tr>
+      <tr><td>An invoice comes back with <code>source</code> set to <code>fallback</code> when Billing is running</td>
+          <td>Billing is replying without <code>discountPence</code>, so the parse raises and the client falls back. Java was changed but Billing was not restarted, so the old build is still answering. Restart it.</td></tr>
+      <tr><td><code>code</code> is not recognised</td>
+          <td>VS Code is not on PATH. On Windows that is set by the installer&apos;s &quot;Add to PATH&quot; option, so re-run the installer, or open a terminal that was started after VS Code was installed. Either way you can open the files from the editor by hand - nothing in the lab depends on the command itself.</td></tr>
+      <tr><td>A created order comes back with <code>discount_percent</code> 0</td>
+          <td><code>store.py</code> was missed. It builds the order field by field, so a new field has to be named there too.</td></tr>
+      <tr><td><code>ruff</code> reports findings in files you did not touch</td>
+          <td>You ran it over the whole repository. Point it at <code>apps/ordercore</code>, as step 5 does.</td></tr>
+      <tr><td><code>python -m ruff</code> is not recognised</td>
+          <td>Ruff is not installed for this Python. <code>python -m pip install ruff</code>, then run step 5 again.</td></tr>
+      <tr><td><code>javac</code> is not recognised, or Claude says it cannot compile</td>
+          <td>The JDK is missing or not on PATH. Open a new terminal first. If it still fails, record it in your rubric evidence and carry on - the Python gate is unaffected.</td></tr>
+      <tr><td><code>mvn</code> is not recognised</td>
+          <td>Expected. Maven is not on the workstation, so the JUnit cases are written and not run. The card in step 5 says how to record that.</td></tr>
+      <tr><td>Claude asks to change a file outside <code>apps</code> or <code>week3</code></td>
+          <td>Say no. This lab never edits the shared documents, rubrics or templates.</td></tr>
+      <tr><td>The self-score passes every row first time</td>
+          <td>Check the evidence column. Any row scored 2 with no quotation beside it should be scored again, by you.</td></tr>
+      <tr><td><code>git commit</code> says there is nothing to commit</td>
+          <td>The edits landed somewhere else. <code>git status</code> shows where; <code>git add</code> that path and commit again.</td></tr>
+      <tr><td>A push is refused</td>
+          <td>Correct. Nothing in this programme is pushed. To hand work over, run <code>git bundle create week3.bundle HEAD</code> and send the file.</td></tr>
+      <tr><td><code>python</code> opens the Microsoft Store</td>
+          <td>Settings &gt; Apps &gt; Advanced app settings &gt; App execution aliases: turn off <code>python.exe</code> and <code>python3.exe</code>, then reopen PowerShell.</td></tr>
+      <tr><td><code>claude</code> is not on PATH</td>
+          <td>Open a new terminal - a window opened before the install does not see it.</td></tr>
+    </tbody>
+  </table>
+
+  <p class="foot">
+    Helios Group is fictional. All data in this repository is synthetic.
+    Week 3 of the Claude Code Capability Program.
+  </p>
+</main>
+
+<script>
+// Copy buttons. Text is taken from the <pre> exactly as written, so what lands on
+  // the clipboard is what is on screen - no smart quotes, no wrapped commands.
+  document.querySelectorAll('.snippet').forEach(function (block) {
+    var button = block.querySelector('.snippet__copy');
+    var pre = block.querySelector('pre');
+    if (!button || !pre) return;
+    button.addEventListener('click', function () {
+      var text = pre.innerText;
+      var done = function () {
+        button.textContent = 'Copied';
+        button.classList.add('done');
+        setTimeout(function () {
+          button.textContent = 'Copy';
+          button.classList.remove('done');
+        }, 1500);
+      };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } else {
+        fallback();
+      }
+      function fallback() {
+        var area = document.createElement('textarea');
+        area.value = text;
+        area.style.position = 'fixed';
+        area.style.opacity = '0';
+        document.body.appendChild(area);
+        area.select();
+        try { document.execCommand('copy'); done(); } catch (e) { button.textContent = 'Select manually'; }
+        document.body.removeChild(area);
+      }
+    });
+  });
+</script>
+</body>
+</html>

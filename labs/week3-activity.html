@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 3 hands-on - Cost the Tool Chain</title>
+<style>
+:root {
+    --gray-50:#ffffff; --gray-75:#fafafa; --gray-100:#f5f5f5; --gray-200:#e1e1e1;
+    --gray-300:#cacaca; --gray-600:#6e6e6e; --gray-800:#2c2c2c; --gray-900:#1b1b1b;
+    --blue-500:#1473e6; --blue-600:#0d66d0; --green-500:#2d9d78;
+    --orange-500:#e68619; --red-500:#e34850; --accent-red:#fa0f00;
+    --radius:4px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--gray-100); color:var(--gray-800);
+    font-family:"Source Sans 3",-apple-system,"Segoe UI",Roboto,sans-serif;
+    font-size:15px; line-height:1.6;
+  }
+  header.masthead{
+    background:var(--gray-900); color:#fff; padding:14px 24px;
+    display:flex; align-items:baseline; gap:12px; position:sticky; top:0; z-index:10;
+  }
+  .masthead__mark{color:var(--accent-red); font-weight:700; font-size:18px; letter-spacing:-.02em}
+  .masthead__title{font-size:16px; font-weight:600}
+  .masthead__env{margin-left:auto; font-size:11px; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--gray-300)}
+  main{max-width:920px; margin:0 auto; padding:24px 24px 80px}
+  h1{font-size:26px; margin:8px 0 4px}
+  .sub{color:var(--gray-600); margin:0 0 24px}
+  h2{font-size:19px; margin:36px 0 4px; padding-top:16px; border-top:1px solid var(--gray-200)}
+  h3{font-size:15px; margin:22px 0 6px}
+  p,li{margin:8px 0}
+  ul,ol{padding-left:22px}
+  .card{background:var(--gray-50); border:1px solid var(--gray-200);
+    border-radius:var(--radius); padding:16px 18px; margin:16px 0}
+  .meta{display:flex; gap:24px; flex-wrap:wrap; font-size:13px; color:var(--gray-600);
+    background:var(--gray-50); border:1px solid var(--gray-200);
+    border-radius:var(--radius); padding:12px 16px}
+  .meta b{color:var(--gray-800)}
+  .step{display:flex; align-items:baseline; gap:10px; margin:28px 0 6px}
+  .step__n{flex:0 0 auto; width:26px; height:26px; border-radius:50%;
+    background:var(--blue-500); color:#fff; font-size:13px; font-weight:700;
+    display:inline-flex; align-items:center; justify-content:center}
+  .step__t{font-size:17px; font-weight:600}
+  .step__time{margin-left:auto; font-size:12px; color:var(--gray-600);
+    border:1px solid var(--gray-300); border-radius:10px; padding:1px 10px; white-space:nowrap}
+  .snippet{position:relative; margin:12px 0}
+  .snippet__bar{display:flex; align-items:center; gap:8px; background:var(--gray-800);
+    color:var(--gray-300); font-size:12px; padding:6px 10px;
+    border-radius:var(--radius) var(--radius) 0 0}
+  .snippet__lang{text-transform:uppercase; letter-spacing:.06em}
+  .snippet__copy{margin-left:auto; background:var(--blue-500); color:#fff; border:0;
+    border-radius:3px; padding:3px 12px; font:inherit; font-size:12px; cursor:pointer}
+  .snippet__copy:hover{background:var(--blue-600)}
+  .snippet__copy.done{background:var(--green-500)}
+  pre{margin:0; background:var(--gray-900); color:#f0f0f0; padding:12px 14px;
+    border-radius:0 0 var(--radius) var(--radius); overflow-x:auto;
+    font-family:"Consolas","DejaVu Sans Mono",monospace; font-size:13px; line-height:1.5;
+    white-space:pre; tab-size:2}
+  code{font-family:"Consolas","DejaVu Sans Mono",monospace; font-size:.92em;
+    background:var(--gray-200); padding:1px 5px; border-radius:3px}
+  pre code{background:none; padding:0; font-size:inherit}
+  .expect{border-left:3px solid var(--green-500); background:#eef8f4;
+    padding:10px 14px; border-radius:0 var(--radius) var(--radius) 0; margin:10px 0}
+  .expect b{color:#1a6b52}
+  .watch{border-left:3px solid var(--orange-500); background:#fff6e8;
+    padding:10px 14px; border-radius:0 var(--radius) var(--radius) 0; margin:10px 0}
+  .watch b{color:#8a5a0b}
+  .bar{border-left:3px solid var(--gray-600); background:var(--gray-75);
+    padding:12px 16px; border-radius:0 var(--radius) var(--radius) 0; margin:16px 0}
+  table{width:100%; border-collapse:collapse; margin:12px 0; font-size:14px}
+  th{text-align:left; background:var(--gray-100); border-bottom:1px solid var(--gray-300);
+    padding:8px 10px; font-size:12px; text-transform:uppercase; letter-spacing:.04em;
+    color:var(--gray-600)}
+  td{padding:8px 10px; border-bottom:1px solid var(--gray-200); vertical-align:top}
+  details{background:var(--gray-50); border:1px solid var(--gray-200);
+    border-radius:var(--radius); padding:10px 14px; margin:12px 0}
+  summary{cursor:pointer; font-weight:600; font-size:14px}
+  footer,.foot{color:var(--gray-600); font-size:13px; margin-top:48px;
+    border-top:1px solid var(--gray-200); padding-top:16px}
+
+  @media print{
+    header.masthead{position:static}
+    .snippet__copy{display:none}
+    pre{background:#fff; color:#000; border:1px solid var(--gray-300);
+      white-space:pre-wrap; word-break:break-word}
+    .snippet__bar{background:#fff; color:#000; border:1px solid var(--gray-300);
+      border-bottom:0}
+    .card,.expect,.watch,.bar,.meta,details{break-inside:avoid}
+    .step{break-after:avoid}
+    details[open] summary~*{display:block}
+    details:not([open])>summary~*{display:block}
+    body{background:#fff; font-size:11pt}
+    main{max-width:none; padding:0}
+    a[href]:after{content:" (" attr(href) ")"; font-size:.85em; color:var(--gray-600)}
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <span class="masthead__mark">Helios</span>
+  <span class="masthead__title">Week 3 hands-on</span>
+  <span class="masthead__env">Training environment</span>
+</header>
+
+<main>
+  <h1>Cost the Tool Chain</h1>
+  <p class="sub">On your own. 45 minutes. Nothing here depends on the lab, and step 0 fetches everything you need. Every command has a copy button.</p>
+
+  <div class="meta">
+    <span><b>Time</b> 45 minutes</span>
+    <span><b>You produce</b> a filled tool chain canvas, a cost model with real figures in it, and one chain priced twice</span>
+    <span><b>Committed</b> locally, never pushed</span>
+    <span><b>Needs</b> Claude Code 2.1.211 or later, Python 3.11, VS Code, this repository</span>
+  </div>
+
+  <div class="card">
+    <b>What you are pricing.</b> Helios automates its monthly release notes with four
+    AI steps in a row. It works. It has never been costed, and nobody has ever asked
+    whether all four steps need a model at all. That chain is written down, with
+    measured token counts, in <code>docs/process/over-engineered-chain.md</code>.
+    <br><br>
+    <b>The claim on trial.</b> That a chain built because the work felt like four
+    steps costs several times what the same work costs done once. You are going to put
+    a number on it, twice, and end with a sentence you could defend to a finance
+    reviewer.
+  </div>
+
+  <div class="card">
+    <b>Did you miss the lab?</b> Nothing below needs it. The lab changed some code and
+    gated it; this hands-on prices a workflow. They share only the folder they write
+    into.
+  </div>
+
+  <h2>The shape of the hour</h2>
+  <table>
+    <thead><tr><th>Step</th><th>What you do</th><th>Time</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Name the task type at each of the four AI steps</td><td>0-7</td></tr>
+      <tr><td>2</td><td>Assign a tier to each, on quality, latency and volume</td><td>7-14</td></tr>
+      <tr><td>3</td><td><b>Ask whether each step needs AI at all.</b> At least one does not</td><td>14-21</td></tr>
+      <tr><td>4</td><td>Price the chain as designed, in the cost model</td><td>21-29</td></tr>
+      <tr><td>5</td><td>Redesign it to the smallest shape that still works, and price that</td><td>29-36</td></tr>
+      <tr><td>6</td><td>A fallback per step, then the six-item anti-pattern audit</td><td>36-42</td></tr>
+      <tr><td>7</td><td>One sentence, then commit</td><td>42-45</td></tr>
+    </tbody>
+  </table>
+
+  <div class="step">
+    <span class="step__n">0</span><span class="step__t">Set up</span>
+    <span class="step__time">before the clock starts</span>
+  </div>
+  <p>
+    <b>Why.</b> Two minutes now, or a confusing error in six. This also pulls the
+    week&apos;s files, so it works whether or not you did the lab.
+  </p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+git fetch origin
+git merge origin/main -m "Week 3 files"
+mkdir week3 -Force | Out-Null
+python -m pip install openpyxl
+if (-not (Test-Path week3\toolchain-canvas.md)) { copy templates\toolchain-canvas.md week3\toolchain-canvas.md }
+if (-not (Test-Path week3\cost-model.xlsx)) { copy data\cost-model.xlsx week3\cost-model.xlsx }
+dir week3
+code week3\toolchain-canvas.md
+claude</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A merge summary, a pip line, then your two working copies:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - names only, and the pip wording varies</span></div>
+<pre><code>Requirement already satisfied: openpyxl
+cost-model.xlsx
+toolchain-canvas.md</code></pre></div>
+    First time on this machine, pip says <code>Successfully installed openpyxl</code>
+    instead. Either is fine. The two shared originals under
+    <code>templates</code> and <code>data</code> are never edited - you work on the
+    copies in <code>week3</code>, and running this block again will not overwrite them.
+    <br><br>
+    <code>copy source missing</code> on either original means the merge brought
+    nothing. Read the git message above it, and tell your facilitator - this
+    week&apos;s files may not have been published yet. The Claude Code version is the
+    one this programme standardised on in Week 2; nothing here needs a newer feature,
+    so anything above 2.1.211 is fine.
+    <br><br>
+    The last line starts Claude Code, which takes over this window. Open a second
+    terminal in VS Code with <code>Ctrl+Shift+`</code> for every <b>powershell</b>
+    block below; each one sets its own folder, so it works in either window.
+  </div>
+
+  <div class="step">
+    <span class="step__n">1</span><span class="step__t">Name the task type at each AI step</span>
+    <span class="step__time">0-7 min</span>
+  </div>
+  <p>
+    <b>Why.</b> You cannot choose a model for &quot;a step&quot;. You can choose one
+    for a classification, or for a piece of drafting. Naming the task is what makes
+    the next decision answerable.
+  </p>
+  <p>
+    Four steps, each a separate Claude session, each handed the whole of the previous
+    step&apos;s output. Read the source before you let a model summarise it for you:
+  </p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+type docs\process\over-engineered-chain.md</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> The chain, and the measured cost table underneath it. These eight
+    figures are the input to everything you do today, and they are the same for
+    everybody:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - the measured table</span></div>
+<pre><code>| Step         | Model | Input tokens | Output tokens |
+| 1 Collector  | deep  | 41,000       | 12,000        |
+| 2 Summariser | deep  | 14,000       | 9,500         |
+| 3 Grouper    | deep  | 24,000       | 6,200         |
+| 4 Writer     | deep  | 8,900        | 3,100         |</code></pre></div>
+    Every step runs on the deep tier, because the chain was built in an afternoon and
+    nobody revisited the choice. That sentence is in the document too.
+  </div>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Read docs/process/over-engineered-chain.md.
+
+Fill section 1 of week3/toolchain-canvas.md: one row per numbered step, with its
+task type taken from the five the canvas lists - classify, extract, synthesize,
+generate, reason - and one clause saying why that type and not the neighbouring
+one. Judge from what the step actually does with its input, not from its name.
+
+Leave every other section of the canvas untouched. Reply with one line: the four
+task types in order.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Four types in step order:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
+<pre><code>extract, synthesize, classify, generate</code></pre></div>
+    <b>Your job is to disagree or not, in ten seconds.</b> Step 1 keeps the rows whose
+    <code>deployed</code> date falls in the month being written up and throws the rest
+    away: that is extraction, not reasoning. Step 3 sorts paragraphs into buckets by
+    system: that is classification, whatever the word &quot;grouper&quot; suggests. A
+    different defensible split is fine - what is not fine is a row with no clause
+    beside it.
+    <br><br>
+    The month in question is <b>January 2026</b>. That is the run the figures were
+    measured on: <code>data/helios-tickets.csv</code> has exactly 41 tickets with a
+    <code>deployed</code> date in 2026-01, which is the 41 the document names. The
+    dataset stops in March 2026, so &quot;this month&quot; would return nothing -
+    name the month whenever you or Claude write a filter today.
+  </div>
+
+  <div class="step">
+    <span class="step__n">2</span><span class="step__t">A tier for each step, and a reason</span>
+    <span class="step__time">7-14 min</span>
+  </div>
+  <p>
+    <b>Why.</b> Every step here runs on the most expensive tier because nobody chose.
+    A tier without a rationale is not a decision, it is a default with a price on it.
+  </p>
+  <p>The three tiers, from <code>data/model-pricing.csv</code>, captured 1 September 2026:</p>
+  <table>
+    <thead><tr><th>Tier</th><th>Model</th><th>Input, per million</th><th>Output, per million</th><th>What it is for</th></tr></thead>
+    <tbody>
+      <tr><td><b>fast</b></td><td>Haiku 4.5</td><td>$1.00</td><td>$5.00</td><td>Classification, extraction, routing. High volume, low judgement</td></tr>
+      <tr><td><b>balanced</b></td><td>Sonnet 5</td><td>$3.00</td><td>$15.00</td><td>The default. Synthesis, drafting, code changes, most day-to-day work</td></tr>
+      <tr><td><b>deep</b></td><td>Opus 5</td><td>$15.00</td><td>$75.00</td><td>Design reasoning, adversarial review, marking other models&apos; work</td></tr>
+    </tbody>
+  </table>
+  <p>
+    A rationale has to answer three things at once, or it is a preference:
+    <b>quality</b> - what breaks if the answer is a bit worse; <b>latency</b> - who is
+    waiting; <b>volume</b> - how often it runs. Release notes go out once a month, so
+    nobody is waiting and volume is one. That leaves quality doing all the work, which
+    is exactly the case where deep is easiest to justify and hardest to justify
+    honestly.
+  </p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Fill section 2 of week3/toolchain-canvas.md, one row per step.
+
+Use the prices and the "typical use" column of data/model-pricing.csv, and take
+the monthly volume from the release_notes row of data/helios-volumes.csv. Every
+row needs a quality need, a latency need, a monthly volume, and one sentence of
+rationale that mentions all three.
+
+For step 4 only, put TIER-TO-DECIDE in the Tier column and leave its rationale
+blank. That one is mine.
+
+Leave every other section untouched. Reply with one line: the tiers you gave
+steps 1 to 3.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Three tiers and a gap:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - yours may differ on step 3</span></div>
+<pre><code>fast, balanced, fast</code></pre></div>
+    Extraction and classification are the fast tier&apos;s own description - but read
+    the rest of that description before you quote it. It says &quot;high volume, low
+    judgement&quot;, and this chain runs once a month. Volume is not the reason here;
+    the reason is that there is no judgement to buy, because a date filter and a
+    column lookup have one right answer each. Step 2 writes prose from a ticket, which
+    is drafting, so balanced.
+  </div>
+  <p>
+    <b>Step 4 is yours.</b> It is the only step whose output a human being reads. Go
+    into the canvas tab, replace <code>TIER-TO-DECIDE</code> with the tier you would
+    defend, and write the sentence: what breaks if it is worse, who is waiting, how
+    often it runs. Balanced is the answer most people land on, because the step is
+    drafting from facts that have already been settled. Deep is defensible too - but
+    only in writing.
+  </p>
+  <!-- hand-edit: rewrite week3/toolchain-canvas.md TIER-TO-DECIDE balanced -->
+  <div class="watch">
+    <b>Do not skip the sentence.</b> The canvas says it and it is the whole point: a
+    tier chosen because it is the one you always use is not a rationale. Step 4 prices
+    the chain as it runs today, so this choice does not move that number. It moves
+    <b>step 5</b>, by a factor of five, because the tier you pick here is the tier the
+    redesigned chain is priced on.
+  </div>
+
+  <div class="step">
+    <span class="step__n">3</span><span class="step__t">Does this step need AI at all?</span>
+    <span class="step__time">14-21 min</span>
+  </div>
+  <p>
+    <b>Why.</b> The cheapest model is no model. A step you delete does not need a
+    tier, a fallback, a retry allowance or a prompt, and it never gets the answer
+    wrong.
+  </p>
+  <div class="card">
+    <b>The three questions.</b> Ask them of every step. Three yeses and it is not an
+    AI step:
+    <ul>
+      <li><b>Is the output decided by a rule you could write down?</b> If you can say
+        the rule in a sentence, code can follow it.</li>
+      <li><b>Is the input already structured?</b> A CSV with a date column does not
+        need reading comprehension.</li>
+      <li><b>Would two people agree on the right answer without discussing it?</b> If
+        there is nothing to argue about, there is no judgement to buy.</li>
+    </ul>
+    A deterministic replacement has to be <b>named</b> - a script, a query, a regular
+    expression, a linter. &quot;Automate it&quot; is not an alternative.
+  </div>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Fill section 3 of week3/toolchain-canvas.md, one row per step of the chain in
+docs/process/over-engineered-chain.md.
+
+For each step answer three questions: is the output decided by a rule you could
+write down, is the input already structured, and would two people agree on the
+answer without discussing it. Three yeses means the step does not need a model.
+
+Where a step fails the test, name the deterministic thing that replaces it - a
+named script over a named file, not "automate it". data/helios-tickets.csv has a
+deployed column, the month being written up is 2026-01, and
+apps/insight/report.py is an example in this repository of reading that file
+without a model.
+
+Where a step is part rule and part judgement, say so and split it.
+
+Leave every other section untouched. Reply with one line: which step numbers
+fail the test.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> At least step 1, and often step 3 as well:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - step 3 is arguable, step 1 is not</span></div>
+<pre><code>step 1 fails; step 3 partly fails</code></pre></div>
+    <b>Step 1 is the clear one.</b> It is handed a 210-row CSV and keeps the rows whose
+    <code>deployed</code> date falls in January 2026. That is a filter on a date
+    column: a rule, structured input, no disagreement possible. It is currently costing the deep
+    tier 41,000 input and 12,000 output tokens a month to do what a dozen lines of
+    Python do for nothing.
+    <br><br>
+    <b>Step 3 is the interesting one.</b> Grouping paragraphs by system is a lookup on
+    a column. Removing duplicates is judgement. If your canvas splits that row in two,
+    you have understood the exercise.
+  </div>
+  <div class="watch">
+    <b>At least one step must fail this test and be replaced by something named.</b>
+    If your canvas says all four steps need a model, you have not run the test, you
+    have described the chain back to yourself.
+  </div>
+
+  <div class="step">
+    <span class="step__n">4</span><span class="step__t">Price it as designed</span>
+    <span class="step__time">21-29 min</span>
+  </div>
+  <p>
+    <b>Why.</b> Everything so far is an argument. This step turns it into a number
+    that somebody outside the team can check.
+  </p>
+  <p>
+    The workbook has three sheets. <b>Rates</b> holds the prices and you leave it
+    alone. On <b>Model</b>, columns A to F are yours - the step, its task type, its
+    tier, runs per month, and the input and output tokens per run - and columns G, H
+    and I are formulas that work out cost per run, monthly cost, and monthly cost with
+    the 15 percent retry allowance in cell B4. <b>Chain compare</b> takes the two
+    totals and does the subtraction.
+  </p>
+  <div class="watch">
+    <b>Price what it is, not what it should be.</b> Section 2 of your canvas holds the
+    tiers you would choose. This step prices the chain that is actually running, and
+    every step of it runs on <b>deep</b> - the document says so, in the sentence about
+    the afternoon nobody revisited. Step 5 is where your own tier choices get priced.
+    The gap between those two numbers is the whole argument, so do not close it early
+    by pricing the chain as though it had already been fixed.
+  </div>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Use openpyxl to fill week3/cost-model.xlsx.
+
+On the Model sheet, put the four steps of the chain into rows 7 to 10, replacing
+the worked example that is in row 7. Columns A to F only:
+- step name and task type from section 1 of week3/toolchain-canvas.md
+- tier: deep for all four. That is what the chain runs on today, and
+  docs/process/over-engineered-chain.md says so. Leave section 2 out of this
+  one; it is what the tiers should be, and step 5 is where that gets priced.
+- runs per month from the release_notes row of data/helios-volumes.csv
+- input and output tokens per run from the measured table in
+  docs/process/over-engineered-chain.md
+Do not write anything into columns G, H or I - they are formulas. Save the
+workbook.
+
+openpyxl does not recalculate formulas, so do the same arithmetic yourself using
+the Rates sheet and write week3/chain-pricing.md:
+- A heading "## As designed", then a table of step, tier, input, output and cost
+  per run, with a total row.
+- The monthly cost, and the monthly cost with the retry allowance from cell B4.
+- One line per figure naming the file or sheet it came from.
+
+Reply with one line: the monthly cost with retries.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> One figure:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
+<pre><code>$4.17 a month with retries</code></pre></div>
+    <b>This one is not yours to differ on.</b> Every input is fixed, so check it
+    against the arithmetic below rather than believing it. Deep costs $15 per million
+    in and $75 per million out:
+    <table>
+      <thead><tr><th>Step</th><th>Input</th><th>Output</th><th>Cost per run</th></tr></thead>
+      <tbody>
+        <tr><td>1 Collector</td><td>41,000</td><td>12,000</td><td>$1.5150</td></tr>
+        <tr><td>2 Summariser</td><td>14,000</td><td>9,500</td><td>$0.9225</td></tr>
+        <tr><td>3 Grouper</td><td>24,000</td><td>6,200</td><td>$0.8250</td></tr>
+        <tr><td>4 Writer</td><td>8,900</td><td>3,100</td><td>$0.3660</td></tr>
+        <tr><td><b>Total, one run</b></td><td>87,900</td><td>30,800</td><td><b>$3.6285</b></td></tr>
+        <tr><td>Monthly, at one run a month</td><td></td><td></td><td>$3.6285</td></tr>
+        <tr><td><b>With the 15 percent retry allowance</b></td><td></td><td></td><td><b>$4.1728</b></td></tr>
+      </tbody>
+    </table>
+    A figure more than a cent away from $4.17 means a tier or a token count went into
+    the wrong cell. Fix it before step 5 - everything after this compares against it.
+  </div>
+  <div class="card">
+    <b>Where the two halves of the bill come from.</b> Steps 1 and 3 are expensive on
+    the way in: they are each handed the whole 210-row dataset. Steps 2 and 4 are
+    expensive on the way out, because output costs five times what input does on
+    every tier. Nothing in the chain is expensive because the work is hard.
+  </div>
+  <details>
+    <summary>Have a Week 2 ledger? Add one row of your own</summary>
+    <p>
+      The token counts above were measured for you. Your own prompts have measured
+      counts too, in <code>week2/ledger.csv</code> if you ran last week&apos;s lab. Ask
+      Claude to add a row to the Model sheet for your <code>code-review</code> prompt,
+      taking input and output tokens from that ledger and runs per month from the
+      <code>code_review</code> row of <code>data/helios-volumes.csv</code>, which is
+      110. Then append the row and its source to
+      <code>week3/chain-pricing.md</code>. It is the same exercise on a prompt you
+      wrote, and it is where next week&apos;s numbers come from.
+    </p>
+  </details>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell - only if you have Excel installed</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+Invoke-Item week3\cost-model.xlsx</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> The workbook opens and columns G, H and I fill themselves in, and
+    cell I19 reads 4.1728. That is the same arithmetic Claude did by hand, arrived at
+    a different way, which is why it is worth doing.
+    <br><br>
+    No Excel on the machine? Nothing is lost.
+    <code>week3/chain-pricing.md</code> is the record, and the workbook still holds
+    your figures for whoever opens it next.
+  </div>
+
+  <div class="step">
+    <span class="step__n">5</span><span class="step__t">Redesign it, and price that</span>
+    <span class="step__time">29-36 min</span>
+  </div>
+  <p>
+    <b>Why.</b> A cost with nothing to compare it to is trivia. The pair of numbers is
+    the argument.
+  </p>
+  <p>
+    The smallest shape that still produces a release note: the filter stops being an
+    AI step, and the three steps that all handle the same text become one session.
+    Every hand-off in the old chain paid the context bill again; one session pays it
+    once.
+  </p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Redesign the chain in docs/process/over-engineered-chain.md to the smallest
+shape that still produces the release note, using your section 3 verdicts in
+week3/toolchain-canvas.md. Keep the deterministic step in the design; it just
+stops being an AI call.
+
+Then reprice it in week3/cost-model.xlsx with openpyxl. Clear rows 7 to 10 of
+the Model sheet and put the redesigned steps in from row 7. Leave the Tier cell
+empty for any step that is no longer an AI call, so that its formulas return
+blank and it adds nothing to the total. Save the workbook.
+
+Take the redesigned figures from the measured table, and show the subtraction:
+- input tokens = step 2's input, which is the month's tickets, plus the house
+  style guide, which is step 4's input less step 3's output
+- output tokens = step 4's output, the only text anyone reads
+
+Then fill the Chain compare sheet: steps and monthly cost with retries for both
+designs, in B5, C5, B6 and C6.
+
+Append to week3/chain-pricing.md a heading "## Redesigned" with the same table,
+both monthly totals, the gap in dollars and the change as a percentage.
+Reply with one line: the percentage.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> One figure again, and again it is checkable:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
+<pre><code>-97.3%</code></pre></div>
+    The subtraction, so you can see there is no sleight of hand in it. The style guide
+    is what step 4 was given beyond step 3&apos;s output, so 8,900 less 6,200 is 2,700
+    tokens; 14,000 plus 2,700 is 16,700. At balanced, $3 per million in and $15 per
+    million out:
+    <br><br>
+    <b>That 2,700 is inferred, not measured</b>, and so is the 16,700 built on it.
+    Only the eight figures in the document were measured. While you are looking:
+    step 2&apos;s measured input is 14,000 but all it is handed is step 1&apos;s
+    12,000-token output, so about 2,000 of it is step 2&apos;s own instruction. Say
+    which of your figures are measured and which are inferred, in the pricing note.
+    A number whose provenance is not written down stops being checkable the moment
+    you leave the room.
+    <table>
+      <thead><tr><th>Step</th><th>Tier</th><th>Input</th><th>Output</th><th>Cost per run</th></tr></thead>
+      <tbody>
+        <tr><td>Filter the month&apos;s tickets</td><td>none, a script</td><td>-</td><td>-</td><td>$0.0000</td></tr>
+        <tr><td>Write the release note</td><td>balanced</td><td>16,700</td><td>3,100</td><td>$0.0966</td></tr>
+        <tr><td><b>Monthly, with retries</b></td><td></td><td></td><td></td><td><b>$0.1111</b></td></tr>
+      </tbody>
+    </table>
+    <table>
+      <thead><tr><th></th><th>Steps</th><th>Monthly, with retries</th></tr></thead>
+      <tbody>
+        <tr><td>As designed</td><td>4</td><td>$4.1728</td></tr>
+        <tr><td>Redesigned</td><td>1</td><td>$0.1111</td></tr>
+        <tr><td><b>Gap</b></td><td>3 removed</td><td><b>$4.0617</b></td></tr>
+      </tbody>
+    </table>
+    If you chose deep for the writing step your figure is about -87 percent instead
+    - $0.5555 a month rather than $0.1111 - and that is a correct answer to a
+    different decision. Say which one you made.
+  </div>
+  <div class="watch">
+    <b>Four dollars a month is not the finding.</b> Release notes run once a month, so
+    the absolute number is small and saying it out loud keeps you honest. The finding
+    is the shape: <b>97 percent of the bill was the chain, not the work.</b> Apply
+    that ratio to <code>code_review</code> at 110 runs a month in
+    <code>data/helios-volumes.csv</code> and it stops being small.
+  </div>
+
+  <div class="step">
+    <span class="step__n">6</span><span class="step__t">Fallbacks, then the anti-pattern audit</span>
+    <span class="step__time">36-42 min</span>
+  </div>
+  <p>
+    <b>Why.</b> A design that only works when everything is available is a
+    demonstration. Naming what happens when it is not is what makes it a design.
+  </p>
+  <p>
+    A fallback names a thing, the way a deterministic alternative does. &quot;Retry&quot;
+    is not a fallback - it is the same call with the same input, which is
+    anti-pattern three. A fallback is another tier, a deterministic route, a queue
+    until tomorrow, or a person.
+  </p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Fill sections 4, 5 and 6 of week3/toolchain-canvas.md.
+
+Section 4, one row per step of the redesigned chain: what happens if the tier
+you chose is unavailable, and what happens if the step fails outright. Name a
+tier, a deterministic route, a delay or a person. Do not write "retry".
+
+Section 5: answer all six rows of templates/anti-pattern-checklist.md against
+the chain as designed, not against your redesign. The Present? column takes
+three things, in this shape: "yes, step 1" or "no, step 4" or "no evidence in
+the document". The step number is what stops the answer being a guess. Where
+the answer is yes, the last column says what the redesign does instead. Do not
+guess a yes where the document is silent.
+
+Section 6: the five figures, each with the sheet or file it came from, taken
+from week3/chain-pricing.md.
+
+Reply with one line: how many of the six the chain as designed is guilty of.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Three:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - a count of five or six needs checking</span></div>
+<pre><code>3 of 6</code></pre></div>
+    Three are in the document in black and white. <b>Context dumping</b>: step 1 is
+    handed the whole dataset and step 2 is handed step 1&apos;s output in full.
+    <b>Duplicate derivation</b>: step 3 re-reads the dataset step 1 already read.
+    <b>Premature chaining</b>: four sessions, four context bills, and the document
+    says the split was never revisited.
+    <br><br>
+    <b>Retry without change</b> and <b>redundant verification</b> have no evidence
+    either way - the document never says what happens when a step fails, or whether
+    anything checks anything. &quot;No evidence&quot; is the honest answer to both.
+    <b>Over-prompting</b> is the only arguable fourth: step 2 writes a paragraph per
+    ticket that step 4 then rewrites, which hints at an instruction carrying more than
+    it needs. To call it a yes you would have to read the step 2 prompt itself, and
+    the document does not include it. Say that, and it is a good answer at 3 or at 4.
+    A count of six means the audit was written rather than run.
+  </div>
+  <div class="card">
+    <b>Section 6 in one place</b>, so you can check what Claude wrote without opening
+    three files. Cost per unit of work is the monthly cost divided by the monthly
+    volume, and the volume of <code>release_notes</code> is one:
+    <table>
+      <thead><tr><th>Figure</th><th>Value</th><th>Where it came from</th></tr></thead>
+      <tbody>
+        <tr><td>Monthly cost, with retries</td><td>$0.1111</td><td>Cost model, Model sheet, cell I19</td></tr>
+        <tr><td>Cost per unit of work</td><td>$0.1111</td><td>Monthly cost divided by a volume of 1</td></tr>
+        <tr><td>Chain as designed</td><td>$4.1728</td><td>Cost model, Chain compare, C5</td></tr>
+        <tr><td>Chain redesigned</td><td>$0.1111</td><td>Cost model, Chain compare, C6</td></tr>
+        <tr><td>Steps removed</td><td>3</td><td>Canvas section 3</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="step">
+    <span class="step__n">7</span><span class="step__t">One sentence, then commit</span>
+    <span class="step__time">42-45 min</span>
+  </div>
+  <p>
+    <b>Why.</b> The number is the evidence. The sentence is the thing your team can
+    act on, and it is the only part of today nobody can write for you.
+  </p>
+
+  <p><b>a.</b> Open the canvas and read it back:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+dir week3\toolchain-canvas.md week3\chain-pricing.md week3\cost-model.xlsx
+code week3\toolchain-canvas.md week3\chain-pricing.md</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Three files listed and two tabs open:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - names only, sizes vary</span></div>
+<pre><code>chain-pricing.md
+cost-model.xlsx
+toolchain-canvas.md</code></pre></div>
+    A file missing here means a step&apos;s prompt answered in the chat instead of
+    writing. Send that prompt again - none of them depend on the session remembering
+    anything.
+  </div>
+
+  <p><b>b.</b> Write section 7 yourself, in the canvas tab. One sentence, in this shape:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">week3/toolchain-canvas.md - section 7, the shape not the words</span></div>
+<pre><code>Replace step N with NAMED DETERMINISTIC THING and collapse steps X to Y into
+one session, taking the monthly cost from $A to $B, because REASON THAT IS NOT
+"it is cheaper".</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A sentence a finance reviewer could check without asking you
+    anything. It has to name the step, name the replacement, carry both numbers, and
+    give a reason that survives someone asking &quot;so what?&quot;. If it needs a
+    second sentence to make sense, it is not finished.
+  </div>
+
+  <p><b>c.</b> Commit:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+git add week3
+git commit -m "Week 3 hands-on: release-notes chain costed and redesigned"
+git log --oneline -1</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> One commit holding the canvas, the workbook and the pricing note:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - the hash is yours</span></div>
+<pre><code>[main 9d02b14] Week 3 hands-on: release-notes chain costed and redesigned
+9d02b14 Week 3 hands-on: release-notes chain costed and redesigned</code></pre></div>
+    Nothing leaves your machine. To hand work to a facilitator, run
+    <code>git bundle create week3.bundle HEAD</code> and send that file.
+  </div>
+
+  <h2>Take it back to your desk</h2>
+  <p class="sub">15 minutes, optional</p>
+  <p>
+    Everything above priced a chain somebody else built inside a company that does not
+    exist. The version that pays is the one you run on a workflow of your own. It is
+    the same four moves and it fits in a quarter of an hour:
+  </p>
+  <table>
+    <thead><tr><th>Minutes</th><th>Do this</th></tr></thead>
+    <tbody>
+      <tr><td>0-4</td><td>Draw your workflow as a list of steps and mark the ones where a model is called. Most people find one they had forgotten</td></tr>
+      <tr><td>4-8</td><td>Run the three questions on each. Cross out the ones that are a rule over structured data, and name what replaces them</td></tr>
+      <tr><td>8-12</td><td>Put what is left into a copy of the cost model with your own token counts and your own monthly volume</td></tr>
+      <tr><td>12-15</td><td>Write the one sentence. If you cannot name the number, you are not finished, you are guessing</td></tr>
+    </tbody>
+  </table>
+  <p>
+    The workbook needs only Python and openpyxl, and the canvas is a Markdown file, so
+    both copy into any repository. The thing worth carrying is not either file - it is
+    the habit of asking whether a step needs a model before asking which one.
+  </p>
+
+  <h2>Passing bar</h2>
+  <div class="bar">
+    A task type named at all four AI steps, each with a clause of reasoning. A tier at
+    each, each with a rationale that mentions quality, latency and volume, and at least
+    one tier you chose rather than accepted. At least one step failing the &quot;does
+    this need AI&quot; test and replaced by something named. The chain priced as
+    designed and priced again redesigned, both figures traceable to a file. A fallback
+    for every remaining step that is not the word &quot;retry&quot;. All six
+    anti-pattern rows answered with the step number you checked. One sentence with two
+    numbers in it. All committed locally.
+  </div>
+
+  <h2>If something breaks</h2>
+  <table>
+    <thead><tr><th>Symptom</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><code>cannot find path</code> for <code>templates\toolchain-canvas.md</code></td>
+          <td>Step 0 did not merge. Run it again and read the git output above the error.</td></tr>
+      <tr><td><code>git merge</code> refuses, citing local changes</td>
+          <td>Commit what you have: <code>git commit -am "wip"</code>, then run step 0 again.</td></tr>
+      <tr><td><code>No module named openpyxl</code></td>
+          <td>The pip line in step 0 did not run or ran against a different Python. <code>python -m pip install openpyxl</code>, then send the step 4 prompt again.</td></tr>
+      <tr><td>Claude edits <code>data\cost-model.xlsx</code> instead of your copy</td>
+          <td>Say no to the edit. The shared original is never touched. Every prompt names <code>week3/cost-model.xlsx</code>; check you pasted the whole thing.</td></tr>
+      <tr><td>The workbook opens with G, H and I empty</td>
+          <td>Normal until Excel recalculates. If they stay empty, a Tier cell does not read exactly <code>fast</code>, <code>balanced</code> or <code>deep</code>, or a tier was written into the wrong column.</td></tr>
+      <tr><td>The monthly figure is a few dollars out</td>
+          <td>A token count went into the wrong row, or a tier is deep where you meant balanced. The table in step 4 has every figure to check against.</td></tr>
+      <tr><td>The monthly figure is a hundred times out</td>
+          <td>The prices are per million tokens. Dividing by a thousand instead of a million is the usual cause.</td></tr>
+      <tr><td>The retry line equals the monthly line</td>
+          <td>Cell B4 was cleared. It should read 0.15, and the formula multiplies by 1.15.</td></tr>
+      <tr><td>The audit says yes to all six</td>
+          <td>Three of them are not visible in the document. Send the step 6 prompt again - it asks for the step number beside every answer, and that is what stops this.</td></tr>
+      <tr><td>A prompt answered in the chat and wrote no file</td>
+          <td>Send it again. Every prompt here names the file it writes, and none of them need the session to remember anything.</td></tr>
+      <tr><td>A run stops with a login or usage-limit message</td>
+          <td>Your seat hit its limit or the login expired. Sign in or wait, then send the same prompt again - repeating is safe.</td></tr>
+      <tr><td><code>Invoke-Item</code> does nothing, or reports no associated application</td>
+          <td>Nothing on this machine opens <code>.xlsx</code>. Skip it; <code>week3/chain-pricing.md</code> holds every figure.</td></tr>
+      <tr><td><code>code</code> is not recognised</td>
+          <td>VS Code is not on PATH. On Windows that is set by the installer&apos;s &quot;Add to PATH&quot; option, so re-run the installer, or open a terminal that was started after VS Code was installed. Either way you can open the files by hand - nothing here depends on the command itself.</td></tr>
+      <tr><td>Claude asks to change a file outside <code>week3</code></td>
+          <td>Say no. This hands-on writes only into your own folder.</td></tr>
+      <tr><td><code>python</code> opens the Microsoft Store</td>
+          <td>Settings &gt; Apps &gt; Advanced app settings &gt; App execution aliases: turn off <code>python.exe</code> and <code>python3.exe</code>, then reopen PowerShell.</td></tr>
+      <tr><td><code>claude</code> is not on PATH</td>
+          <td>Open a new terminal - a window opened before the install does not see it.</td></tr>
+    </tbody>
+  </table>
+
+  <p class="foot">
+    Helios Group is fictional. All data in this repository is synthetic.
+    Week 3 of the Claude Code Capability Program.
+  </p>
+</main>
+
+<script>
+// Copy buttons. Text is taken from the <pre> exactly as written, so what lands on
+  // the clipboard is what is on screen - no smart quotes, no wrapped commands.
+  document.querySelectorAll('.snippet').forEach(function (block) {
+    var button = block.querySelector('.snippet__copy');
+    var pre = block.querySelector('pre');
+    if (!button || !pre) return;
+    button.addEventListener('click', function () {
+      var text = pre.innerText;
+      var done = function () {
+        button.textContent = 'Copied';
+        button.classList.add('done');
+        setTimeout(function () {
+          button.textContent = 'Copy';
+          button.classList.remove('done');
+        }, 1500);
+      };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } else {
+        fallback();
+      }
+      function fallback() {
+        var area = document.createElement('textarea');
+        area.value = text;
+        area.style.position = 'fixed';
+        area.style.opacity = '0';
+        document.body.appendChild(area);
+        area.select();
+        try { document.execCommand('copy'); done(); } catch (e) { button.textContent = 'Select manually'; }
+        document.body.removeChild(area);
+      }
+    });
+  });
+</script>
+</body>
+</html>
