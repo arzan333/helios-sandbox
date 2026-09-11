@@ -204,12 +204,15 @@ git fetch origin
 git merge origin/main -m "Week 3 files"
 mkdir week3 -Force | Out-Null
 python -m pip install -r apps\ordercore\requirements.txt ruff
-dir data\model-pricing.csv helios-backlog\HEL-207.json rubrics\lld.md</code></pre>
+dir data\model-pricing.csv
+dir helios-backlog\HEL-207.json
+dir rubrics\lld.md</code></pre>
   </div>
   <div class="expect">
-    <b>Expected.</b> A merge summary, a run of pip lines, then three files found.
-    PowerShell prints a Mode, LastWriteTime, Length and Name table for each one; the
-    three names are the part that matters, and the dates and sizes are yours:
+    <b>Expected.</b> A merge summary, a run of pip lines, then three small listings,
+    one per <code>dir</code>. PowerShell heads each with the folder and a Mode,
+    LastWriteTime, Length and Name table; the three names are the part that matters,
+    and the dates and sizes are yours:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - names only, and the pip wording varies</span></div>
 <pre><code>Requirement already satisfied: fastapi
 Requirement already satisfied: pytest
@@ -225,6 +228,12 @@ lld.md</code></pre></div>
     <code>cannot find path</code> on it means the merge brought nothing. Read the git
     message above the error, and tell your facilitator - the week&apos;s files may not
     have been published yet.
+    <br><br>
+    <b>One <code>dir</code> per line, on purpose.</b> <code>dir a b c</code> is not
+    valid PowerShell: the second path is taken as a filter and the third has nowhere
+    to go, so you get either a wrong answer or
+    <code>A positional parameter cannot be found</code>. Every listing in this book is
+    one path at a time for that reason.
   </div>
 
   <p><b>c.</b> Start Claude Code. VS Code is already open; this is the only thing you need to launch:</p>
@@ -593,9 +602,14 @@ All checks passed!</code></pre></div>
     <b>What these two gates do not cover, said plainly.</b> Two things, and the second
     is the one that matters.
     <ul>
-      <li>The Java tests are JUnit and run under Maven, which is not installed on the
-        workstation. <code>BillingServerTest.java</code> is written today and not run
-        today. What was executed on the Java side is the compile in step 4.</li>
+      <li>The Java tests are JUnit and normally run under Maven, which is not
+        installed on the workstation. <code>BillingServerTest.java</code> is written
+        today and not run today. What was executed on the Java side is the compile in
+        step 4. The four figures it asserts are not guesswork - they were run and
+        confirmed when this lab was built, on both sides of the boundary and over a
+        live HTTP call, and the appendix at the end has the commands if you want to
+        repeat that yourself. What is missing is <i>you</i> running them, which is a
+        different thing and belongs in your evidence column as such.</li>
       <li><b>Nothing at all tests what actually crosses the wire.</b> The Java test
         builds its own request string, so it never sees what
         <code>billing_client.py</code> sends. All four of your Python tests reach the
@@ -783,6 +797,66 @@ All checks passed!
     about what it does not.
   </p>
 
+  <h2>Appendix - running the Java tests yourself</h2>
+  <p class="sub">Outside the 45 minutes. Needs the internet once. Nothing above depends on it.</p>
+  <p>
+    The lab stops at the compile because the workstation has a JDK and no Maven, and
+    because a gate that is honest about its coverage teaches more than one that quietly
+    fills the gap. If you want the gap filled anyway, JUnit ships a single self-contained
+    jar that needs no Maven and no project file. These commands were run on this
+    workstation and are reproduced exactly.
+  </p>
+  <p><b>First</b>, fetch the jar once, into a folder outside the repository so it is never committed:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell - only if you want to run the Java tests yourself</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE
+mkdir helios-tools -Force | Out-Null
+Invoke-WebRequest -Uri https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/1.10.2/junit-platform-console-standalone-1.10.2.jar -OutFile helios-tools\junit-console.jar
+dir helios-tools\junit-console.jar</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> One file of about 2.7 MB:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - the date is yours</span></div>
+<pre><code>Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----        11-09-2026     14:27        2680679 junit-console.jar</code></pre></div>
+    <b>Use <code>Invoke-WebRequest</code>, not <code>curl</code>.</b> In Windows
+    PowerShell <code>curl</code> is an alias for <code>Invoke-WebRequest</code>, so
+    curl&apos;s own flags give you
+    <code>A parameter cannot be found that matches parameter name &apos;fsSL&apos;</code>.
+    <br><br>
+    <b>If the download fails</b> you will see
+    <code>The remote name could not be resolved</code>, or a proxy or certificate
+    error. Maven Central is blocked on plenty of corporate networks and this appendix
+    is the only thing in Week 3 that touches it. Nothing is broken: no jar is written,
+    and the lab above is unaffected, because it never needed one.
+  </div>
+  <p><b>Then</b> compile both source trees against the jar and run the suite:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell - only if you want to run the Java tests yourself</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox\apps\billing
+javac -d out src\main\java\com\helios\billing\*.java
+javac -cp "out;$env:USERPROFILE\helios-tools\junit-console.jar" -d testout src\test\java\com\helios\billing\*.java
+java -jar $env:USERPROFILE\helios-tools\junit-console.jar execute --class-path "out;testout" --select-package com.helios.billing --details=summary</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Two silent compiles, then a summary. <b>Twenty-one tests</b>: the
+    nineteen that were already there and the two you added in step 4.
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - the timing is yours</span></div>
+<pre><code>Test run finished after 101 ms
+[        21 tests found           ]
+[        21 tests successful      ]
+[         0 tests failed          ]</code></pre></div>
+    A failure in <code>appliesTheDiscountBeforeTax</code> means the Java arithmetic
+    disagrees with the Python arithmetic, which is the one outcome this change must not
+    ship with. Nothing else in the suite touches the discount.
+    <br><br>
+    Both <code>out</code> and <code>testout</code> hold only <code>.class</code> files,
+    which the repository already ignores, so neither can get into your commit.
+  </div>
+
   <h2>Passing bar</h2>
   <div class="bar">
     An impact note naming seven files to change and at least one place the entity map
@@ -812,6 +886,8 @@ All checks passed!
           <td>Tax was charged on the full subtotal. The discount has to come off before the tax line, in <code>_local_invoice</code> and in <code>calculate</code>.</td></tr>
       <tr><td>An invoice comes back with <code>source</code> set to <code>fallback</code> when Billing is running</td>
           <td>Billing is replying without <code>discountPence</code>, so the parse raises and the client falls back. Java was changed but Billing was not restarted, so the old build is still answering. Restart it.</td></tr>
+      <tr><td><code>A positional parameter cannot be found</code> from <code>dir</code></td>
+          <td>Two or more paths were put on one <code>dir</code>. PowerShell binds only the first. Give each path its own line, as every block here does.</td></tr>
       <tr><td><code>code</code> is not recognised</td>
           <td>VS Code is not on PATH. On Windows that is set by the installer&apos;s &quot;Add to PATH&quot; option, so re-run the installer, or open a terminal that was started after VS Code was installed. Either way you can open the files from the editor by hand - nothing in the lab depends on the command itself.</td></tr>
       <tr><td>A created order comes back with <code>discount_percent</code> 0</td>
@@ -823,7 +899,9 @@ All checks passed!
       <tr><td><code>javac</code> is not recognised, or Claude says it cannot compile</td>
           <td>The JDK is missing or not on PATH. Open a new terminal first. If it still fails, record it in your rubric evidence and carry on - the Python gate is unaffected.</td></tr>
       <tr><td><code>mvn</code> is not recognised</td>
-          <td>Expected. Maven is not on the workstation, so the JUnit cases are written and not run. The card in step 5 says how to record that.</td></tr>
+          <td>Expected. Maven is not on the workstation, so the JUnit cases are written and not run. The card in step 5 says how to record that, and the appendix has a Maven-free way to run them if you want one.</td></tr>
+      <tr><td><code>A parameter cannot be found that matches parameter name 'fsSL'</code></td>
+          <td>You used <code>curl</code> with curl&apos;s flags. In Windows PowerShell <code>curl</code> is an alias for <code>Invoke-WebRequest</code>. Use the appendix command as written.</td></tr>
       <tr><td>Claude asks to change a file outside <code>apps</code> or <code>week3</code></td>
           <td>Say no. This lab never edits the shared documents, rubrics or templates.</td></tr>
       <tr><td>The self-score passes every row first time</td>

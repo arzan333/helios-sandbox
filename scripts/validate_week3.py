@@ -140,6 +140,122 @@ for rel, text in BOOKS:
             check(re.search(r"week3/[A-Za-z0-9_./-]+", code) or "do not edit" in code.lower(),
                   f"{rel}: a prompt that names no output file - the answer lands in the chat: {code[:60]}")
 
+# --------------------------------------------- three rules, each from a defect
+# Every rule below was written after something got through the checks above and
+# only failed when the commands were run on a real Windows workstation. They are
+# applied to Week 3 as failures and to Week 2 as advice, because Week 2 is
+# already in participants' hands.
+
+# What the Week 1 setup script actually puts on a workstation. Anything a book
+# invokes that is not here, and is not a PowerShell builtin, is a command that
+# works for the author and not for the room.
+SETUP = ROOT / "setup/Setup-HeliosWorkstation.ps1"
+_probes = set(re.findall(r"Probe='(\w+)'", SETUP.read_text(encoding="utf-8"))) if SETUP.exists() else set()
+_pips = set(re.findall(r"'([\w-]+)'", re.search(r"PipPackages\s*=\s*@\(([^)]*)\)",
+            SETUP.read_text(encoding="utf-8")).group(1))) if SETUP.exists() else set()
+# Tools that arrive with one of the probed installs rather than on their own.
+RIDES_ALONG = {"java": {"javac", "jar", "jshell"}, "node": {"npm", "npx"},
+               "python": {"py", "pip"}}
+INSTALLED = set(_probes) | set(_pips)
+for base, extra in RIDES_ALONG.items():
+    if base in _probes:
+        INSTALLED |= extra
+# PowerShell's own verbs and aliases. Not applications, so not the setup script's job.
+SHELL_BUILTINS = {
+    "cd", "dir", "ls", "type", "cat", "copy", "cp", "move", "mkdir", "md", "rmdir",
+    "del", "rm", "echo", "exit", "if", "else", "elseif", "foreach", "for", "while",
+    "try", "catch", "finally", "function", "return", "param", "Get-ChildItem",
+    "Get-Content", "Get-Item", "Get-Location", "Get-Command", "Get-Process",
+    "Stop-Process", "Set-Content", "Set-Location", "Set-Clipboard", "Add-Content",
+    "New-Item", "Remove-Item", "Copy-Item", "Move-Item", "Rename-Item", "Test-Path",
+    "Out-Null", "Out-File", "Out-String", "Write-Host", "Write-Output",
+    "Select-Object", "Where-Object", "ForEach-Object", "Sort-Object",
+    "Measure-Object", "Select-String", "Start-Sleep", "Start-Process",
+    "Invoke-Item", "Invoke-WebRequest", "Invoke-Expression", "Join-Path",
+    "Split-Path", "Compare-Object", "Import-Csv", "Export-Csv", "ConvertTo-Json",
+}
+# Documents only Office opens. The setup script installs no Office.
+OFFICE_SUFFIXES = (".xlsx", ".xls", ".xlsm", ".docx", ".doc", ".pptx", ".ppt")
+
+
+def ps_lines(text):
+    """Every PowerShell line in a book, with the lang of the block it sits in."""
+    for lang, body in re.findall(
+            r'<span class="snippet__lang">([^<]+)</span>.*?<pre><code>(.*?)</code></pre>',
+            text, re.S):
+        if not lang.lower().startswith("powershell"):
+            continue
+        for line in html.unescape(body).splitlines():
+            yield lang, line.strip()
+
+
+def prompt_blocks(text):
+    for lang, body in re.findall(
+            r'<span class="snippet__lang">([^<]+)</span>.*?<pre><code>(.*?)</code></pre>',
+            text, re.S):
+        if lang.lower().startswith("prompt"):
+            yield lang, html.unescape(body)
+
+
+def house_rules(rel, text):
+    """Return a list of complaints. Empty means the book is clean."""
+    found = []
+
+    # 1. `dir a b` is not a listing of two files. PowerShell binds the first
+    #    argument to -Path and the second to -Filter, so the second file is
+    #    silently ignored; a third argument fails outright. One path per line.
+    for lang, line in ps_lines(text):
+        m = re.match(r"(?:dir|ls|Get-ChildItem)\s+(.+)$", line)
+        if not m:
+            continue
+        args = [a for a in re.findall(r'"[^"]*"|\S+', m.group(1)) if not a.startswith("-")]
+        if len(args) > 1:
+            found.append(f"{rel}: `{line[:60]}` lists more than one path. PowerShell binds "
+                         f"only the first; the second becomes a filter. One dir per line.")
+
+    # 2. openpyxl ignores a None passed as the `value=` argument, so a cell the
+    #    book says is cleared is not cleared and a stale row stays in the total.
+    #    A prompt may name the broken form only to warn against it.
+    for lang, code in prompt_blocks(text):
+        for ln in code.splitlines():
+            if re.search(r"cell\([^)]*value\s*=\s*None", ln):
+                if not re.search(r"\b(do not|don't|never|instead of|rather than)\b", ln, re.I):
+                    found.append(f"{rel}: a prompt clears a cell with value=None, which openpyxl "
+                                 f"ignores. Use .value = None: {ln.strip()[:60]}")
+
+    # 3. A command the Week 1 setup script does not install. Either the book
+    #    must not need it, or the block must be marked optional and the book
+    #    must work without it.
+    for lang, line in ps_lines(text):
+        if not line or line.startswith("#"):
+            continue
+        head = line.split()[0].strip("(")
+        if head and re.fullmatch(r"[A-Za-z][\w.-]*", head):
+            base = head[:-4] if head.lower().endswith(".exe") else head
+            if base not in SHELL_BUILTINS and base not in INSTALLED:
+                found.append(f"{rel}: `{base}` is not installed by "
+                             f"setup/Setup-HeliosWorkstation.ps1 and is not a PowerShell "
+                             f"builtin, so this line works only on the author's machine")
+        if re.match(r"(?:Invoke-Item|Start-Process)\b", line) and line.lower().rstrip('"').endswith(OFFICE_SUFFIXES):
+            if "only if" not in lang.lower():
+                found.append(f"{rel}: `{line[:50]}` opens an Office document, and the setup "
+                             f"script installs no Office. Mark the block 'only if' and give "
+                             f"the step a path that does not need it")
+    return found
+
+
+for rel, text in BOOKS:
+    for complaint in house_rules(rel, text):
+        check(False, complaint)
+    checks += 3  # the three rules ran clean on this book
+
+# Week 2 is already with participants. Report, do not fail the Week 3 build.
+WEEK2_FINDINGS = []
+for rel in ("labs/week2.html", "labs/week2-activity.html"):
+    p = ROOT / rel
+    if p.exists():
+        WEEK2_FINDINGS += house_rules(rel, p.read_text(encoding="utf-8"))
+
 # ------------------------------------------------------- paths really exist
 for rel, text in BOOKS:
     plain = html.unescape(text)
@@ -218,6 +334,14 @@ if (ROOT / "scripts/validate_week2.py").exists():
     check(r.returncode == 0, f"the Week 3 work broke Week 2:\n{r.stdout[-400:]}")
 
 print(f"Ran {checks} checks.")
+if WEEK2_FINDINGS:
+    print(f"\nADVISORY - the same three rules fired {len(WEEK2_FINDINGS)} time(s) on Week 2, "
+          f"which is already with participants:")
+    for f in WEEK2_FINDINGS:
+        print(f"  ! {f}")
+    print("  These do not fail this build. Decide separately whether to reissue Week 2.")
+else:
+    print("The three workstation rules were also run against both Week 2 books: no findings.")
 if failures:
     print(f"{len(failures)} FAILURE(S):")
     for f in failures:

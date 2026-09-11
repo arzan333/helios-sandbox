@@ -480,21 +480,60 @@ Reply with one line: the monthly cost with retries.</code></pre>
       wrote, and it is where next week&apos;s numbers come from.
     </p>
   </details>
+  <p>
+    <b>Now check the workbook rather than the note.</b> Claude wrote the cells and then
+    did the arithmetic again in Markdown. Both halves came from the same model in the
+    same turn, so agreeing with itself proves nothing. This reads the cells back and
+    reprices them from the Rates sheet, in one line, with no Excel involved:
+  </p>
   <div class="snippet">
-    <div class="snippet__bar"><span class="snippet__lang">powershell - only if you have Excel installed</span>
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
-Invoke-Item week3\cost-model.xlsx</code></pre>
+python -c "from openpyxl import load_workbook as L; w=L('week3/cost-model.xlsx'); r=w['Rates']; m=w['Model']; p={r.cell(row=i,column=1).value:(r.cell(row=i,column=3).value,r.cell(row=i,column=4).value) for i in (6,7,8)}; c=[(m.cell(row=i,column=1).value,(m.cell(row=i,column=5).value*p[m.cell(row=i,column=3).value][0]+m.cell(row=i,column=6).value*p[m.cell(row=i,column=3).value][1])/1e6,m.cell(row=i,column=4).value) for i in range(7,19) if m.cell(row=i,column=3).value in p]; t=sum(v*q for n,v,q in c); print(chr(10).join('%-34s %8.4f per run x %s' % (n,v,q) for n,v,q in c)); print('monthly %.4f   with retries %.4f' % (t, t*(1+m['B4'].value)))"</code></pre>
   </div>
   <div class="expect">
-    <b>Expected.</b> The workbook opens and columns G, H and I fill themselves in, and
-    cell I19 reads 4.1728. That is the same arithmetic Claude did by hand, arrived at
-    a different way, which is why it is worth doing.
+    <b>Expected.</b> Four rows and the two totals from step 4, worked out from the
+    workbook rather than from the note:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - your step names, these figures</span></div>
+<pre><code>Collect the month's tickets          1.5150 per run x 1
+Summarise each ticket                0.9225 per run x 1
+Group by system                      0.8250 per run x 1
+Write the release note               0.3660 per run x 1
+monthly 3.6285   with retries 4.1728</code></pre></div>
+    The step names are whatever you called them. <b>The five figures are not yours to
+    differ on</b>, and if they disagree with
+    <code>week3/chain-pricing.md</code> the workbook is the one to trust, because this
+    line read it rather than being told about it.
     <br><br>
-    No Excel on the machine? Nothing is lost.
-    <code>week3/chain-pricing.md</code> is the record, and the workbook still holds
-    your figures for whoever opens it next.
+    Fewer than four rows means a Tier cell is not spelled exactly
+    <code>fast</code>, <code>balanced</code> or <code>deep</code>, and that row was
+    skipped - which is also what the spreadsheet would do. You will run this line
+    again in step 5, where it earns its keep.
   </div>
+  <details>
+    <summary>Excel on your machine? Open it and watch the sheet agree</summary>
+    <div class="snippet">
+      <div class="snippet__bar"><span class="snippet__lang">powershell - only if you have Excel installed</span>
+        <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+Invoke-Item week3\cost-model.xlsx</code></pre>
+    </div>
+    <p>
+      Columns G, H and I fill themselves in and cell I19 reads 4.1728. That is a third
+      route to the same number. Excel is not part of the workstation build, so this is
+      a bonus rather than a step: nothing below needs it, and
+      <code>Invoke-Item</code> simply reports that nothing is associated with
+      <code>.xlsx</code> if Excel is absent.
+    </p>
+    <p>
+      <b>Close Excel again before you go on.</b> While the workbook is open, Excel
+      holds an exclusive lock on it and puts a <code>~$cost-model.xlsx</code> marker
+      beside it. Step 5 writes to that same file, so it will stop with
+      <code>Permission denied</code> until you close the window - and the marker file
+      would otherwise end up in your commit.
+    </p>
+  </details>
 
   <div class="step">
     <span class="step__n">5</span><span class="step__t">Redesign it, and price that</span>
@@ -518,10 +557,15 @@ shape that still produces the release note, using your section 3 verdicts in
 week3/toolchain-canvas.md. Keep the deterministic step in the design; it just
 stops being an AI call.
 
-Then reprice it in week3/cost-model.xlsx with openpyxl. Clear rows 7 to 10 of
-the Model sheet and put the redesigned steps in from row 7. Leave the Tier cell
-empty for any step that is no longer an AI call, so that its formulas return
-blank and it adds nothing to the total. Save the workbook.
+Then reprice it in week3/cost-model.xlsx with openpyxl. Clear columns A to F of
+rows 7 to 10 on the Model sheet, then put the redesigned steps in from row 7.
+Leave the Tier cell empty for any step that is no longer an AI call, so that its
+formulas return blank and it adds nothing to the total. Save the workbook.
+
+Clear a cell by assigning to it: ws.cell(row=r, column=c).value = None.
+Do NOT use ws.cell(row=r, column=c, value=None) - openpyxl ignores a value of
+None passed that way, so the old rows survive and the new total silently
+includes them.
 
 Take the redesigned figures from the measured table, and show the subtraction:
 - input tokens = step 2's input, which is the month's tickets, plus the house
@@ -570,6 +614,29 @@ Reply with one line: the percentage.</code></pre>
     If you chose deep for the writing step your figure is about -87 percent instead
     - $0.5555 a month rather than $0.1111 - and that is a correct answer to a
     different decision. Say which one you made.
+  </div>
+  <p>Run the same check as step 4 again. This is the one that catches the usual mistake:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+python -c "from openpyxl import load_workbook as L; w=L('week3/cost-model.xlsx'); r=w['Rates']; m=w['Model']; p={r.cell(row=i,column=1).value:(r.cell(row=i,column=3).value,r.cell(row=i,column=4).value) for i in (6,7,8)}; c=[(m.cell(row=i,column=1).value,(m.cell(row=i,column=5).value*p[m.cell(row=i,column=3).value][0]+m.cell(row=i,column=6).value*p[m.cell(row=i,column=3).value][1])/1e6,m.cell(row=i,column=4).value) for i in range(7,19) if m.cell(row=i,column=3).value in p]; t=sum(v*q for n,v,q in c); print(chr(10).join('%-34s %8.4f per run x %s' % (n,v,q) for n,v,q in c)); print('monthly %.4f   with retries %.4f' % (t, t*(1+m['B4'].value)))"</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> <b>One row</b>, because the filter step has no tier and costs
+    nothing:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
+<pre><code>Write the release note                 0.0966 per run x 1
+monthly 0.0966   with retries 0.1111</code></pre></div>
+    <b>Three or four rows here is the failure to look for</b>, and it is silent. It
+    means the old steps were never cleared out of rows 9 and 10, so the redesigned
+    total still carries the Grouper and the Writer at the deep tier, and you get about
+    $3.22 a month instead of $0.11. Nothing errors; the number is just wrong.
+    <br><br>
+    The cause is always the same: <code>ws.cell(row=r, column=c, value=None)</code>
+    looks like it clears a cell and does not, because openpyxl ignores a
+    <code>None</code> passed that way. Tell Claude to clear with
+    <code>ws.cell(row=r, column=c).value = None</code> and run this line again.
   </div>
   <div class="watch">
     <b>Four dollars a month is not the finding.</b> Release notes run once a month, so
@@ -663,18 +730,25 @@ Reply with one line: how many of the six the chain as designed is guilty of.</co
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
-dir week3\toolchain-canvas.md week3\chain-pricing.md week3\cost-model.xlsx
+dir week3\toolchain-canvas.md
+dir week3\chain-pricing.md
+dir week3\cost-model.xlsx
 code week3\toolchain-canvas.md week3\chain-pricing.md</code></pre>
   </div>
   <div class="expect">
-    <b>Expected.</b> Three files listed and two tabs open:
+    <b>Expected.</b> Three small listings, one per <code>dir</code>, then two tabs
+    open. PowerShell heads each listing with the folder and a Mode, LastWriteTime,
+    Length and Name table; the names are the part that matters and the sizes are yours:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - names only, sizes vary</span></div>
-<pre><code>chain-pricing.md
-cost-model.xlsx
-toolchain-canvas.md</code></pre></div>
-    A file missing here means a step&apos;s prompt answered in the chat instead of
-    writing. Send that prompt again - none of them depend on the session remembering
-    anything.
+<pre><code>toolchain-canvas.md
+chain-pricing.md
+cost-model.xlsx</code></pre></div>
+    A <code>cannot find path</code> here means a step&apos;s prompt answered in the
+    chat instead of writing. Send that prompt again - none of them depend on the
+    session remembering anything.
+    <br><br>
+    One <code>dir</code> per line, on purpose: <code>dir a b c</code> is not valid
+    PowerShell, because only the first path binds and the rest have nowhere to go.
   </div>
 
   <p><b>b.</b> Write section 7 yourself, in the canvas tab. One sentence, in this shape:</p>
@@ -759,6 +833,16 @@ git log --oneline -1</code></pre>
           <td>Normal until Excel recalculates. If they stay empty, a Tier cell does not read exactly <code>fast</code>, <code>balanced</code> or <code>deep</code>, or a tier was written into the wrong column.</td></tr>
       <tr><td>The monthly figure is a few dollars out</td>
           <td>A token count went into the wrong row, or a tier is deep where you meant balanced. The table in step 4 has every figure to check against.</td></tr>
+      <tr><td><code>Permission denied</code> writing <code>week3/cost-model.xlsx</code></td>
+          <td>The workbook is open in Excel, which locks it. Close the Excel window and send the prompt again. A <code>~$cost-model.xlsx</code> file beside it is the giveaway; it disappears when Excel closes.</td></tr>
+      <tr><td>A <code>~$cost-model.xlsx</code> file turns up in <code>git status</code></td>
+          <td>Excel is still open. Close it, and the file removes itself. Do not commit it.</td></tr>
+      <tr><td>The redesigned total is about $3.22, and the check line prints three or four rows</td>
+          <td>Rows 9 and 10 were never cleared, so the old deep-tier steps are still in the total. <code>ws.cell(row=r, column=c, value=None)</code> does not clear a cell in openpyxl. Tell Claude to use <code>ws.cell(row=r, column=c).value = None</code> and run the check line again.</td></tr>
+      <tr><td><code>A positional parameter cannot be found</code> from <code>dir</code></td>
+          <td>Two or more paths were put on one <code>dir</code>. PowerShell binds only the first. Give each path its own line, as every block here does.</td></tr>
+      <tr><td><code>nothing to commit, working tree clean</code></td>
+          <td>You already committed. Not an error - <code>git log --oneline -1</code> on the next line shows the commit you made.</td></tr>
       <tr><td>The monthly figure is a hundred times out</td>
           <td>The prices are per million tokens. Dividing by a thousand instead of a million is the usual cause.</td></tr>
       <tr><td>The retry line equals the monthly line</td>
