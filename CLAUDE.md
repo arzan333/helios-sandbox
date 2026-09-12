@@ -33,7 +33,7 @@ followed today, but say so rather than quietly picking one.
 - React: function components, hooks, no class components.
 - Tests live beside the code they cover and must pass before a commit.
 - Commit locally only. Nothing in this programme is ever pushed. A `pre-push` hook in
-  `.githooks/` blocks it; never suggest bypassing it with `--no-verify`.
+  `.githooks/` blocks it; never suggest bypassing it with `--no-verify`. The one exception is the facilitator seeding the shared material, which is not participant work.
 
 ## What not to modify
 
@@ -69,3 +69,4 @@ and marks them `source: "fallback"`.
 Plan before you generate. Say what you are about to change and which files it
 touches before changing them. Keep diffs small and one concern at a time. Run the
 tests before saying something is done.
+
