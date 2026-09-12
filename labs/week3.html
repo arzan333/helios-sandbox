@@ -400,7 +400,8 @@ code week3\impact-note.md apps\ordercore\app\store.py apps\ordercore\app\main.py
     Asking a model to confirm any of the three is redundant verification, the fifth
     row of <code>templates/anti-pattern-checklist.md</code>: paying for a second and
     less reliable answer to a question that is already settled. This week&apos;s
-    hands-on audits a real workflow against all six rows of that list.
+    hands-on, <code>labs/week3-activity.html</code> in this repository, audits a real
+    workflow against all six rows of that list.
   </div>
 
   <div class="step">
@@ -543,7 +544,8 @@ agree on. Reply with one line: whether it compiled.</code></pre>
     file stops compiling until every one of those calls is edited. Keeping it also
     means a future caller can skip the discount without noticing. You chose the
     smaller diff over the louder failure. Put that sentence in
-    <code>week3/change-java.md</code> - your rubric asks for it in step 6.
+    <code>week3/change-java.md</code>. Step 6 scores your change out of that file, so a
+    decision you made and did not write down is a decision the gate cannot see.
   </div>
 
   <p><b>b.</b> The second diff:</p>
@@ -614,13 +616,15 @@ All checks passed!</code></pre></div>
         builds its own request string, so it never sees what
         <code>billing_client.py</code> sends. All four of your Python tests reach the
         fallback, which works the discount out locally, so none of them sees what
-        Billing replies. Both sides are tested. The sentence between them is not.</li>
+        Billing replies. Both sides are tested. The sentence between them is not.
+        Delete <code>discountPercent</code> from the outgoing payload and all fifteen
+        tests still pass, which is the shortest proof that a green suite is evidence
+        about what it covers and none at all about what it does not.</li>
     </ul>
     That second gap is a fact about your change, not a mood. Write both into your
     rubric&apos;s evidence column in the next step rather than pretending them away,
     and expect the contract row to cost you a point. A gate that lies about its own
-    coverage is worse than no gate. The challenge at the end of this book shows you
-    the gap live, in about a minute.
+    coverage is worse than no gate.
   </div>
 
   <div class="step">
@@ -643,41 +647,105 @@ dir week3\gate-rubric.md
 code week3\gate-rubric.md</code></pre>
   </div>
   <div class="expect">
-    <b>Expected.</b> One file, then one tab. It holds five criteria scored 0, 1 or 2,
-    a pass threshold of 8 of 10 with no criterion at 0, and four house rules:
-    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">week3/gate-rubric.md - the five rows you are adapting</span></div>
-<pre><code>1  Contracts
-2  Error handling
-3  Tests
-4  Security and validation
-5  Standards conformance</code></pre></div>
-    Everybody starts from the same five. What you do next is yours, and no two
-    participants should end up with the same file.
+    <b>Expected.</b> One file, then one tab. This is what is in it. Read it now, because
+    part b rewrites it and you will want to know what changed:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">week3/gate-rubric.md - before, body only. Scroll right; the rows are wide</span></div>
+<pre><code># Low-level design gate rubric
+
+Used before a change is accepted. Score each criterion 0, 1 or 2.
+
+**Pass threshold: 8 of 10, and no criterion at 0.**
+
+| # | Criterion | 0 | 1 | 2 | Evidence required |
+|---|---|---|---|---|---|
+| 1 | Contracts | Field names or types changed on one side only | Both sides changed, no test | Both sides changed and a contract test covers it | The contract test |
+| 2 | Error handling | Failure path undefined | Handled, message unclear | Handled with a specific status and message | The rejecting test |
+| 3 | Tests | None added | Happy path only | Happy path plus at least one boundary and one rejection | Test names |
+| 4 | Security and validation | Input unvalidated | Validated loosely | Range or format enforced and tested | The validation test |
+| 5 | Standards conformance | Linter fails | Linter passes, house rules broken | Linter passes and house rules met | Lint output, `CLAUDE.md` rule |
+
+## House rules this rubric checks
+
+- Money is a whole number of pence, never a float.
+- No new runtime dependency in Billing.
+- Tests sit beside the code they cover.
+- One concern per commit.</code></pre></div>
+    Five criteria, a threshold, and four house rules. Everybody starts from the same
+    file. Above and below that, the file also carries a block of YAML front matter -
+    owner, version, dates - and a closing &quot;How to use it&quot; paragraph. Both are
+    left alone by everything you do today.
+    <br><br>
+    <b>Look at the last column.</b> Every entry in it is generic - &quot;the contract
+    test&quot;, &quot;test names&quot;, &quot;lint output&quot;. It tells you what kind
+    of thing would convince you and not which one. That column is most of what part b
+    fixes, and it is the difference between a rubric you could apply to any change and
+    a gate for this one.
   </div>
 
-  <p><b>b.</b> Three edits, by hand, in that tab. This is the typing you came here to do:</p>
-  <ol>
-    <li><b>Retitle it</b> for HEL-207, so it reads as a gate for this change rather
-      than as a general document.</li>
-    <li><b>Add a sixth criterion</b> for what this ticket is actually about: the
-      discount range. Score 0 if the range is enforced on neither side, 1 if on one,
-      2 if on both with a test that names the boundary. Raise the threshold to
-      <b>10 of 12</b> and keep the rule that no criterion may sit at 0.</li>
-    <li><b>Make the evidence column concrete, and add a Score column.</b> The
-      rubric ships with an &quot;Evidence required&quot; column already filled in, but
-      generically: &quot;the contract test&quot;, &quot;test names&quot;, &quot;lint
-      output&quot;. Replace each one with the actual artefact from your change - the
-      test name, the command whose output you would paste, the file you would point
-      at - and add a Score column to write into. Deciding what would convince you,
-      before you look, is the only thing that stops a self-score being a rubber
-      stamp.</li>
-  </ol>
-  <!-- hand-edit: rewrite week3/gate-rubric.md Low-level HEL-207 -->
+  <p><b>b.</b> Turn that general document into a gate for this change. Paste this into Claude Code:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Edit week3/gate-rubric.md in place. Work on that file only.
+
+1. Retitle it for HEL-207 so it reads as a gate for this change rather than as
+   a general design document.
+
+2. Add a sixth criterion, "Discount range": 0 if the range is enforced on
+   neither side, 1 if on one, 2 if on both with a test that names the
+   boundary. Raise the pass threshold to 10 of 12. Keep the rule that no
+   criterion may sit at 0.
+
+3. Replace every entry in the "Evidence required" column with the concrete
+   artefact from this change: the real test name, the exact command whose
+   output would be pasted, the specific file. Take them from
+   week3/change-python.md, week3/change-java.md and the source files those two
+   name. Invent nothing - where no artefact exists for a row, write
+   "none exists yet" and say what would have to be written.
+
+4. Add a "Score" column at the end of the table, empty on every row.
+
+Change nothing else in the file. Leave the YAML front matter, the house rules
+and the closing "How to use it" section exactly as they are.
+Reply with one line: the new threshold and how many criterion rows the table
+has.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> The tab you already have open reloads, and one line comes back:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
+<pre><code>threshold 10 of 12, 6 criterion rows</code></pre></div>
+    <b>Now look at the file.</b> Compare it with the block in part a - this is what
+    changed. The three scoring columns are untouched, so they are elided here with dots
+    to keep the rows readable:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">week3/gate-rubric.md - after. The 0, 1 and 2 columns are unchanged and shown as dots</span></div>
+<pre><code># HEL-207 gate rubric - optional order discount
+
+**Pass threshold: 10 of 12, and no criterion at 0.**
+
+| # | Criterion | 0 | 1 | 2 | Evidence required | Score |
+|---|---|---|---|---|---|---|
+| 1 | Contracts | ... | ... | ... | `appliesTheDiscountBeforeTax` in `apps/billing/src/test/java/com/helios/billing/BillingServerTest.java`, plus the matching `discountPercent` key sent by `apps/ordercore/app/billing_client.py` | |
+| 2 | Error handling | ... | ... | ... | `test_create_order_rejects_a_discount_above_fifty` in `apps/ordercore/tests/test_orders.py`, and the message `discountPercent must be between 0 and 50` in `InvoiceCalculator.java` | |
+| 3 | Tests | ... | ... | ... | `test_create_order_accepts_a_discount`, `test_create_order_accepts_the_fifty_percent_boundary`, `test_create_order_rejects_a_discount_above_fifty`, `test_invoice_applies_discount_before_tax` | |
+| 4 | Security and validation | ... | ... | ... | `discount_percent: int = Field(default=0, ge=0, le=50)` in `apps/ordercore/app/models.py` and `MAX_DISCOUNT_PERCENT` in `InvoiceCalculator.java` | |
+| 5 | Standards conformance | ... | ... | ... | Output of `python -m ruff check apps/ordercore`, against the `CLAUDE.md` rule that money is a whole number of pence | |
+| 6 | Discount range | ... | ... | ... | `test_create_order_accepts_the_fifty_percent_boundary` and `aDiscountAboveFiftyIsRejected` | |</code></pre></div>
+    Four differences, and they are the whole point: a title that names the ticket, a
+    threshold of 10 of 12, a sixth row, and an evidence column that names things you
+    can go and open. Yours will not match word for word - it is written from your own
+    change notes - but every entry in that last column should be a file, a test name or
+    a command that really exists. Anything still reading &quot;the contract test&quot;
+    was not rewritten. Anything naming a test you did not write is invented. Both are
+    worth one more turn to fix.
+  </div>
+
   <div class="watch">
-    <b>Row 1 is the one to be strict about.</b> It reads &quot;both sides changed and
-    a contract test covers it&quot;. You changed both sides. The Java contract test
-    exists and was not run today. Decide now, in writing, whether that is a 1 or a 2,
-    and hold yourself to your own answer in a moment.
+    <b>Now the decision, and it is the only one in this step.</b> Row 1 reads
+    &quot;both sides changed and a contract test covers it&quot;. You changed both
+    sides. The Java contract test exists and was not run today, and nothing tests what
+    crosses between the two. Put your answer in the Score column for row 1 - a
+    <b>1</b> or a <b>2</b> - and a few words saying why. Do it before part c runs, so
+    you are committing to a view rather than agreeing with one.
   </div>
 
   <p><b>c.</b> Now hand the change to Claude and ask it to fail you:</p>
@@ -686,6 +754,9 @@ code week3\gate-rubric.md</code></pre>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>Read week3/gate-rubric.md, then week3/change-python.md and week3/change-java.md,
 then every source file those two name.
+
+Ignore whatever is already in the Score column. That is my own answer to one
+row and it is not evidence. Do not read it, agree with it or mention it.
 
 Score my change against every row of my rubric, 0, 1 or 2, and for each row
 quote the exact evidence my rubric asks for, taken from the code or from the
@@ -704,13 +775,17 @@ Reply with one line: the total and the verdict.</code></pre>
   <div class="expect">
     <b>Expected.</b> A total out of 12 and a verdict:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - your total will differ</span></div>
-<pre><code>10/12 - passes, but criterion 2 sits at 1</code></pre></div>
+<pre><code>10/12 - passes, but criteria 1 and 2 sit at 1</code></pre></div>
     <b>A clean pass on the first attempt is the suspicious result</b>, not the good
     one. <b>Contracts should cost you a point</b>, and if it did not, score it again
     yourself: both sides changed, but no test anywhere watches what crosses between
     them, which is the second bullet in the step 5 card. Error handling usually costs
     the other one, because a discount above 50 is rejected with a 422 whose message
     nobody wrote.
+    <br><br>
+    <b>Compare row 1 with the answer you wrote in part b.</b> If Claude gave it a 2
+    and you gave it a 1, one of you has not read the coverage gap properly, and it is
+    worth thirty seconds finding out which.
     <br><br>
     Read the evidence column, not the total. A row that scored 2 with no quotation
     beside it did not score 2 - it was assumed. Lower it yourself in
@@ -770,32 +845,6 @@ All checks passed!
     your own rubric checks. Nothing is pushed; a hook blocks it, and you would not
     want to anyway.
   </div>
-
-  <h2>Challenge - break the contract on purpose</h2>
-  <p class="sub">5 minutes, afterwards</p>
-  <p>
-    Ask Claude to remove <code>discountPercent</code> from the outgoing payload in
-    <code>billing_client.py</code> and change nothing else, then run the tests again.
-    Put it back afterwards with
-    <code>git checkout -- apps/ordercore/app/billing_client.py</code>.
-  </p>
-  <p>
-    <b>All fifteen still pass.</b> That is the result, and it is the uncomfortable
-    one. Every test that reaches the client takes the fallback, which works the
-    discount out locally from the order it already has, so none of them notices that
-    Billing was told nothing. The Java test does not notice either: it builds its own
-    request string and never sees what Python sent. A live Billing service would
-    return a total with no discount in it, and the Shop would show that total.
-  </p>
-  <p>
-    <b>Two things would have caught it</b>, and neither is in your change.
-    <code>request_invoice</code> takes a <code>client</code> argument precisely so a
-    test can stand one in and assert on the payload it was handed. Or an end-to-end
-    run with Billing actually started. Pick one, add it, and watch the contract row of
-    your rubric move. Then write the general version down somewhere your team will
-    read it: a green suite is evidence about what it covers, and no evidence at all
-    about what it does not.
-  </p>
 
   <h2>Appendix - running the Java tests yourself</h2>
   <p class="sub">Outside the 45 minutes. Needs the internet once. Nothing above depends on it.</p>
@@ -861,11 +910,14 @@ java -jar $env:USERPROFILE\helios-tools\junit-console.jar execute --class-path "
   <div class="bar">
     An impact note naming seven files to change and at least one place the entity map
     is wrong. The change made across Python and Java in two diffs you read. Fifteen
-    tests passing and the linter clean, both run by you rather than reported to you by
-    a model. A gate rubric with six criteria and an evidence column you filled in
-    before scoring. A score you gave yourself against it. One rework item done, or a
-    written reason there were none. One local commit holding the code and the evidence
-    together.
+    tests passing and the linter clean, sixteen if your rework added one, both run by
+    you rather than reported to you by a model. A gate rubric with six criteria and an
+    evidence column naming artefacts that exist. Your own answer written into row 1 of
+    that file before anything else scored it. <b>The score you hand in is
+    <code>week3/gate-score.md</code></b>, after you have read it and lowered any row
+    that scored 2 without a quotation beside it; the Score column in the rubric holds
+    only your row 1 call. One rework item done, or a written reason there were none.
+    One local commit holding the code and the evidence together.
   </div>
 
   <h2>If something breaks</h2>
