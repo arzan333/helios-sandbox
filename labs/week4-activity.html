@@ -1,0 +1,1318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Week 4 hands-on - Package a Skill, and Finish the Repository</title>
+<style>
+:root {
+    --gray-50:#ffffff; --gray-75:#fafafa; --gray-100:#f5f5f5; --gray-200:#e1e1e1;
+    --gray-300:#cacaca; --gray-600:#6e6e6e; --gray-800:#2c2c2c; --gray-900:#1b1b1b;
+    --blue-500:#1473e6; --blue-600:#0d66d0; --green-500:#2d9d78;
+    --orange-500:#e68619; --red-500:#e34850; --accent-red:#fa0f00;
+    --radius:4px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--gray-100); color:var(--gray-800);
+    font-family:"Source Sans 3",-apple-system,"Segoe UI",Roboto,sans-serif;
+    font-size:15px; line-height:1.6;
+  }
+  header.masthead{
+    background:var(--gray-900); color:#fff; padding:14px 24px;
+    display:flex; align-items:baseline; gap:12px; position:sticky; top:0; z-index:10;
+  }
+  .masthead__mark{color:var(--accent-red); font-weight:700; font-size:18px; letter-spacing:-.02em}
+  .masthead__title{font-size:16px; font-weight:600}
+  .masthead__env{margin-left:auto; font-size:11px; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--gray-300)}
+  main{max-width:920px; margin:0 auto; padding:24px 24px 80px}
+  h1{font-size:26px; margin:8px 0 4px}
+  .sub{color:var(--gray-600); margin:0 0 24px}
+  h2{font-size:19px; margin:36px 0 4px; padding-top:16px; border-top:1px solid var(--gray-200)}
+  h3{font-size:15px; margin:22px 0 6px}
+  p,li{margin:8px 0}
+  ul,ol{padding-left:22px}
+  .card{background:var(--gray-50); border:1px solid var(--gray-200);
+    border-radius:var(--radius); padding:16px 18px; margin:16px 0}
+  .meta{display:flex; gap:24px; flex-wrap:wrap; font-size:13px; color:var(--gray-600);
+    background:var(--gray-50); border:1px solid var(--gray-200);
+    border-radius:var(--radius); padding:12px 16px}
+  .meta b{color:var(--gray-800)}
+  .step{display:flex; align-items:baseline; gap:10px; margin:28px 0 6px}
+  .step__n{flex:0 0 auto; width:26px; height:26px; border-radius:50%;
+    background:var(--blue-500); color:#fff; font-size:13px; font-weight:700;
+    display:inline-flex; align-items:center; justify-content:center}
+  .step__t{font-size:17px; font-weight:600}
+  .step__time{margin-left:auto; font-size:12px; color:var(--gray-600);
+    border:1px solid var(--gray-300); border-radius:10px; padding:1px 10px; white-space:nowrap}
+  .snippet{position:relative; margin:12px 0}
+  .snippet__bar{display:flex; align-items:center; gap:8px; background:var(--gray-800);
+    color:var(--gray-300); font-size:12px; padding:6px 10px;
+    border-radius:var(--radius) var(--radius) 0 0}
+  .snippet__lang{text-transform:uppercase; letter-spacing:.06em}
+  .snippet__copy{margin-left:auto; background:var(--blue-500); color:#fff; border:0;
+    border-radius:3px; padding:3px 12px; font:inherit; font-size:12px; cursor:pointer}
+  .snippet__copy:hover{background:var(--blue-600)}
+  .snippet__copy.done{background:var(--green-500)}
+  pre{margin:0; background:var(--gray-900); color:#f0f0f0; padding:12px 14px;
+    border-radius:0 0 var(--radius) var(--radius); overflow-x:auto;
+    font-family:"Consolas","DejaVu Sans Mono",monospace; font-size:13px; line-height:1.5;
+    white-space:pre; tab-size:2}
+  code{font-family:"Consolas","DejaVu Sans Mono",monospace; font-size:.92em;
+    background:var(--gray-200); padding:1px 5px; border-radius:3px}
+  pre code{background:none; padding:0; font-size:inherit}
+  .expect{border-left:3px solid var(--green-500); background:#eef8f4;
+    padding:10px 14px; border-radius:0 var(--radius) var(--radius) 0; margin:10px 0}
+  .expect b{color:#1a6b52}
+  .watch{border-left:3px solid var(--orange-500); background:#fff6e8;
+    padding:10px 14px; border-radius:0 var(--radius) var(--radius) 0; margin:10px 0}
+  .watch b{color:#8a5a0b}
+  .bar{border-left:3px solid var(--gray-600); background:var(--gray-75);
+    padding:12px 16px; border-radius:0 var(--radius) var(--radius) 0; margin:16px 0}
+  table{width:100%; border-collapse:collapse; margin:12px 0; font-size:14px}
+  th{text-align:left; background:var(--gray-100); border-bottom:1px solid var(--gray-300);
+    padding:8px 10px; font-size:12px; text-transform:uppercase; letter-spacing:.04em;
+    color:var(--gray-600)}
+  td{padding:8px 10px; border-bottom:1px solid var(--gray-200); vertical-align:top}
+  details{background:var(--gray-50); border:1px solid var(--gray-200);
+    border-radius:var(--radius); padding:10px 14px; margin:12px 0}
+  summary{cursor:pointer; font-weight:600; font-size:14px}
+  footer,.foot{color:var(--gray-600); font-size:13px; margin-top:48px;
+    border-top:1px solid var(--gray-200); padding-top:16px}
+
+  @media print{
+    header.masthead{position:static}
+    .snippet__copy{display:none}
+    pre{background:#fff; color:#000; border:1px solid var(--gray-300);
+      white-space:pre-wrap; word-break:break-word}
+    .snippet__bar{background:#fff; color:#000; border:1px solid var(--gray-300);
+      border-bottom:0}
+    .card,.expect,.watch,.bar,.meta,details{break-inside:avoid}
+    .step{break-after:avoid}
+    details[open] summary~*{display:block}
+    details:not([open])>summary~*{display:block}
+    body{background:#fff; font-size:11pt}
+    main{max-width:none; padding:0}
+    a[href]:after{content:" (" attr(href) ")"; font-size:.85em; color:var(--gray-600)}
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <span class="masthead__mark">Helios</span>
+  <span class="masthead__title">Week 4 hands-on</span>
+  <span class="masthead__env">Training environment</span>
+</header>
+
+<main>
+  <h1>Package a Skill, and Finish the Repository</h1>
+  <p class="sub">On your own. 45 minutes. Nothing here depends on the lab, and step 0 fetches and rebuilds everything you need. Every command has a copy button.</p>
+
+  <div class="meta">
+    <span><b>Time</b> 45 minutes</span>
+    <span><b>You produce</b> a technical specification with its tables back, front matter on every file, a long document split at its own section boundaries, a CLAUDE.md under 400 words, a Skill that triggers without being named, one Week 2 prompt scored twice, and a governance check</span>
+    <span><b>Committed</b> locally, never pushed</span>
+    <span><b>Needs</b> Claude Code 2.1.211 or later, Python 3.11, pandoc, markitdown with its PDF extra, VS Code, this repository</span>
+  </div>
+
+  <div class="card">
+    <b>What you are finishing.</b> Two OrderCore specifications have been converted out
+    of Word and PDF into markdown. The conversion carried the words and broke the
+    tables, gave nothing an owner, and left a five-thousand-word document in one file.
+    None of that is retrievable yet. You finish it, and then you package the one piece
+    of judgement you have that a repository cannot hold - a repeatable job - as a
+    <b>Skill</b>.
+    <br><br>
+    <b>The claim on trial.</b> That a Skill nobody has to remember to invoke is worth
+    more than a prompt somebody has to find. You test it the only way that counts: by
+    asking a question that never mentions it, and seeing whether it fires.
+  </div>
+
+  <div class="card">
+    <b>Did you miss the lab?</b> Nothing below needs it. Step 0 converts both documents
+    and repairs their headings if that has not already happened, so it starts from the
+    same place either way. If you did the lab, step 0 finds the files and creates
+    nothing.
+  </div>
+
+  <h2>The shape of the hour</h2>
+  <table>
+    <thead><tr><th>Step</th><th>What you do</th><th>Time</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Put the technical specification&apos;s tables back, and find the one that will not come back</td><td>0-7</td></tr>
+      <tr><td>2</td><td>Front matter on every file. <b>You choose the owner and the review date</b></td><td>7-14</td></tr>
+      <tr><td>3</td><td>Split the long document at its own section boundaries, and index it</td><td>14-21</td></tr>
+      <tr><td>4</td><td>A CLAUDE.md under 400 words</td><td>21-27</td></tr>
+      <tr><td>5</td><td><b>Build one Skill, and test that it triggers without being named</b></td><td>27-35</td></tr>
+      <tr><td>6</td><td>One Week 2 prompt, against the repository and against the raw sources</td><td>35-41</td></tr>
+      <tr><td>7</td><td>Register what you built, then commit</td><td>41-45</td></tr>
+    </tbody>
+  </table>
+
+  <div class="card">
+    <b>Every prompt below is labelled with its pattern</b>, in the grey bar above the
+    copy block. <b>analysis</b> reads and reports, and always names its evidence.
+    <b>coding</b> transforms files, and is always followed by a command that checks it.
+    <b>validation</b> checks a claim that has already been made, and never writes the
+    thing it is checking. If you find yourself writing a prompt that does two of the
+    three, split it - the half that marks its own work is the half that is wrong.
+  </div>
+
+  <div class="step">
+    <span class="step__n">0</span><span class="step__t">Set up</span>
+    <span class="step__time">before the clock starts</span>
+  </div>
+  <p>
+    <b>Why.</b> Four minutes now, or a confusing error in six. This also rebuilds
+    anything the lab would have left behind, so it works whether or not you did it.
+  </p>
+
+  <p><b>a.</b> Check your tools. In a plain PowerShell window:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+claude --version
+python --version
+python -c "import importlib.util as u, shutil; print(shutil.which('pandoc') or 'pandoc MISSING'); print('markitdown can read PDF' if all(u.find_spec(m) for m in ('markitdown','pdfminer','pdfplumber')) else 'markitdown PDF SUPPORT MISSING')"</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Two version lines, a path, and a sentence:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - the versions and the pandoc path are yours</span></div>
+<pre><code>2.1.260 (Claude Code)
+Python 3.11.9
+C:\Users\you\AppData\Local\Pandoc\pandoc.EXE
+markitdown can read PDF</code></pre></div>
+    Claude Code must be <b>2.1.211 or higher</b>. Pandoc reads the Word file; markitdown
+    reads the PDF; neither can do the other one on this build.
+    <br><br>
+    <b>The last line asks whether markitdown can read a PDF, not whether it is
+    installed.</b> markitdown keeps its format support in optional extras, and
+    <code>pip install markitdown</code> installs none of them - reading a PDF needs
+    <code>markitdown[pdf]</code>, which brings <code>pdfminer.six</code> and
+    <code>pdfplumber</code>. Step 0b converts the PDF, so this has to be right before
+    the clock starts.
+  </div>
+  <details>
+    <summary>Only if that last line said MISSING</summary>
+    <p>
+      One command, once per machine, and it needs the internet. Then run step 0a again:
+    </p>
+    <div class="snippet">
+      <div class="snippet__bar"><span class="snippet__lang">powershell - only if the check said MISSING</span>
+        <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+python -m pip install "markitdown[pdf]"
+python -c "import importlib.util as u; print('markitdown can read PDF' if all(u.find_spec(m) for m in ('markitdown','pdfminer','pdfplumber')) else 'still MISSING')"</code></pre>
+    </div>
+  </details>
+
+  <p><b>b.</b> Pull in this week&apos;s files, make your folders, and convert the PDF. Safe to run twice:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+git fetch origin
+git merge origin/main -m "Week 4 files"
+mkdir week4 -Force | Out-Null
+mkdir week4\raw -Force | Out-Null
+mkdir week4\repo -Force | Out-Null
+mkdir week4\out -Force | Out-Null
+if (-not (Test-Path week4\raw\techspec.md)) { python -m markitdown docs\specs\ordercore-techspec.pdf -o week4\raw\techspec.md }
+if (-not (Test-Path week4\repo\governance-log.md)) { copy docs\governance-log.md week4\repo\governance-log.md }
+dir week4\raw\techspec.md
+dir week4\repo\governance-log.md
+dir docs\specs\ordercore-techspec.pdf</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A merge summary, silence from the conversion, then three small
+    listings, one per <code>dir</code>. PowerShell heads each with the folder and a
+    Mode, LastWriteTime, Length and Name table; the three names are the part that
+    matters, and the dates and sizes are yours:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - names only, sizes and dates vary</span></div>
+<pre><code>techspec.md
+governance-log.md
+ordercore-techspec.pdf</code></pre></div>
+    <code>docs\specs\ordercore-techspec.pdf</code> is the file to watch. It is new this
+    week, so <code>cannot find path</code> on it means the merge brought nothing - and
+    the two lines above it will have failed too, because both are made from it. Read the
+    git message above the error and tell your facilitator; the week&apos;s files may not
+    have been published yet.
+    <br><br>
+    <b>Your copy of the governance log, not the shared one.</b>
+    <code>docs/governance-log.md</code> is a shared document and nothing today edits it.
+    You register into <code>week4/repo/governance-log.md</code>, which is the log
+    <i>your</i> repository owns, and step 7 says what the two rows would look like in the
+    shared one.
+    <br><br>
+    <b>One <code>dir</code> per line, on purpose.</b> <code>dir a b c</code> is not
+    valid PowerShell: the second path is taken as a filter and the third has nowhere to
+    go. Every listing here is one path at a time for that reason.
+  </div>
+
+  <p><b>c.</b> Start Claude Code. VS Code is already open; this is the only thing you need to launch:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+claude</code></pre>
+  </div>
+  <div class="watch">
+    <b>You now need two windows.</b> This one is Claude Code. Open a second terminal
+    inside VS Code with <code>Ctrl+Shift+`</code> for every <b>powershell</b> block
+    below. Each block sets its own folder, so it works in either window.
+  </div>
+
+  <p><b>d.</b> Catch up, if you need to. This prompt creates nothing that is already there:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt - coding</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Bring the repository up to the state the Week 4 lab leaves it in. Skip any
+part that is already done, and say which parts you skipped.
+
+1. If week4/raw/fsd.md does not exist, create it by running, from the
+   repository root:
+
+       pandoc docs/specs/ordercore-fsd.docx -t gfm -o week4/raw/fsd.md
+
+2. If week4/repo/specs/ordercore-fsd.md does not exist, write it from
+   week4/raw/fsd.md, and if week4/repo/specs/ordercore-techspec.md does not
+   exist, write it from week4/raw/techspec.md. In each, give every section the
+   heading level its own numbering implies: the title is level 1, a whole
+   number section is level 2, a decimal subsection is level 3, a three-part
+   number like 4.1.1 is level 4, an appendix is level 2. Change no wording outside a heading line, carry every table across
+   exactly as it is, and do not repair a broken table - step 1 does that.
+
+3. If week4/repo/index.md does not exist, write it as a one-row-per-file
+   table: file, what it holds in one clause, and nothing else. Pointers only.
+
+Do not touch any file that already exists. Reply with one line: which of the
+four files you created and which you found.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> If you did the lab, nothing happens:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - if you did the lab</span></div>
+<pre><code>created none, found all four</code></pre></div>
+    If you did not, it creates the four and says so, and takes about two minutes. Either
+    way you are now at the same starting line. <b>If it says it created a file you know
+    you already had</b>, it overwrote your work - <code>git diff week4</code> will show
+    what changed, and <code>git checkout -- week4</code> puts it back.
+  </div>
+
+  <div class="step">
+    <span class="step__n">1</span><span class="step__t">Put the tables back</span>
+    <span class="step__time">0-7 min</span>
+  </div>
+  <p>
+    <b>Why.</b> A table is how a specification says &quot;these things vary together&quot;.
+    Broken into prose it becomes a paragraph nobody can diff, and a row that goes missing
+    goes missing silently.
+  </p>
+
+  <p><b>a.</b> Look at the damage first, so you know what to check afterwards:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+dir week4\repo\specs\ordercore-techspec.md
+python -c "import re,pathlib; t=pathlib.Path('week4/repo/specs/ordercore-techspec.md').read_text(encoding='utf-8'); print(len(re.findall('(?m)^[|][-| :]+[|]', t)), 'separator rows'); print(len(re.findall('(?m)^[|]', t)), 'lines that start as a table row')"</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A listing, then two counts that do not add up:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - exact</span></div>
+<pre><code>9 separator rows
+17 lines that start as a table row</code></pre></div>
+    The document has <b>four</b> tables with nineteen data rows between them: the field
+    mapping in 2.1, the configuration table in 5, the testing table in 6 and the known
+    gaps table in 7. Nine separators for four tables means the converter started a fresh
+    table every time a row wrapped onto two lines in the PDF.
+    <br><br>
+    Break the seventeen down and it is worse than it looks: four headers, nine
+    separators and <b>four surviving data rows</b> - <code>order_id</code>,
+    <code>subtotal_pence</code>, <code>Lint</code> and <code>TG-2</code>. A repaired file
+    would have four headers, four separators and nineteen data rows, which is
+    twenty-seven lines. <b>Fifteen of the nineteen rows are sitting in the file as plain
+    prose.</b>
+    <br><br>
+    One of those nine &quot;separators&quot; is not a separator at all. It is the second
+    half of a testing row that wrapped in the PDF, whose first cell came out empty, so it
+    reads as pipes, spaces and dashes - and the check&apos;s regular expression cannot
+    tell that from a rule. <b>The measurement is right and its label is not</b>, which is
+    the sort of thing worth catching now rather than after you have quoted it.
+    <br><br>
+    They are not lost. Every word is still there, immediately above or below the header
+    it belongs to. Putting them back is mechanical, which is why the next part is a
+    prompt and not an afternoon.
+  </div>
+
+  <p><b>b.</b> Restore them. Note the last paragraph - it is the part that stops this going wrong:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt - coding</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Repair the tables in week4/repo/specs/ordercore-techspec.md, in place.
+
+The PDF conversion broke four tables: the field mapping in section 2.1, the
+configuration table in section 5, the testing table in section 6 and the known
+gaps table in section 7. In each one, some rows came through as markdown rows
+and some as plain lines of prose directly above or below them, and some tables
+were split in half by a second separator row.
+
+For each of the four: one header row, one separator row, and every data row as
+a markdown row, in the order they appear in the file. Where a row wrapped onto
+two lines, join it. Where a cell is empty, leave it empty.
+
+Take every word from week4/repo/specs/ordercore-techspec.md itself. Do not
+open the PDF, do not use the code in apps/, and do not add a row, a column or
+a cell that is not already somewhere in that file. If a table is referred to
+but its contents are not in the file at all, leave a line saying so instead of
+reconstructing it.
+
+Change nothing outside those four tables. Reply with one line: how many data
+rows each of the four tables ended up with.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Four counts:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
+<pre><code>6, 5, 3, 5</code></pre></div>
+    Six field mappings, five configuration settings, three test suites, five known gaps -
+    nineteen rows. <b>A count higher than that is an invented row</b>, and the usual one
+    is a sixth known gap, because five is an odd number of gaps to have. Ask it to quote
+    the line each row came from.
+  </div>
+  <div class="watch">
+    <b>There is a fifth table, and it does not come back.</b> Section 3 of the technical
+    specification says three responses leave the service and then hands you Figure 3 -
+    the error response table, five conditions with their status codes - which is an
+    image. No converter on this workstation can read it and no prompt can recover it:
+    the words were never in the file. The prompt above tells Claude to say so rather
+    than reconstruct it, and <b>an answer that quietly produces a plausible error table
+    is the single worst outcome of this step</b>, because it is exactly as convincing as
+    the four real ones. Check that section before you move on.
+  </div>
+
+  <p><b>c.</b> Count what you have now:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+python -c "import re,pathlib; t=pathlib.Path('week4/repo/specs/ordercore-techspec.md').read_text(encoding='utf-8'); print(len(re.findall('(?m)^[|][-| :]+[|]', t)), 'separator rows'); print(len(re.findall('(?m)^[|]', t)) - 2*len(re.findall('(?m)^[|][-| :]+[|]', t)), 'data rows')"</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Four tables, nineteen rows:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - exact, and worth re-running until it is</span></div>
+<pre><code>4 separator rows
+19 data rows</code></pre></div>
+    Five separators means one table is still split. Twenty or more data rows means
+    something was invented, or a prose line that was never a row got promoted into one.
+    Eighteen means a row was dropped in the joining. Send part b again naming the table
+    that is wrong - it is a two-minute fix and it is the last chance to catch it, because
+    step 3 is about to split this document into pieces.
+  </div>
+
+  <div class="step">
+    <span class="step__n">2</span><span class="step__t">Front matter on every file</span>
+    <span class="step__time">7-14 min</span>
+  </div>
+  <p>
+    <b>Why.</b> A file with no front matter is a file nobody owns, and an unowned
+    document does not go stale - it just becomes wrong while everybody keeps trusting it.
+  </p>
+  <p>
+    The schema is <code>templates/frontmatter-schema.md</code>: four required fields,
+    <code>owner</code>, <code>version</code>, <code>effective_date</code> and
+    <code>review_date</code>, plus <code>source</code> on anything converted and an
+    optional <code>status</code>. Two of them do the work. <b>owner</b> is one role,
+    never a team, because a team cannot answer a question. <b>review_date</b> is the only
+    field that makes staleness visible at all.
+  </p>
+
+  <p><b>a.</b> Add it everywhere it can be derived, and flag where it cannot:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt - coding</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Give every markdown file under week4/repo a front matter block, following
+templates/frontmatter-schema.md exactly: the block is the first thing in the
+file, nothing above it, ISO dates, the four required fields in the schema's
+order.
+
+Skip week4/repo/CLAUDE.md if it exists. That file is instructions to a tool,
+not a document in the repository, and it has no owner separate from the
+repository itself.
+
+Where a file was converted from an original, take owner, version,
+effective_date and review_date from that original's row in
+docs/governance-log.md, and add source: naming the original. Do not invent a
+date that is in that file.
+
+Where a file is new today - an index, the gap register - there is no row to
+copy, so put OWNER-TO-DECIDE in the owner field and REVIEW-TO-DECIDE in the
+review_date field. Set version 1.0 and today's date as effective_date. Leave
+both placeholders exactly as written; I fill them in.
+
+week4/repo/governance-log.md began as a copy of a shared file. It is a new
+document now, about a different repository, so replace its inherited front
+matter using the same rule as a new file.
+
+Look for every markdown file rather than assuming which ones exist - what is
+there depends on whether the lab was done. Change nothing below the front
+matter block in any file. Reply with one line: how many files you gave front
+matter to, and the names of the ones that carry a placeholder.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Every file covered, and the new ones flagged:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - if you did the lab; four files and two placeholders if you did not</span></div>
+<pre><code>6 files; placeholders in index.md, specs/index.md, gaps.md, governance-log.md</code></pre></div>
+    Six is what a post-lab repository holds: two specifications, two indexes, your
+    governance log and the gap register. Without the lab there are four, because there is
+    no gap register and no <code>specs/index.md</code> yet. The count is not the point -
+    <b>the list is</b>, because those are the files you are about to open.
+    <br><br>
+    The two converted specifications get their owner and dates from the governance log.
+    Everything else was written today and has no row to copy from, so it comes back with
+    placeholders. That is correct behaviour and not a failure: <b>there is no source for
+    an owner except somebody deciding.</b>
+  </div>
+
+  <p><b>b.</b> Open the repository in the editor - the files with placeholders in them are the ones you are about to decide:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+dir week4\repo
+code week4\repo</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A listing, then VS Code opens the folder in its explorer:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - names only, and yours may be shorter</span></div>
+<pre><code>specs
+gaps.md
+governance-log.md
+index.md</code></pre></div>
+    <code>Ctrl+Shift+F</code> and search for <code>TO-DECIDE</code> to find every one of
+    them at once, including the ones inside <code>specs\</code>. That is faster than
+    opening files by name and it will not miss one.
+  </div>
+
+  <div class="watch">
+    <b>The two fields nobody can derive.</b> In each file the search found, replace
+    <code>OWNER-TO-DECIDE</code> with one role - Architect, Product Manager, Release
+    Manager, Quality Engineer, Developer, Business Analyst - and
+    <code>REVIEW-TO-DECIDE</code> with an ISO date.
+    <br><br>
+    Two questions decide both, and neither has a lookup: <b>who gets the question when
+    this file is wrong</b>, and <b>how long can it be wrong before somebody is hurt</b>.
+    An index that points at two specifications can be stale for a year without much
+    happening, so six months is generous. A gap register describing what a repository
+    does not contain goes wrong the moment somebody fills a gap, so it wants a shorter
+    life than the documents it describes. A date you cannot defend in a sentence is
+    decoration - and this is the field the whole of step 7 is built on.
+  </div>
+  <!-- hand-edit:
+       rewrite week4/repo/*.md OWNER-TO-DECIDE Architect
+       rewrite week4/repo/*.md REVIEW-TO-DECIDE 2027-03-17
+       rewrite week4/repo/specs/*.md OWNER-TO-DECIDE Architect
+       rewrite week4/repo/specs/*.md REVIEW-TO-DECIDE 2027-03-17 -->
+
+  <p><b>c.</b> Check every file, not the three you happened to open:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+python -c "import pathlib; [print(('ok  ' if t.startswith('---') and all(f in t.split('---')[1] for f in ['owner:','version:','effective_date:','review_date:']) and 'TO-DECIDE' not in t else 'FIX '), p.as_posix()) for p in sorted(pathlib.Path('week4/repo').rglob('*.md')) if p.name != 'CLAUDE.md' for t in [p.read_text(encoding='utf-8')]]"</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> One line per markdown document in the repository, all of them
+    <code>ok</code>:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - your file list, all ok</span></div>
+<pre><code>ok   week4/repo/gaps.md
+ok   week4/repo/governance-log.md
+ok   week4/repo/index.md
+ok   week4/repo/specs/index.md
+ok   week4/repo/specs/ordercore-fsd.md
+ok   week4/repo/specs/ordercore-techspec.md</code></pre></div>
+    Your list is shorter if you did not do the lab. A <code>FIX</code> means one of three
+    things: the block is not the first thing in the file, a required field is missing, or
+    a <code>TO-DECIDE</code> placeholder is still sitting there. The check does not care
+    which - from a tool&apos;s point of view it is the same failure, a file it cannot
+    place.
+    <br><br>
+    <code>CLAUDE.md</code> is skipped by name, here and in the prompt above. It is
+    instructions to a tool rather than a document about OrderCore, and giving it an owner
+    and a review date of its own would mean claiming it can go stale independently of the
+    repository it describes.
+  </div>
+
+  <div class="step">
+    <span class="step__n">3</span><span class="step__t">Split the long one, and index it</span>
+    <span class="step__time">14-21 min</span>
+  </div>
+  <p>
+    <b>Why.</b> Retrieval works on whole files. A five-thousand-word file answers a
+    question about tax by handing over everything anybody ever wrote about orders, and
+    you pay for all of it on every request.
+  </p>
+
+  <p><b>a.</b> Find out which files are too big. The rule of thumb is about 1500 words:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+python -c "import pathlib; [print('%6d  %s' % (len(t.split()), p.as_posix())) for p in sorted(pathlib.Path('week4/repo').rglob('*.md')) for t in [p.read_text(encoding='utf-8')]]"</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> One line per file, and one of them an order of magnitude bigger
+    than the rest:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - if you did the lab; your counts will be close to these, not identical</span></div>
+<pre><code>   234  week4/repo/CLAUDE.md
+   667  week4/repo/gaps.md
+   279  week4/repo/governance-log.md
+    75  week4/repo/index.md
+   106  week4/repo/specs/index.md
+  5073  week4/repo/specs/ordercore-fsd.md
+   792  week4/repo/specs/ordercore-techspec.md</code></pre></div>
+    <b>Exactly one file is over the line, and nothing else is close.</b> The functional
+    specification is about three and a half times the limit. The technical specification
+    is a fifth of it and stays whole - splitting a document that does not need splitting
+    adds a layer of indirection for nothing, and 1500 is a threshold, not a target.
+    <br><br>
+    Your numbers will differ by a few hundred words depending on how the headings came
+    out, and your list is shorter if you did not do the lab. The decision would only
+    change if a file were near 1500, and none of these is.
+  </div>
+
+  <p><b>b.</b> Split at the document&apos;s own boundaries, never at a word count:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt - coding</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Split week4/repo/specs/ordercore-fsd.md into parts under
+week4/repo/specs/ordercore-fsd/.
+
+- Split only at level-2 headings, which are the document's own numbered
+  sections and its appendices. Never split inside a section, never split
+  inside a table, and never split to hit a word count.
+- Where consecutive sections are short, put them in one part. Where a single
+  section is over about 1500 words on its own, leave it over and say so in the
+  reply - a section is the smallest honest unit.
+- Name each part NN-slug.md, numbered in document order, the slug from the
+  heading.
+- Every part carries the same front matter as the file it came from, plus
+  part: N of M, plus covers: listing the section numbers in it.
+- Write week4/repo/specs/ordercore-fsd/index.md: one row per part - file,
+  section numbers, and one clause on what is in it. No summaries of content.
+- Then delete week4/repo/specs/ordercore-fsd.md and update BOTH
+  week4/repo/index.md and week4/repo/specs/index.md, so that nothing anywhere
+  points at a file that no longer exists. The specs index has a row naming it.
+
+Move text, do not rewrite it. The parts joined back together must be the same
+document. Reply with one line: how many parts, and the largest part's word
+count.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Somewhere between six and ten parts, none of them very large:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - the number of parts is a judgement, the second figure is not</span></div>
+<pre><code>7 parts, largest 986 words</code></pre></div>
+    Six to ten is all defensible - it depends on how aggressively short sections were
+    grouped. <b>The second number is the one to check.</b> If the largest part is over
+    1500, look at which section it is: section 7, the cart and delivery window, is the
+    longest single section in the document at about 960 words, so anything much above
+    that is two sections that should have been two parts. If the largest part is over
+    2000, sections were not grouped but concatenated, and the split did nothing.
+  </div>
+
+  <p><b>c.</b> Prove nothing was lost in the splitting. This is the check that matters:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+dir week4\repo\specs\ordercore-fsd
+python -c "import re,pathlib; ps=sorted(pathlib.Path('week4/repo/specs/ordercore-fsd').glob('[0-9]*.md')); b=[re.sub('(?s)^---.*?---','',p.read_text(encoding='utf-8')) for p in ps]; print(len(ps), 'parts'); print(sum(len(x.split()) for x in b), 'words in the parts'); print(sum(len(re.findall('(?m)^[|][-| :]+[|]', x)) for x in b), 'tables in the parts'); print(max((len(x.split()) for x in b), default=0), 'words in the largest')"</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Four numbers. The middle two are the ones to read:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - the word counts are yours, the table count is not</span></div>
+<pre><code>7 parts
+5058 words in the parts
+6 tables in the parts
+962 words in the largest</code></pre></div>
+    <b>Six tables.</b> That is the number the functional specification started with in
+    Word and the number pandoc carried out of it - version history, stakeholders, status
+    transitions, order fields, transit days, and the non-functional requirements. Five
+    means a table was split across two parts and one half lost its header. Seven means
+    one got cut in two and both halves grew a separator.
+    <br><br>
+    The word total should land within a hundred or so of the figure you saw in part a.
+    This check strips each front matter block before counting, which is also why the
+    largest part reads a few words lower here than in the reply to part b. A drop of
+    several hundred means a section was summarised rather than moved, and that is the
+    failure to send back: the parts joined together have to be the same document.
+  </div>
+
+  <div class="step">
+    <span class="step__n">4</span><span class="step__t">A CLAUDE.md under 400 words</span>
+    <span class="step__time">21-27 min</span>
+  </div>
+  <p>
+    <b>Why.</b> This is the one file that is re-read on every single request in the
+    repository. Its length is not a one-off cost, it is a subscription.
+  </p>
+
+  <p><b>a.</b> Write it from the template. The hard part is the Where to look section:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt - coding</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Read templates/claude-md-template.md, then look at what is actually under
+week4/repo now, and write week4/repo/CLAUDE.md.
+
+The five headings from the template and no others.
+
+- What is here: two or three lines.
+- Standards: the rules that would otherwise be repeated in every request about
+  these documents. Front matter is the first thing in every file. ISO dates. A
+  converted document keeps a source field. Money is whole pence. No file over
+  about 1500 words. Five or six lines at most.
+- Where to look: point at week4/repo/index.md, at the two specification
+  indexes, at week4/repo/governance-log.md, and at the gap register if you
+  have one. One line each, saying what question it answers. Point, never
+  summarise.
+- Do not: week4/raw holds working files and is not the repository; the
+  originals under docs/specs are never edited; the contents of a figure are
+  not in this markdown and must never be reconstructed from memory; the shared
+  docs/governance-log.md is not yours to edit.
+- Ownership: one line, by role.
+
+Under 400 words. Nothing a reader could get by opening the directory, and no
+file-by-file inventory - that is what the index files are for. Reply with one
+line: the word count.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A short file, and a number under 400:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - yours will differ</span></div>
+<pre><code>248 words</code></pre></div>
+    Between about 150 and 400 is a reasonable answer. Over 400 and something is being
+    summarised that should be pointed at - almost always the list of document parts,
+    which belongs in
+    <code>week4/repo/specs/ordercore-fsd/index.md</code> and nowhere else.
+  </div>
+
+  <p><b>b.</b> Check the ceiling and the headings, then read it:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+dir week4\repo\CLAUDE.md
+python -c "import pathlib; t=pathlib.Path('week4/repo/CLAUDE.md').read_text(encoding='utf-8'); n=len(t.split()); print(n, 'words', 'ok' if n &lt; 400 else 'OVER'); [print(('yes' if h in t else 'NO '), h) for h in ['## What is here','## Standards','## Where to look','## Do not','## Ownership']]"
+code week4\repo\CLAUDE.md</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A listing, a count under the ceiling, five headings, and a tab:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - the count is yours, the rest is not</span></div>
+<pre><code>248 words ok
+yes ## What is here
+yes ## Standards
+yes ## Where to look
+yes ## Do not
+yes ## Ownership</code></pre></div>
+    <b>Now apply the template&apos;s own test to what you are reading.</b> If a section
+    would be just as useful sitting in its own file with a pointer from here, move it
+    and point at it. That single rule is what keeps this file at 250 words a year from
+    now instead of 1200.
+  </div>
+
+  <div class="step">
+    <span class="step__n">5</span><span class="step__t">Build a Skill, and make it fire</span>
+    <span class="step__time">27-35 min</span>
+  </div>
+  <p>
+    <b>Why.</b> A prompt is something somebody has to find and paste. A Skill is the same
+    knowledge attached to the words people already use, so it arrives without anybody
+    remembering it exists. Whether it fires is a property of one sentence, and that
+    sentence is the whole exercise.
+  </p>
+
+  <p><b>a.</b> Read the worked example first. It is deliberately small:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+dir skills\example-skill\SKILL.md
+type skills\example-skill\SKILL.md</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A listing, then a short file. These two lines are the whole of the
+    trigger:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - skills/example-skill/SKILL.md, the front matter</span></div>
+<pre><code>name: stage-report
+description: Summarise Helios delivery stage durations from data/helios-tickets.csv. Use when asked about cycle time, stage waits, bottlenecks, rework rates, or how long a Helios workflow takes.</code></pre></div>
+    <b>Look at what that description does and does not do.</b> It says what the job is
+    in one clause, and then it lists the words somebody would actually type -
+    &quot;cycle time&quot;, &quot;bottlenecks&quot;, &quot;how long a workflow takes&quot;.
+    It never says &quot;use this skill when you need the stage report skill&quot;, which
+    is the most common way a description fails: it triggers only on its own name, and
+    somebody who knew the name did not need it.
+    <br><br>
+    The body is equally deliberate. One job, the command to run, how to read the answer,
+    and three rules - including &quot;if asked about a workflow that is not in the list,
+    say so rather than guessing&quot;. The detail that would have doubled its length is
+    left in <code>docs/process/</code> and pointed at.
+  </div>
+
+  <p><b>b.</b> Build yours. One job, one page, and a description written for a stranger:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt - coding</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Read skills/example-skill/SKILL.md and use it as the pattern.
+
+Write week4/skills/ticket-impact/SKILL.md - a Skill that turns a Helios
+ticket key into an impact note. That is where you author it; the next step
+installs it where Claude Code looks.
+
+Front matter: name, then description. The name must be exactly
+ticket-impact, matching the folder it sits in - a name that disagrees with its
+folder is the other common reason a hand-written Skill never loads. The
+description says what the job is in
+one clause and then names the words somebody would actually type when they
+want it - which files a change touches, what a ticket affects, what breaks if
+I change this, who has to approve it. It must not mention the skill's own
+name, and it must not say "impact note" only, because nobody asks for one by
+that name.
+
+Body, under a page:
+- Where to look: helios-backlog/&lt;KEY&gt;.json for the ticket, data/entity-map.md
+  for what each concept touches, and the files the map names.
+- What to produce: a table of File, Change needed, Why; a section for anything
+  that must change and is not in the map; a section for acceptance criteria
+  that are out of scope.
+- Rules: decide from the code, not from the map, because the map says of
+  itself that it is maintained by hand. Never invent a file path. Say which
+  approval the change needs and name the role, not a person.
+
+Then write week4/skill-notes.md: the description you used, the five or six
+phrases you expect it to fire on, and TRIGGERED-TO-DECIDE on its own line
+under a heading "## Did it fire". I fill that in.
+
+Reply with one line: the description, exactly as you wrote it.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Two files, and the description read back to you:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - yours will differ, the shape should not</span></div>
+<pre><code>Write an impact note for a Helios ticket from the entity map and the code. Use when asked which files a change touches, what a ticket affects, what would break, or who has to approve it.</code></pre></div>
+    One clause of job, one clause of trigger words. <b>If the description you get back
+    contains the word &quot;skill&quot;, or reads &quot;use this when you want a
+    ticket-impact analysis&quot;, it will only fire for somebody who already knows it is
+    there.</b> Send part b again.
+  </div>
+  <div class="watch">
+    <b>You author it in your folder and install it somewhere else.</b> Claude Code
+    discovers project Skills in <code>.claude/skills/</code> at the root of the
+    repository you started it in - a SKILL.md in your own week folder is a markdown file
+    nobody reads. There is also a personal <code>~/.claude/skills/</code> that follows
+    you between repositories, which is the right home for something you use everywhere
+    and the wrong home for this, because it names paths that exist only here. Part c
+    copies it into the project. Keeping the authored copy
+    under <code>week4</code> is what makes it your work rather than a change to the
+    repository&apos;s configuration, and step 7 commits both.
+  </div>
+
+  <p><b>c.</b> Install it, then restart Claude Code - Skills are discovered when a session starts:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+dir week4\skills\ticket-impact\SKILL.md
+if (-not (Test-Path .claude\skills\ticket-impact)) { mkdir .claude\skills\ticket-impact -Force | Out-Null }
+copy week4\skills\ticket-impact\SKILL.md .claude\skills\ticket-impact\SKILL.md
+python -c "import pathlib; p=pathlib.Path('.claude/skills/ticket-impact/SKILL.md'); print('installed' if p.exists() else 'MISSING', p.as_posix())"
+claude</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> One listing, then one confirmation line, then a fresh Claude Code
+    session:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
+<pre><code>installed .claude/skills/ticket-impact/SKILL.md</code></pre></div>
+    <b>This block has no <code>Test-Path</code> guard, on purpose</b> - it overwrites.
+    Run it again after every change to the Skill, including the rewrite in part e.
+    Copying and then forgetting to copy again is the second most common reason a
+    description &quot;still does not work&quot;.
+    <br><br>
+    Type <code>/exit</code> in your existing Claude Code window first, or use the second
+    terminal. A session that was already running when the file was installed does not
+    know it exists, and <b>the commonest reason a Skill &quot;does not trigger&quot; is
+    that nothing has restarted</b>. Rule that out before you conclude anything about
+    your description.
+    <br><br>
+    <b>Watch your windows.</b> The last line of this block turns whichever terminal you
+    ran it in into a Claude Code session, and steps 6 and 7 both need a PowerShell
+    prompt again. Either run this block in the window that was already Claude Code, or
+    open a third terminal with <code>Ctrl+Shift+`</code> for what is left.
+  </div>
+
+  <p>
+    <b>d.</b> The test. Paste this into <b>the session part c just started</b>, not into
+    one that was already open, and never name the Skill:
+  </p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt - analysis</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>HEL-207 is going into build next sprint and I have not looked at it. Which
+files does it touch, and who has to approve it?
+
+Write the answer to week4/trigger-test.md.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Either the session says it is using your Skill before it answers, or
+    it does not:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - what you are looking for in the transcript</span></div>
+<pre><code>Skill: ticket-impact</code></pre></div>
+    The exact wording of that line varies between Claude Code versions - it may name the
+    Skill on its own line, or in the list of what it is about to do. What you are looking
+    for is the name <code>ticket-impact</code> appearing at all, before the answer.
+    <br><br>
+    <b>If you have two Claude Code windows open, check you used the right one.</b> A
+    session started before the Skill was installed will answer the question perfectly
+    well and never mention it, which looks exactly like a description that did not fire.
+    That is the single most common way this step produces a false &quot;no&quot;.
+    <br><br>
+    <b>Read the answer as well as the transcript.</b> A Skill that fired and then ignored
+    its own rules - inventing a file path, naming a person instead of a role - is a
+    failure of the body, not the description, and it is a different fix.
+  </div>
+
+  <div class="watch">
+    <b>Write down what happened, in one word.</b> Open
+    <code>week4\skill-notes.md</code> and replace <code>TRIGGERED-TO-DECIDE</code> with
+    <b>yes</b> or <b>no</b>, and add one line: which words in your question you think
+    matched, or which words you expected to match and did not.
+    <br><br>
+    This is the only part of the step that is yours. Everything else - writing the file,
+    rewriting the description - is mechanical. Deciding whether a description earned its
+    place is not, and a &quot;no&quot; honestly recorded is worth more today than a
+    &quot;yes&quot; you talked yourself into.
+  </div>
+  <!-- hand-edit: rewrite week4/skill-notes.md TRIGGERED-TO-DECIDE yes -->
+
+  <p><b>e.</b> Only if it did not fire. Rewrite the description and test it again:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt - coding, only if part d did not fire</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>The description in week4/skills/ticket-impact/SKILL.md did not fire on this
+question:
+
+    HEL-207 is going into build next sprint and I have not looked at it.
+    Which files does it touch, and who has to approve it?
+
+Rewrite the description line in week4/skills/ticket-impact/SKILL.md, and only
+that line. Put the words from that question into it - "files", "touch",
+"approve" - and any other phrasing somebody would use for the same job. Keep
+it to two sentences. Change nothing else in the file.
+
+Then append to week4/skill-notes.md: the old description, the new one, and
+which words you added. Reply with one line: the new description.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A description with the question&apos;s own words in it:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - yours will differ</span></div>
+<pre><code>Write an impact note for a Helios ticket. Use when asked which files a ticket touches, what a change affects or breaks, or who has to approve it.</code></pre></div>
+    <b>Run the part c block again</b> - the rewrite landed in your authored copy and the
+    installed one is still the old file - then send part d again. If a second rewrite
+    still does not fire, <b>record that in your notes and move on</b>: it is a real
+    finding about descriptions, and the next step does not depend on it.
+  </div>
+  <details>
+    <summary>Would rather package your Week 3 gate rubric instead?</summary>
+    <p>
+      Same exercise, different job, and it is the better choice if you did Week 3 and
+      still have <code>week3/gate-rubric.md</code>. Author
+      <code>week4/skills/design-review/SKILL.md</code> from
+      <code>rubrics/lld.md</code> and install it the same way part c does: the job is
+      scoring a change against the low-level
+      design gate, and the description should fire on &quot;is this ready to merge&quot;,
+      &quot;review my change&quot;, &quot;does this pass the gate&quot;. The body carries
+      the five criteria, the pass threshold, and the rule that a row scored 2 without a
+      quotation beside it is scored again.
+    </p>
+    <p>
+      Test it the same way, with a question that never says &quot;rubric&quot; or
+      &quot;gate&quot;: <i>I have finished HEL-207 across Python and Java. Is it ready?</i>
+      Everything else in this step is unchanged, including the notes file.
+    </p>
+  </details>
+
+  <div class="step">
+    <span class="step__n">6</span><span class="step__t">One Week 2 prompt, twice</span>
+    <span class="step__time">35-41 min</span>
+  </div>
+  <p>
+    <b>Why.</b> The repository is a claim. A prompt you already have, run against it and
+    against what you had before, is the only evidence that turns the claim into a number.
+  </p>
+
+  <p><b>a.</b> The prompt and its rubric are both already in this repository:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+dir prompts\prompt-pack-v0\impact-note.md
+dir prompts\prompt-pack-v0\rubrics\impact-note.md
+dir docs\specs\ordercore-fsd.txt</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Three listings, one per <code>dir</code>:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - names only, sizes vary</span></div>
+<pre><code>impact-note.md
+impact-note.md
+ordercore-fsd.txt</code></pre></div>
+    The first is one of the eight bloated Week 2 prompts - the impact note for HEL-207,
+    with three worked examples and the whole ticket pasted into it. The second is its
+    25-point rubric. The third is the raw side of today&apos;s comparison: the plain-text
+    export of the functional specification that has been sitting in
+    <code>docs/specs/</code> all along, which is what anybody had before this week.
+  </div>
+
+  <p><b>b.</b> Run it against the repository:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt - analysis</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Read prompts/prompt-pack-v0/impact-note.md and carry out the task in it.
+
+For documentation, use only what is under week4/repo. Start at
+week4/repo/index.md and follow its pointers. You may read the code under
+apps/, as the prompt asks. Use no other documentation, and nothing you already
+know about OrderCore.
+
+Cite the file and heading behind every claim about intended behaviour. Where
+the documentation does not settle something, say so rather than filling it in.
+
+Write the impact note to week4/out/impact-note-repo.md. Reply with one line:
+how many files you named as needing to change.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> A number in the same region as the Week 3 answer:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - 7 or 8, and the citations matter more</span></div>
+<pre><code>7 files must change</code></pre></div>
+    Seven is the answer Week 3 arrived at from the code and the entity map, counting only
+    the Python and Java sides. Anything from seven to nine is defensible here, because
+    this prompt asks for the whole estate: add <code>OrderDetail.jsx</code> for the
+    totals row and <code>Json.java</code> if you think the parser is involved, and you
+    have nine. <b>The count is not the point of this step</b> - what you are looking at
+    is how many of the claims carry a file and a heading beside them, because that is
+    the thing the repository is supposed to have bought.
+  </div>
+
+  <p><b>c.</b> Now the same task against what you had before this week:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt - analysis</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Read prompts/prompt-pack-v0/impact-note.md and carry out the task in it again.
+
+For documentation this time, use only docs/specs/ordercore-fsd.txt and
+week4/raw/techspec.md - the plain-text export and the unrepaired conversion.
+You may read the code under apps/, as the prompt asks. Use nothing under
+week4/repo, and nothing you already know about OrderCore.
+
+Cite the file and heading behind every claim about intended behaviour. Where
+the documentation does not settle something, say so rather than filling it in.
+
+Write the impact note to week4/out/impact-note-raw.md. Reply with one line:
+how many files you named as needing to change.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Very likely the same number:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - the same count is the normal result</span></div>
+<pre><code>7 files must change</code></pre></div>
+    <b>Both runs read the same code</b>, and the file list comes mostly from the code and
+    the entity map, so the headline answer barely moves. That is worth seeing: a
+    repository does not make a model cleverer. Whatever difference there is will be in
+    the citations and in what each run was willing to say it did not know - which is
+    exactly what the rubric measures.
+  </div>
+
+  <p><b>d.</b> Score both, against the rubric that already exists:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt - validation</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Score week4/out/impact-note-repo.md and then week4/out/impact-note-raw.md
+against prompts/prompt-pack-v0/rubrics/impact-note.md. Five criteria, 0 to 5
+each, out of 25. Score only what is written in the file; give no credit for
+what it probably meant.
+
+For every criterion, quote the words you scored from the file. Where you
+cannot quote anything, the criterion is 0.
+
+Then add two rows of your own, scored the same way and reported separately
+from the 25:
+- Citations: how many claims about intended behaviour name a file and a
+  heading.
+- Honest gaps: does it say which questions its documentation could not answer.
+
+Write week4/out/scores.md: the two scored tables, the two totals out of 25,
+the two extra rows, and a section "## What the repository bought" of at most
+four lines. Change neither impact note.
+
+Reply with one line: the two totals, and the two citation counts.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Two totals within a point or two of each other, and two citation
+    counts that are not close at all:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - yours will differ; the shape is the finding</span></div>
+<pre><code>repo 20/25, raw 20/25, citations 5 and 1</code></pre></div>
+    <b>The rubric barely moves and the citations collapse.</b> That is the honest result,
+    and it is a smaller claim than the one people expect to make about a document
+    repository. The rubric was written to score an impact note, and an impact note is
+    mostly derived from code that both runs could read. Anything from a dead heat to
+    three points apart is the normal range; <b>a gap of ten means one of the two runs was
+    given something the other was not</b>, and it is worth finding out what.
+    <br><br>
+    <b>Read the citations rather than counting them.</b> Expect nought to two from the
+    raw run, and look at what they are:
+    <code>docs/specs/ordercore-fsd.txt</code> has no markdown headings, but it does have
+    numbered section titles in its prose, so a run can cite &quot;8.2 Error
+    responses&quot; and mean it. That is a page reference. The repository run cites a
+    file and a heading you can open, which is an address. The difference between the two
+    is the whole of what the morning bought, and it does not show up as a score.
+    <br><br>
+    <b>Say all of that in the four lines.</b> The repository bought traceability and an
+    honest account of its own gaps; it did not make the model better at reading code. A
+    day when the measurement disagrees with the thing you spent the morning building is
+    the day the measurement was worth taking.
+  </div>
+
+  <div class="step">
+    <span class="step__n">7</span><span class="step__t">Register it, then commit</span>
+    <span class="step__time">41-45 min</span>
+  </div>
+  <p>
+    <b>Why.</b> A document joins a repository when somebody writes down who owns it and
+    when it must be looked at again. Until then it is a file in a folder, and the
+    governance log is where you find out how well that is going.
+  </p>
+
+  <p><b>a.</b> Register what you built, and check the log you copied it from:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt - validation</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Two jobs, both against docs/governance-log.md, which you must not edit.
+
+First, add a row to week4/repo/governance-log.md for every markdown file you
+can see under week4/repo, taking document, owner, version, effective and
+review by from that file's own front matter. Status is "overdue" if the review
+date is in the past today and "current" otherwise. Work it out from the dates;
+do not copy a status.
+
+Second, write week4/governance-check.md:
+- A table of every row in docs/governance-log.md: document, the review date
+  the log gives, whether that date is in the past today, and what the Status
+  column claims.
+- A second table: for every row whose document is a markdown file with front
+  matter of its own, the owner, version and review date in the log beside the
+  owner, version and review date in the file, and whether they agree.
+- One line saying which of the two a tool would believe, and why.
+
+Reply with one line: how many log rows are past their review date, how many
+say so, and how many disagree with the file they name.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Three numbers, and none of them is the one the log implies:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - exact, from 3 September 2026 onwards</span></div>
+<pre><code>9 past, 2 say so, 7 disagree</code></pre></div>
+    <b>Every row in that log is past its review date.</b> Two of them are marked
+    <code>overdue</code> in bold, with a paragraph underneath explaining that this is the
+    ordinary way a repository rots. The other seven are marked <code>current</code> or
+    <code>draft</code> and are equally stale. The word in the Status column was typed by
+    hand on the day the row was added, and it has not been true since.
+    <br><br>
+    <b>And seven of the seven rows that name a markdown file disagree with that file.</b>
+    <code>rubrics/lld.md</code> is the sharpest: the log says the Architect owns it, the
+    file says the Developer does, and they differ on both dates as well. The log says so
+    itself, at the bottom - the file&apos;s front matter is what a tool reads, so the file
+    wins and the row is what needs fixing.
+    <br><br>
+    A different count means the date was read differently, not that the data changed.
+    Check the prompt asked for today&apos;s date rather than a date in the text.
+  </div>
+  <div class="watch">
+    <b>Do not fix the shared log.</b> It is a shared document and nothing in Week 4 edits
+    one. Your finding belongs in <code>week4/governance-check.md</code>, and the two rows
+    you would add belong to the Architect who owns that file. Writing down a disagreement
+    you found and cannot fix is the deliverable - it is how the next person finds out.
+  </div>
+
+  <p><b>b.</b> Read it back, then commit everything as one thing:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+dir week4\governance-check.md
+dir week4\out\scores.md
+type week4\repo\governance-log.md
+git add week4 .claude
+git commit -m "Week 4 hands-on: repository finished, ticket-impact Skill, governance check"
+git log --oneline -1</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Two listings, your own governance log, then one commit:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - the hash and the branch name are yours</span></div>
+<pre><code>governance-check.md
+scores.md
+[main b7e4d10] Week 4 hands-on: repository finished, ticket-impact Skill, governance check
+b7e4d10 Week 4 hands-on: repository finished, ticket-impact Skill, governance check</code></pre></div>
+    <b><code>.claude</code> is in that commit on purpose.</b> The Skill is the only thing
+    you made today that lives outside your own folder, because that is the only place
+    Claude Code looks for it. Nothing is pushed; a hook blocks it.
+    <br><br>
+    <code>nothing to commit</code> means the edits landed somewhere else -
+    <code>git status</code> shows where.
+  </div>
+
+  <h2>Take it back to your desk</h2>
+  <p class="sub">15 minutes, optional</p>
+  <p>
+    Everything above converted documents about a company that does not exist. The version
+    that pays is the one you run on a document your team actually argues about. It is the
+    same four moves and it fits in a quarter of an hour:
+  </p>
+  <table>
+    <thead><tr><th>Minutes</th><th>Do this</th></tr></thead>
+    <tbody>
+      <tr><td>0-4</td><td>Pick the one document your team quotes most often and cannot search. Convert it - pandoc for Word, markitdown for PDF - and count the headings you got</td></tr>
+      <tr><td>4-8</td><td>List its figures and tables. For each, ask whether the fact is anywhere in the text. That list is the deliverable, more than the conversion is</td></tr>
+      <tr><td>8-12</td><td>Give it front matter. The two fields that matter are the two nobody can derive: who answers when it is wrong, and how long it may be wrong for</td></tr>
+      <tr><td>12-15</td><td>Write the row you would add to your team&apos;s equivalent of a governance log. If there is no such log, that is the finding</td></tr>
+    </tbody>
+  </table>
+  <p>
+    The thing worth carrying is not the folder structure. It is the habit of asking what a
+    conversion dropped before trusting what it produced, and of refusing to put a document
+    in a repository until somebody&apos;s name is on it.
+  </p>
+
+  <h2>Passing bar</h2>
+  <div class="bar">
+    Four tables in the technical specification, nineteen data rows, and a line in the file
+    saying the fifth table was an image and cannot be recovered. Front matter on every
+    markdown file under <code>week4/repo</code>, first thing in the file, with <b>an owner
+    and a review date you chose and can defend in a sentence</b> on everything that had no
+    row to copy from. The functional specification split at its own section boundaries,
+    no part much over 1500 words, all six of its tables still present, and an index that
+    points rather than summarises. A CLAUDE.md under 400 words with the template&apos;s
+    five headings. <b>A Skill in <code>.claude/skills/</code>, tested with a question that
+    never named it, and the result written down whichever way it went</b> - with a
+    rewritten description if the first one did not fire. One Week 2 prompt run against the
+    repository and against the raw sources, both scored against the existing 25-point
+    rubric, plus the citation counts. <b>The thing you hand in is
+    <code>week4/governance-check.md</code></b>: every row of the shared log against
+    today&apos;s date and against the file it names. All committed locally, including
+    <code>.claude</code>.
+  </div>
+
+  <h2>If something breaks</h2>
+  <table>
+    <thead><tr><th>Symptom</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td><code>markitdown PDF SUPPORT MISSING</code> in step 0a</td>
+          <td><code>python -m pip install "markitdown[pdf]"</code>, then run step 0a again. The Week 1 setup installs plain <code>markitdown</code>, whose format support lives in optional extras; reading a PDF needs <code>pdfminer.six</code> and <code>pdfplumber</code>, which that extra brings. The block under step 0a has the command with a copy button.</td></tr>
+      <tr><td><code>pandoc MISSING</code> in step 0a</td>
+          <td>Open a new terminal first - an installer adds to PATH only for windows opened afterwards. If it is genuinely absent, re-run <code>setup/Setup-HeliosWorkstation.ps1</code>, which installs it through winget.</td></tr>
+      <tr><td><code>MissingDependencyException</code> from markitdown on the PDF</td>
+          <td>The PDF extra is not installed. <code>python -m pip install "markitdown[pdf]"</code>, then run step 0b again. On the <code>.docx</code> the same error is expected and correct: pandoc reads Word.</td></tr>
+      <tr><td>The PDF converts, but step 1a reports 0 separator rows</td>
+          <td><code>pdfplumber</code> is missing while <code>pdfminer.six</code> is present, so markitdown fell back to plain text and never looked for a table. Install <code>"markitdown[pdf]"</code>, delete <code>week4\raw\techspec.md</code>, and run step 0b again.</td></tr>
+      <tr><td><code>cannot find path</code> for <code>docs\specs\ordercore-techspec.pdf</code></td>
+          <td>Step 0b did not merge. That file is new this week, which is why it is the one to watch, and the two lines above it are both made from it. Run the step again and read the git output above the error; if the merge succeeds and the file is still absent, the week&apos;s files have not been published and your facilitator has to do that first.</td></tr>
+      <tr><td><code>git merge</code> refuses, citing local changes</td>
+          <td>Commit what you have: <code>git commit -am "wip"</code>, then run step 0b again.</td></tr>
+      <tr><td>Step 0d says it created files you already had</td>
+          <td>It overwrote lab work. <code>git diff week4</code> shows what changed and <code>git checkout -- week4</code> puts it back, if you committed the lab. If you did not, carry on - the rebuilt files are equivalent.</td></tr>
+      <tr><td>Step 1c reports twenty or more data rows</td>
+          <td>A row was invented, or a prose line that was never part of a table got promoted. Ask Claude to quote the line each row of that table came from; the invented one will have no quotation.</td></tr>
+      <tr><td>A five-row error table appears in section 3</td>
+          <td>It was reconstructed from the model&apos;s own knowledge - the words were never in the file, because Figure 3 is an image. Delete the table, leave a line saying the content is image-only, and note it: this is the failure the step exists to produce.</td></tr>
+      <tr><td>The front matter check prints <code>FIX</code></td>
+          <td>One of three things: the block is not the first thing in the file, a required field is missing, or a <code>TO-DECIDE</code> placeholder is still there. Open the file the line names.</td></tr>
+      <tr><td>Claude fills in the owner itself</td>
+          <td>It guessed, and the guess will look reasonable. There is no source for an owner except a decision. Put <code>OWNER-TO-DECIDE</code> back and decide it.</td></tr>
+      <tr><td>The split loses several hundred words</td>
+          <td>A section was summarised instead of moved. Send the step 3b prompt again with the last line emphasised: the parts joined back together must be the same document.</td></tr>
+      <tr><td>Step 3c reports five or seven tables</td>
+          <td>A table was cut across two parts. Ask for the split to move the whole section that table is in into one part; a table is never a boundary.</td></tr>
+      <tr><td><code>CLAUDE.md</code> comes back over 400 words</td>
+          <td>It listed the document parts instead of pointing at their index. That list belongs in <code>week4/repo/specs/ordercore-fsd/index.md</code> and nowhere else.</td></tr>
+      <tr><td>The Skill does not fire in step 5d</td>
+          <td>Restart first - a session that was running when the file was written does not know it exists. If it still does not, that is the finding the step is for: record it, then use part e.</td></tr>
+      <tr><td>The Skill fires on everything</td>
+          <td>The description is too broad - usually a trailing "use when asked about Helios". Narrow it to the job. A Skill that fires on every question costs its own length on every request.</td></tr>
+      <tr><td>The Skill fires but invents a file path</td>
+          <td>That is the body, not the description. The rules section has to say it: never name a file that is not in <code>data/entity-map.md</code> or that you have not opened.</td></tr>
+      <tr><td>The Skill is never offered at all, whatever the description says</td>
+          <td>Check the <code>name</code> in the front matter against the folder it sits in. They must be the same word - <code>ticket-impact</code> in both. Then check you copied it to <code>.claude\skills\</code> and restarted.</td></tr>
+      <tr><td>The two impact notes score the same</td>
+          <td>Not a failure. Both read the same code, which is where most of the answer comes from. Say so in the four lines, and compare the citation counts instead.</td></tr>
+      <tr><td>The governance check reports a different count</td>
+          <td>It compared against a date in the text rather than today. Ask it for today&apos;s date first, then the comparison.</td></tr>
+      <tr><td>Claude offers to fix <code>docs/governance-log.md</code></td>
+          <td>Say no. It is a shared document. The disagreement goes in <code>week4/governance-check.md</code>, and the fix belongs to the role that owns the file.</td></tr>
+      <tr><td><code>pathspec '.claude' did not match any files</code> on the commit</td>
+          <td>Step 5c was skipped, so nothing was ever installed there. Run it, or drop <code>.claude</code> from the <code>git add</code> line - the rest of the commit is unaffected.</td></tr>
+      <tr><td>A prompt answered in the chat and wrote no file</td>
+          <td>Send it again. Every prompt here names the file it writes, and none of them need the session to remember anything.</td></tr>
+      <tr><td><code>A positional parameter cannot be found</code> from <code>dir</code></td>
+          <td>Two or more paths were put on one <code>dir</code>. PowerShell binds only the first. Give each path its own line, as every block here does.</td></tr>
+      <tr><td>A run stops with a login or usage-limit message</td>
+          <td>Your seat hit its limit or the login expired. Sign in or wait, then send the same prompt again - repeating is safe.</td></tr>
+      <tr><td><code>code</code> is not recognised</td>
+          <td>VS Code is not on PATH. On Windows that is set by the installer&apos;s &quot;Add to PATH&quot; option, so re-run the installer, or open a terminal that was started after VS Code was installed. Either way you can open the files by hand - nothing here depends on the command itself.</td></tr>
+      <tr><td>A push is refused</td>
+          <td>Correct. Nothing in this programme is pushed. To hand work over, run <code>git bundle create week4.bundle HEAD</code> and send the file.</td></tr>
+      <tr><td><code>python</code> opens the Microsoft Store</td>
+          <td>Settings &gt; Apps &gt; Advanced app settings &gt; App execution aliases: turn off <code>python.exe</code> and <code>python3.exe</code>, then reopen PowerShell.</td></tr>
+      <tr><td><code>claude</code> is not on PATH</td>
+          <td>Open a new terminal - a window opened before the install does not see it.</td></tr>
+    </tbody>
+  </table>
+
+  <p class="foot">
+    Helios Group is fictional. All data in this repository is synthetic.
+    Week 4 of the Claude Code Capability Program. The lab,
+    <code>labs/week4.html</code>, is where these documents were converted; nothing here
+    needed it.
+  </p>
+</main>
+
+<script>
+// Copy buttons. Text is taken from the <pre> exactly as written, so what lands on
+  // the clipboard is what is on screen - no smart quotes, no wrapped commands.
+  document.querySelectorAll('.snippet').forEach(function (block) {
+    var button = block.querySelector('.snippet__copy');
+    var pre = block.querySelector('pre');
+    if (!button || !pre) return;
+    button.addEventListener('click', function () {
+      var text = pre.innerText;
+      var done = function () {
+        button.textContent = 'Copied';
+        button.classList.add('done');
+        setTimeout(function () {
+          button.textContent = 'Copy';
+          button.classList.remove('done');
+        }, 1500);
+      };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(done, fallback);
+      } else {
+        fallback();
+      }
+      function fallback() {
+        var area = document.createElement('textarea');
+        area.value = text;
+        area.style.position = 'fixed';
+        area.style.opacity = '0';
+        document.body.appendChild(area);
+        area.select();
+        try { document.execCommand('copy'); done(); } catch (e) { button.textContent = 'Select manually'; }
+        document.body.removeChild(area);
+      }
+    });
+  });
+</script>
+</body>
+</html>
