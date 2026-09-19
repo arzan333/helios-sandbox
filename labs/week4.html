@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Week 4 lab - From Word and PDF to a Retrievable Repository</title>
+<title>Week 4 lab - Two Documents a Model Can Read</title>
 <style>
 :root {
     --gray-50:#ffffff; --gray-75:#fafafa; --gray-100:#f5f5f5; --gray-200:#e1e1e1;
@@ -107,71 +107,59 @@
 </header>
 
 <main>
-  <h1>From Word and PDF to a Retrievable Repository</h1>
+  <h1>Two Documents a Model Can Read</h1>
   <p class="sub">Self-paced. Follow along on your own machine, or watch and run it afterwards. Every command has a copy button.</p>
 
   <div class="meta">
-    <span><b>Time</b> 45 minutes</span>
-    <span><b>You produce</b> two specifications converted and given headings, a gap register with a verdict you typed in every row, a small repository with front matter and index files, a CLAUDE.md under a page, and one question answered twice and scored</span>
+    <span><b>Time</b> 40 minutes</span>
+    <span><b>You produce</b> two specifications converted, repaired and given an owner, a small repository with index files and a CLAUDE.md, and one question answered twice and scored</span>
     <span><b>Committed</b> locally, never pushed</span>
-    <span><b>Needs</b> Claude Code 2.1.211 or later, Python 3.11, pandoc, markitdown with its PDF extra, VS Code, this repository</span>
+    <span><b>Needs</b> Claude Code 2.1.211 or later, Python 3.11, pandoc, markitdown with its PDF extra, this repository</span>
   </div>
 
   <div class="card">
-    <b>The job.</b> Everything anybody knows about OrderCore is in two files:
-    <code>docs/specs/ordercore-fsd.docx</code>, a Word functional specification, and
-    <code>docs/specs/ordercore-techspec.pdf</code>, a PDF technical specification.
-    Neither can be searched, quoted, diffed or pointed at. In 45 minutes you turn them
-    into markdown that a person or a model can retrieve one section of, and put a
-    folder structure and a CLAUDE.md around them.
+    <b>The job.</b> You are given two specifications for an order service: a functional
+    one in Word and a technical one in PDF. Neither can be searched, quoted or pointed
+    at. In forty minutes you turn them into markdown with real headings, intact tables
+    and an owner on every file, put a folder and a CLAUDE.md around them, and measure
+    what that was worth.
     <br><br>
-    <b>The question.</b> A converter that exits without an error has told you nothing
-    about what it dropped. Both of today&apos;s conversions succeed. Both lose facts
-    that are written down nowhere else in Helios. The work is finding out which, and
-    writing that down where the next reader will see it.
+    <b>The catch.</b> Both conversions succeed, and both drop facts that are written
+    down nowhere else. Step 2 is one command that proves it in thirty seconds.
   </div>
 
-  <h2>The shape of the hour</h2>
+  <h2>The shape of the session</h2>
   <table>
     <thead><tr><th>Step</th><th>What you do</th><th>Time</th></tr></thead>
     <tbody>
-      <tr><td>1</td><td>Convert both documents, and look at what came out</td><td>0-8</td></tr>
-      <tr><td>2</td><td>Repair the heading hierarchy, carry every table across</td><td>8-16</td></tr>
-      <tr><td>3</td><td><b>Find what the conversion lost, and decide what it costs</b></td><td>16-26</td></tr>
-      <tr><td>4</td><td>Choose the folder shape, then build it with front matter and indexes</td><td>26-34</td></tr>
-      <tr><td>5</td><td>A CLAUDE.md under one page</td><td>34-39</td></tr>
-      <tr><td>6</td><td>One question, answered twice, scored both ways</td><td>39-45</td></tr>
+      <tr><td>1</td><td>Convert both documents, and count what came out</td><td>0-8</td></tr>
+      <tr><td>2</td><td>One command showing what the conversion dropped</td><td>8-13</td></tr>
+      <tr><td>3</td><td>Repair the headings and the tables</td><td>13-22</td></tr>
+      <tr><td>4</td><td>Build the folder, and write the CLAUDE.md</td><td>22-32</td></tr>
+      <tr><td>5</td><td>One question, asked twice, scored both ways</td><td>32-40</td></tr>
     </tbody>
   </table>
-  <p>
-    Step 3 is the one that matters. Steps 1 and 2 are mechanical - they are prompts,
-    and they take eight minutes each because you are reading the result, not typing it.
-    Step 3 is ten minutes of your own judgement, and nothing in it can be handed to a
-    model.
-  </p>
 
   <div class="card">
-    <b>Three prompt patterns, and every prompt in this book is labelled with one.</b>
-    Look at the grey bar above each copy block.
+    <b>Three prompt patterns, and every prompt below is labelled with one</b> in the grey
+    bar above its copy button.
     <ul>
-      <li><b>analysis</b> - read something and tell me what is in it. The output is a
-        finding. It can be wrong in a way that looks right, so it always has to name
-        its evidence.</li>
-      <li><b>coding</b> - transform files. The output is a diff. Success is checkable
-        by running something afterwards, which is why a coding prompt in this book is
-        always followed by a command.</li>
-      <li><b>validation</b> - check a claim somebody has already made. The output is a
-        pass or a fail. It never writes the thing it is checking.</li>
+      <li><b>analysis</b> reads something and reports. The output is a finding, so it
+        always has to name its evidence.</li>
+      <li><b>coding</b> transforms files. The output is a diff, so it is always followed
+        by a command that checks it.</li>
+      <li><b>validation</b> checks a claim somebody has already made. The output is a
+        score or a verdict, and it never writes the thing it is checking.</li>
     </ul>
-    Mixing them is the usual way a prompt goes wrong: a prompt that converts a file
-    <i>and</i> tells you the conversion went well has marked its own homework.
+    Labelling costs no time at all. It is worth doing because a prompt that converts a
+    file <i>and</i> tells you the conversion went well has marked its own homework.
   </div>
 
   <div class="step">
     <span class="step__n">0</span><span class="step__t">Set up</span>
     <span class="step__time">before the clock starts</span>
   </div>
-  <p><b>Why.</b> This week needs two converters the other weeks never used, and a check now is cheaper than a confusing error in six minutes.</p>
+  <p><b>Why.</b> Today needs two converters the other weeks never used, and a check now is cheaper than a confusing error in six minutes.</p>
 
   <p><b>a.</b> Check your tools. In a plain PowerShell window:</p>
   <div class="snippet">
@@ -189,38 +177,16 @@ python -c "import importlib.util as u, shutil; print(shutil.which('pandoc') or '
 Python 3.11.9
 C:\Users\you\AppData\Local\Pandoc\pandoc.EXE
 markitdown can read PDF</code></pre></div>
-    Claude Code must be <b>2.1.211 or higher</b> and Python 3.11 or higher. The pandoc
+    Claude Code must be <b>2.1.211 or higher</b> and Python 3.11 or higher. Your pandoc
     path will not match this one; what matters is that it is a path rather than
     <code>MISSING</code>.
     <br><br>
-    <b>The last line is the one worth understanding.</b> It does not ask whether
-    markitdown is installed - it asks whether markitdown can read a PDF, which is a
-    different question. markitdown keeps its format support in optional extras, and
-    <code>pip install markitdown</code> installs the tool without any of them. Reading a
-    PDF needs <code>markitdown[pdf]</code>, which brings <code>pdfminer.six</code> and
-    <code>pdfplumber</code> with it. The check imports all three by name for that reason;
-    a version check on markitdown alone would pass on a machine where step 1a cannot run.
+    The last line asks whether markitdown can read a PDF, not whether it is installed.
+    Those are different questions: markitdown keeps its format support in optional
+    extras, so the check imports all three pieces by name. If either the path or the
+    sentence comes back wrong, the first two rows of the table at the end of this book
+    have the one command that fixes it.
   </div>
-  <details>
-    <summary>Only if that last line said MISSING</summary>
-    <p>
-      One command, once per machine, and it needs the internet. Then run step 0a again
-      and expect <code>markitdown can read PDF</code>:
-    </p>
-    <div class="snippet">
-      <div class="snippet__bar"><span class="snippet__lang">powershell - only if the check said MISSING</span>
-        <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
-python -m pip install "markitdown[pdf]"
-python -c "import importlib.util as u; print('markitdown can read PDF' if all(u.find_spec(m) for m in ('markitdown','pdfminer','pdfplumber')) else 'still MISSING')"</code></pre>
-    </div>
-    <p>
-      If <code>pandoc</code> said <code>MISSING</code> instead, open a new terminal first -
-      an installer only adds itself to the PATH of windows opened afterwards. If it is
-      genuinely absent, re-run <code>setup/Setup-HeliosWorkstation.ps1</code>, which
-      installs pandoc through winget.
-    </p>
-  </details>
 
   <p><b>b.</b> Pull in this week&apos;s files and make your folders. Safe to run twice:</p>
   <div class="snippet">
@@ -236,27 +202,26 @@ dir docs\specs\ordercore-techspec.pdf
 dir templates\frontmatter-schema.md</code></pre>
   </div>
   <div class="expect">
-    <b>Expected.</b> A merge summary, then three small listings, one per
-    <code>dir</code>. PowerShell heads each with the folder and a Mode, LastWriteTime,
-    Length and Name table; the three names are the part that matters, and the dates and
-    sizes are yours:
+    <b>Expected.</b> A merge summary, then the three names below. PowerShell heads each
+    listing with its folder and a Mode, LastWriteTime, Length and Name table, and it puts
+    files from the same folder under one heading, so three <code>dir</code> lines arrive
+    as two tables. The names are the part that matters; the dates and sizes are yours:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - names only, sizes and dates vary</span></div>
 <pre><code>ordercore-fsd.docx
 ordercore-techspec.pdf
 frontmatter-schema.md</code></pre></div>
-    <code>ordercore-techspec.pdf</code> is the file to watch. It is new this week, so
-    <code>cannot find path</code> on it means the merge brought nothing. Read the git
-    message above the error, and tell your facilitator - the week&apos;s files may not
-    have been published yet.
+    <code>cannot find path</code> on any of the three means the merge brought nothing.
+    Read the git message above the error, and tell your facilitator - the week&apos;s
+    files may not have been published yet.
     <br><br>
-    <b>One <code>dir</code> per line, on purpose.</b> <code>dir a b c</code> is not
-    valid PowerShell: the second path is taken as a filter and the third has nowhere to
-    go, so you get either a wrong answer or
+    <b>One <code>dir</code> per line, on purpose.</b> <code>dir a b c</code> is not valid
+    PowerShell: the second path is taken as a filter and the third has nowhere to go, so
+    you get either a wrong answer or
     <code>A positional parameter cannot be found</code>. Every listing in this book is
     one path at a time for that reason.
   </div>
 
-  <p><b>c.</b> Start Claude Code. VS Code is already open; this is the only thing you need to launch:</p>
+  <p><b>c.</b> Start Claude Code. This is the only thing you need to launch:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
@@ -264,682 +229,423 @@ frontmatter-schema.md</code></pre></div>
 claude</code></pre>
   </div>
   <div class="watch">
-    <b>You now need two windows.</b> This one is Claude Code. Open a second terminal
-    inside VS Code with <code>Ctrl+Shift+`</code> for every <b>powershell</b> block
-    below. Each block sets its own folder, so it works in either window.
+    <b>You now need two windows.</b> The one you just typed <code>claude</code> in is
+    Claude Code, and every block labelled <b>prompt</b> below is pasted into it. Open a
+    second PowerShell window for every block labelled <b>powershell</b> - from the Start
+    menu, or inside VS Code with <code>Ctrl+Shift+`</code>. Each block sets its own
+    folder, so it does not matter which window you use as long as it is not the Claude
+    Code one.
   </div>
 
   <div class="step">
-    <span class="step__n">1</span><span class="step__t">Convert both, and look at what came out</span>
+    <span class="step__n">1</span><span class="step__t">Convert both documents</span>
     <span class="step__time">0-8 min</span>
   </div>
-  <p>
-    <b>Why.</b> Two file formats need two different converters, and neither of them
-    will tell you what it could not carry. Running them takes a minute. The seven
-    minutes after that are you reading the result.
-  </p>
+  <p><b>Why.</b> Word and PDF need two different converters, and neither of them tells you what it could not carry.</p>
 
-  <p><b>a.</b> The PDF first, with your own hands, so you see a conversion arrive unfiltered:</p>
+  <p><b>a.</b> One prompt runs both converters. It is a <b>coding</b> prompt: it transforms files and nothing else.</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">prompt - coding</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>Convert two specifications to markdown. Run both of these from the repository
+root, exactly as written:
+
+    pandoc docs/specs/ordercore-fsd.docx -t gfm -o week4/raw/fsd.md
+    python -m markitdown docs/specs/ordercore-techspec.pdf -o week4/raw/techspec.md
+
+Then write week4/conversion-log.md: the two commands, which converter read
+which format, and the exit code each returned.
+
+Convert nothing else, and change nothing inside either output file - they are
+the raw conversions and a later step measures them. Reply with one line: the
+two exit codes.</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Two commands run, a short log written, and one line back:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
+<pre><code>pandoc 0, markitdown 0</code></pre></div>
+    Both converters are silent when they succeed, so the exit codes are all you get. Say
+    <b>Yes</b> to the two commands and to the log; there is nothing else for this prompt
+    to touch.
+  </div>
+
+  <p><b>b.</b> Now measure what arrived, rather than trusting that it arrived:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
-if (-not (Test-Path week4\raw\techspec.md)) { python -m markitdown docs\specs\ordercore-techspec.pdf -o week4\raw\techspec.md }
-dir week4\raw\techspec.md
-type week4\raw\techspec.md</code></pre>
+dir week4\raw
+python -c "import re,pathlib; [print(p.name, len(re.findall('(?m)^#', t)), 'headings,', len(re.findall('(?m)^[|][-| :]+[|]', t)), 'table separators') for p in sorted(pathlib.Path('week4/raw').glob('*.md')) for t in [p.read_text(encoding='utf-8')]]"</code></pre>
   </div>
   <div class="expect">
-    <b>Expected.</b> Nothing from the conversion itself - markitdown is silent when it
-    succeeds - then a listing, then about seventy-five lines of markdown. This is the
-    part to read, the field mapping table from section 2.1:
-    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - week4/raw/techspec.md, section 2.1 exactly as it arrives</span></div>
-<pre><code>2.1 Field mapping
-| OrderCore | Billing | Type   | Notes                 |
-| --------- | ------- | ------ | --------------------- |
-| order_id  | orderId | string | Echoed back unchanged |
-unit_price_pence unitPricePence integer Whole pence, never a decimal
-discount_percent discountPercent integer 0 to 50 inclusive, added HEL-207
-| subtotal_pence | subtotalPence | integer | Derived, not stored |
-| -------------- | ------------- | ------- | ------------------- |
-tax_pence taxPence integer 20 percent, calculated once on the order
-total_pence totalPence integer subtotal minus discount, plus tax</code></pre></div>
-    <b>Look at what that is.</b> One table has become a header, a separator, one real
-    row, two rows of plain prose, a second real row, another separator where no
-    separator belongs, and two more rows of prose. Every word survived. The structure
-    did not, and the structure was the only thing that made it a table.
+    <b>Expected.</b> A listing of the two conversions, then two measured lines:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - the two counts are exact on every machine</span></div>
+<pre><code>fsd.md 0 headings, 6 table separators
+techspec.md 0 headings, 9 table separators</code></pre></div>
+    <b>Zero headings in both is the finding, not a failure.</b> Both conversions
+    succeeded. Neither produced a single markdown heading, because in the Word file the
+    headings were styled by hand and in the PDF they are text that happens to be bigger
+    than the text around it. What made those documents navigable was a visual
+    convention, and visual conventions do not convert.
     <br><br>
-    The column padding is markitdown&apos;s and may shift with its version. The shape -
-    real rows, prose rows, and a separator row where no separator belongs - is what you
-    are looking for, and it is the same on every machine.
-    <br><br>
-    <b>The file is written only if it is not already there.</b> Run the block twice and
-    the second run changes nothing, which is what the <code>Test-Path</code> guard is
-    for. Delete the file if you want the conversion again.
+    <b>Six is right and nine is wrong.</b> The functional specification has six tables
+    and all six came through. The technical specification has four, so nine separator
+    rows means the converter started a fresh table every time a row wrapped onto two
+    lines in the PDF. Step 3 puts those back; carry both numbers until then.
   </div>
-
-  <p><b>b.</b> Now the Word file. This one is a prompt, because it is mechanical work with a command in the middle of it:</p>
-  <div class="snippet">
-    <div class="snippet__bar"><span class="snippet__lang">prompt - coding</span>
-      <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>Convert the Word functional specification, and record what the conversion did.
-
-Run this, from the repository root:
-
-    pandoc docs/specs/ordercore-fsd.docx -t gfm -o week4/raw/fsd.md
-
-Then write week4/raw/conversion-log.md:
-- The two commands that produced week4/raw/fsd.md and week4/raw/techspec.md.
-  For the pandoc one, the exit code you saw. For the markitdown one, write
-  "run in the terminal in step 1a; printed nothing, which is how markitdown
-  reports success" - you did not run it, so do not record an exit code for it.
-- For each of those two files: how many markdown headings it contains (lines
-  beginning with a hash), and how many table separator rows (lines beginning
-  with a pipe and containing only dashes, spaces, colons and pipes).
-- One line saying which converter reads Word on this workstation and which
-  reads PDF, and what happens if you use the other one.
-
-Convert nothing else and edit nothing else. Reply with one line: the heading
-count in each of the two files.</code></pre>
-  </div>
-  <div class="expect">
-    <b>Expected.</b> Claude runs the command, writes the log, and answers:
-    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
-<pre><code>fsd.md 0 headings, techspec.md 0 headings</code></pre></div>
-    <b>Zero and zero is the finding, not a failure.</b> Both conversions succeeded.
-    Neither produced a single markdown heading, because the Word file styles its
-    headings by hand instead of using heading styles, and a PDF has no headings at all -
-    only text that happens to be larger than the text around it. Everything that made
-    those documents navigable was a visual convention, and visual conventions do not
-    convert.
-    <br><br>
-    The separator counts in the log are <b>6</b> for <code>fsd.md</code> and <b>9</b>
-    for <code>techspec.md</code>. Six is right: the functional specification has six
-    tables and pandoc carried all six. Nine is wrong, because the technical
-    specification has four - and you have just seen why a broken table grows extra
-    separator rows. Keep both numbers; step 2 checks them again.
-  </div>
-  <div class="watch">
-    <b>Do not point markitdown at the .docx.</b> It recognises the file and then stops
-    with <code>MissingDependencyException</code>, because the Week 1 setup installs
-    markitdown without its optional Word support. Pandoc reads Word and cannot read
-    PDF; markitdown reads PDF and, here, cannot read Word. That is the whole of the
-    tool choice, and it is worth a line in the conversion log so the next person does
-    not spend ten minutes on it.
-  </div>
-  <details>
-    <summary>Rather run the pandoc command yourself?</summary>
-    <p>
-      Nothing is lost either way - it is the same command, and part b hands it to
-      Claude only because the log has to be written in the same turn. If you would
-      rather watch it run:
-    </p>
-    <div class="snippet">
-      <div class="snippet__bar"><span class="snippet__lang">powershell - alternative to the prompt in part b</span>
-        <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
-pandoc docs\specs\ordercore-fsd.docx -t gfm -o week4\raw\fsd.md
-dir week4\raw\fsd.md</code></pre>
-    </div>
-    <p>
-      Pandoc is silent on success. Send the part b prompt afterwards anyway, so the log
-      exists - step 6 scores what is written down, not what you remember doing.
-    </p>
-  </details>
 
   <div class="step">
-    <span class="step__n">2</span><span class="step__t">Repair the heading hierarchy</span>
-    <span class="step__time">8-16 min</span>
+    <span class="step__n">2</span><span class="step__t">What the conversion dropped</span>
+    <span class="step__time">8-13 min</span>
   </div>
-  <p>
-    <b>Why.</b> A heading is the only thing a retrieval tool can aim at. Without one, a
-    question about tax has to be answered by reading five thousand words, which is what
-    you are paying to avoid.
-  </p>
+  <p><b>Why.</b> A converter that exits zero has told you that it finished, and nothing at all about what it could not carry.</p>
 
-  <p><b>a.</b> One prompt does both files. Read what it is forbidden to do:</p>
+  <p><b>a.</b> Five facts, one command. Each of the five lives in a diagram in the PDF:</p>
+  <div class="snippet">
+    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
+      <button class="snippet__copy" type="button">Copy</button></div>
+<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
+python -c "import pathlib; t=pathlib.Path('week4/raw/techspec.md').read_text(encoding='utf-8').lower(); [print(('present' if w in t else 'ABSENT '), w) for w in ['8080','no retry','404','820','p50']]"</code></pre>
+  </div>
+  <div class="expect">
+    <b>Expected.</b> Five lines, all the same:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - exact, on every machine</span></div>
+<pre><code>ABSENT  8080
+ABSENT  no retry
+ABSENT  404
+ABSENT  820
+ABSENT  p50</code></pre></div>
+    Those five strings are the port the service listens on, the rule about retrying a
+    failed call, the status code for an order that does not exist, a measured response
+    time, and the label on every median in the performance chart. The conversion carried
+    every word of prose in that document and not one of these, because each of them was
+    drawn rather than written.
+    <br><br>
+    One of the five is worth a sentence on its own: a chart held a measurement, and the
+    measurement is gone. The prose still says a limit is being breached; the number that
+    proved it does not survive, so nothing in the converted document connects the claim
+    to its evidence.
+    <br><br>
+    <b>Thirty seconds, and it is repeatable.</b> That matters more than it sounds: the
+    same command run after the next conversion tells you whether the same five facts are
+    still missing, which a paragraph written about this conversion never could. A
+    <code>present</code> on any line means the file came from something other than the
+    conversion in step 1; delete it and send the step 1a prompt again.
+  </div>
+
+  <div class="step">
+    <span class="step__n">3</span><span class="step__t">Repair the headings and the tables</span>
+    <span class="step__time">13-22 min</span>
+  </div>
+  <p><b>Why.</b> A heading is the only thing a retrieval tool can aim at, and a broken table is worse than a missing one because it still looks converted.</p>
+
+  <p><b>a.</b> One <b>coding</b> prompt does both files. Read its last paragraph before you send it:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">prompt - coding</span>
       <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>Read week4/raw/fsd.md and week4/raw/techspec.md and rewrite them as structured
-markdown.
+<pre><code>Rewrite week4/raw/fsd.md as week4/repo/specs/ordercore-fsd.md and
+week4/raw/techspec.md as week4/repo/specs/ordercore-techspec.md.
 
-Write week4/repo/specs/ordercore-fsd.md and
-week4/repo/specs/ordercore-techspec.md.
+Headings. Give every section the level its own numbering implies. The document
+title is level 1. A whole-number section, and an appendix, is level 2. A
+two-part number like 1.1 is level 3, and a three-part number like 4.1.1 is
+level 4. The numbering is written inconsistently in the originals: make the
+heading text consistent, and change no section number.
 
-- Give every section the heading level its own numbering implies. The document
-  title is level 1. "1. Introduction", "2 Background", "SECTION 3 - SYSTEM
-  CONTEXT", "Appendix A" and "Appendix B" are all level 2. "1.1", "5.2" and
-  "7.5" are level 3, and a three-part number like "4.1.1" is level 4. The
-  numbering style is inconsistent in the original: make the style consistent in
-  the heading text, and change no section number.
-- Carry every table across exactly as it is. Do NOT repair the broken ones in
-  techspec.md today. Leave them wrong, so the next step can count them.
-- Change no wording anywhere outside a heading line. Do not summarise, do not
-  reorder, and do not drop the figure captions.
+Tables. week4/raw/fsd.md has six tables and they all arrived intact, so carry
+them across untouched. week4/raw/techspec.md has four tables and the PDF
+conversion broke all four: some rows came through as markdown rows and some as
+plain prose directly above or below them, and some tables were cut in half by
+a second separator row. Rebuild each of the four as one header row, one
+separator row, and every data row as a markdown row, in the order they already
+appear. Where a row wrapped onto two lines, join it.
 
-You are moving furniture, not writing. Reply with one line: the number of
-level-2 headings in each file.</code></pre>
+Take every word from those two files. Do not open the .docx or the .pdf, and
+do not add a row, a column or a cell that is not already in the text. One
+table in the technical specification exists only as an image, so its contents
+are not in the file at all: leave a line saying so where it belongs, and
+reconstruct nothing.
+
+Change no wording outside a heading line. Reply with one line: how many data
+rows each of the four repaired tables ended up with.</code></pre>
   </div>
   <div class="expect">
-    <b>Expected.</b> Two files written, then one line:
-    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - one either way on the first number is fine</span></div>
-<pre><code>ordercore-fsd.md 16, ordercore-techspec.md 7</code></pre></div>
-    Seven is exact: the technical specification has sections 1 to 7. Sixteen depends on
-    whether &quot;Document control&quot; was counted as a section alongside 1 to 13 and
-    the two appendices, so fifteen or sixteen are both right. Twenty means subsections
-    were promoted, and the file is now flat.
+    <b>Expected.</b> Two files written, and four counts:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
+<pre><code>6, 5, 3, 5</code></pre></div>
+    Six field mappings, five configuration settings, three test suites, five known gaps:
+    nineteen rows. A higher count is an invented row, and the usual invention is a sixth
+    known gap. Ask Claude to quote the line each row came from and the invented one will
+    have no quotation.
+    <br><br>
+    <b>The table that does not come back is the point of the last paragraph.</b> One
+    table in that document was pasted in as a picture, so no converter and no prompt can
+    recover it - the words were never in the file. An answer that quietly produces a
+    plausible table in its place is the worst outcome of this step, because it is exactly
+    as convincing as the four real ones.
   </div>
 
-  <p><b>b.</b> Check it rather than believe it. The same measurement as the conversion log, run by you:</p>
+  <p><b>b.</b> Count what came out. The separator numbers are the ones to read:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
 dir week4\repo\specs
-python -c "import re,pathlib; [print(p.name, len(re.findall('(?m)^## ', t)), 'level-2', len(re.findall('(?m)^[|][-| :]+[|]', t)), 'separator rows') for p in sorted(pathlib.Path('week4/repo/specs').glob('*.md')) for t in [p.read_text(encoding='utf-8')]]"</code></pre>
+python -c "import re,pathlib; [print(p.name, len(re.findall('(?m)^## ', t)), 'level-2,', len(re.findall('(?m)^[|][-| :]+[|]', t)), 'separators,', len(re.findall('(?m)^[|]', t)) - 2*len(re.findall('(?m)^[|][-| :]+[|]', t)), 'data rows') for p in sorted(pathlib.Path('week4/repo/specs').glob('*.md')) for t in [p.read_text(encoding='utf-8')]]"</code></pre>
   </div>
   <div class="expect">
     <b>Expected.</b> A listing of two files, then two measured lines:
-    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - the first number may read 15</span></div>
-<pre><code>ordercore-fsd.md 16 level-2 6 separator rows
-ordercore-techspec.md 7 level-2 9 separator rows</code></pre></div>
-    <b>The separator counts must not have moved.</b> Six and nine are the numbers the
-    conversion log recorded before any rewriting. If <code>ordercore-fsd.md</code> now
-    reads five, a table was dropped. If <code>ordercore-techspec.md</code> reads four,
-    the broken tables were quietly repaired - which is this week&apos;s hands-on and not
-    this step; send part a again with the &quot;leave them wrong&quot; sentence
-    emphasised.
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - the level-2 count on the first line may read 15</span></div>
+<pre><code>ordercore-fsd.md 16 level-2, 6 separators, 37 data rows
+ordercore-techspec.md 7 level-2, 4 separators, 19 data rows</code></pre></div>
+    <b>Read the second line first.</b> Four separators where step 1 counted nine, and
+    nineteen data rows: the four tables are whole again. Five separators means one is
+    still cut in half. Twenty or more data rows means a prose line that was never part of
+    a table got promoted into one.
     <br><br>
-    <b>Nine separator rows for four tables</b> is the number to carry into step 3. A
-    table that arrives in pieces is worse than a table that arrives as prose, because
-    it looks converted.
-  </div>
-  <div class="watch">
-    <b>This step wrote no front matter and no index.</b> That is deliberate. Structure
-    first, ownership in step 4 - a document nobody has read yet is not one you can
-    honestly put a review date on.
+    On the first line, <b>six separators and thirty-seven data rows must not have
+    moved</b> - those are the same six tables, carried across untouched. The level-2 count
+    reads 15 or 16 depending on whether the document control block at the front was
+    treated as a section, and both are right. Twenty means subsections were promoted and
+    the file is now flat.
   </div>
 
   <div class="step">
-    <span class="step__n">3</span><span class="step__t">What the conversion lost</span>
-    <span class="step__time">16-26 min</span>
+    <span class="step__n">4</span><span class="step__t">Build the folder, write the CLAUDE.md</span>
+    <span class="step__time">22-32 min</span>
   </div>
-  <p>
-    <b>Why.</b> Both conversions exited cleanly and both dropped facts written down
-    nowhere else in Helios. If you do not record what is missing, the repository
-    becomes confidently incomplete, which is worse than the Word file was.
-  </p>
+  <p><b>Why.</b> Retrieval is a folder problem before it is a model problem, and an unowned document does not go stale so much as quietly become wrong.</p>
 
-  <p><b>a.</b> Ask only what the converted text can support. The first paragraph is the whole of the method:</p>
-  <div class="snippet">
-    <div class="snippet__bar"><span class="snippet__lang">prompt - analysis</span>
-      <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>Work only from week4/raw/fsd.md and week4/raw/techspec.md. Do not open the
-.docx or the .pdf. Do not use anything you know about OrderCore from the code
-or from anywhere else in this repository. You are standing in for a retrieval
-tool that has nothing but this markdown.
-
-Write week4/repo/gaps.md.
-
-- A table, one row per figure caption in either file. Columns: Figure |
-  Document | What the caption or the text around it says the figure holds | Is
-  that fact anywhere in the converted text | Verdict.
-- Column four is a quotation or it is "not in the text". Where it is a
-  quotation, give the sentence. Where it is not, say which words you searched
-  for.
-- Put VERDICT-TO-DECIDE in every row of the Verdict column. That column is
-  mine.
-- Then a section "## What a reader cannot do": one line per question about
-  OrderCore that these two files can no longer answer, each naming the figure
-  the answer went into.
-
-Supply no fact from memory. If a caption says something is recorded nowhere
-else, that is a gap to report and not a hole to fill. Reply with one line: how
-many captions you found, and how many of them hold a fact that is not in the
-text.</code></pre>
-  </div>
-  <div class="expect">
-    <b>Expected.</b> A register written, and a count:
-    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - the second number is the one that matters</span></div>
-<pre><code>8 captions, 5 hold a fact that is not in the text</code></pre></div>
-    Eight is exact: four figures in each document. <b>Five</b> is the interesting
-    number, and four or six is defensible - the argument is over the three Shop screens
-    in the functional specification, whose content the text does describe elsewhere. The
-    five that are not arguable:
-    <table>
-      <thead><tr><th>Figure</th><th>What went with it</th></tr></thead>
-      <tbody>
-        <tr><td>Technical spec, Figure 1</td><td>The port each service listens on. Nothing in either converted file names a port except the Billing base URL in the configuration table</td></tr>
-        <tr><td>Technical spec, Figure 2</td><td>Whether a failed Billing call is retried, and how many times</td></tr>
-        <tr><td>Technical spec, Figure 3</td><td>What each error condition <i>logs</i>, and the table that put condition, status, body and log level in one place. The functional specification does give the status codes in prose in 8.2, so it is the log levels and the single view that are gone</td></tr>
-        <tr><td>Technical spec, Figure 4</td><td>Ten measured response times, including the one the document&apos;s own gap register calls a breach</td></tr>
-        <tr><td>Functional spec, Appendix B</td><td>The 2026 bank holiday dates the delivery window calculation depends on</td></tr>
-      </tbody>
-    </table>
-    <b>Be precise about rows one and three, because a grep will be.</b> Those two figures
-    illustrate things the <i>other</i> document does describe: the fallback rule is in
-    functional spec 3.2, 6.2 and NFR-4, and the error status codes are in 8.2. A gap
-    register that claims more than that is wrong, and it is wrong in the direction that
-    costs you credibility. What is genuinely nowhere is the log level for each condition,
-    the ports, the retry count, the ten measurements and the bank holiday dates.
-    <br><br>
-    The functional specification is the more honest of the two: its own open item
-    <b>OI-3</b> says the bank holidays are an image and need to become data. The
-    technical specification says nothing of the kind. Its captions claim the opposite -
-    that these facts are recorded there <i>and nowhere else</i> - which turns out to be
-    very nearly true.
-    <br><br>
-    <b>Very nearly, and the exception is worth ten seconds.</b> Figure 1&apos;s caption
-    claims the ports, the Billing timeout <i>and</i> the fallback rule are recorded
-    there and nowhere else - but section 5 of the same document lists the Billing
-    timeout as 2000 ms in its configuration table, and gap TG-4 in section 7 says
-    runtime orders are lost on restart. A caption is a claim like any other. If your
-    register repeated that claim without checking it, correct the row: it is the ports
-    and the fallback rule that are gone, not the timeout.
-  </div>
-
-  <p><b>b.</b> Do not take that on trust either. Six seconds, and it is the proof the whole lab rests on:</p>
-  <div class="snippet">
-    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
-      <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
-python -c "import pathlib; t=pathlib.Path('week4/raw/techspec.md').read_text(encoding='utf-8').lower(); [print(('present' if w in t else 'ABSENT '), w) for w in ['no retry','8080','404','820','p50']]"</code></pre>
-  </div>
-  <div class="expect">
-    <b>Expected.</b> Five lines, all the same:
-    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - exact, on every machine</span></div>
-<pre><code>ABSENT  no retry
-ABSENT  8080
-ABSENT  404
-ABSENT  820
-ABSENT  p50</code></pre></div>
-    Those five strings are the retry rule, the port OrderCore listens on, the status
-    code for a missing order, the measured p95 that breaches a requirement, and the
-    label on every median in the performance figure. Not one of them survives into the
-    converted text. <b>The word &quot;fallback&quot; does survive</b>, twice - once in a
-    caption describing a picture you cannot see, and once inside the broken testing
-    table, where it is the tail of a row that arrived as prose. Neither hit is the rule.
-    That is the most dangerous of the three outcomes, because a search returns something.
-    <br><br>
-    A <code>present</code> on any line means your <code>week4\raw\techspec.md</code>
-    came from something other than markitdown on this PDF. Delete it and run step 1a
-    again.
-  </div>
-
-  <p><b>c.</b> Now look at the four pictures yourself. It is the only way to see them, and it takes two minutes:</p>
-  <div class="snippet">
-    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
-      <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
-dir docs\specs\ordercore-techspec.pdf
-Start-Process docs\specs\ordercore-techspec.pdf
-dir week4\repo\gaps.md
-code week4\repo\gaps.md</code></pre>
-  </div>
-  <div class="expect">
-    <b>Expected.</b> Two listings and a tab in VS Code, and in between them the PDF
-    opens in whatever this machine uses for PDFs, which on the standard build is Edge.
-    Opening the reader prints nothing:
-    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - names only, sizes and dates vary</span></div>
-<pre><code>ordercore-techspec.pdf
-gaps.md</code></pre></div>
-    Pages 1 to 4, one figure each. Read Figure 4 on page 4 against <b>NFR-2</b> in
-    section 10 of the functional specification, which you now have as markdown and can
-    search. The specification requires the invoice call to return within 800 ms. The
-    figure measures it at 820 ms at p95. That is gap <b>TG-3</b> in section 7 of the
-    technical specification, which says a breach exists and never says by how much.
-    <br><br>
-    <b>That is what an image-only fact costs.</b> The number that proves the breach is
-    in a picture; the claim that there is a breach is in text; and nothing in the
-    converted repository connects them. Nobody did anything wrong. The document was
-    written to be read by a person holding both files open.
-    <br><br>
-    If nothing opens, skip it - a PDF reader is not part of the workstation build, and
-    the figures are described well enough above to finish the step.
-  </div>
-
-  <div class="watch">
-    <b>Now the decision, and it is the only one in this lab.</b> The tab you just
-    opened is <code>week4\repo\gaps.md</code>. Replace every
-    <code>VERDICT-TO-DECIDE</code> with one word: <b>blocking</b> if a reader would
-    make a wrong decision without that fact, <b>recoverable</b> if somebody could go and
-    get it inside an hour, <b>cosmetic</b> if nothing depends on it. At least one must
-    be blocking, and you should be able to say in a sentence what would go wrong.
-    Most people make Figure 3 blocking, because a team that cannot read the error
-    contract writes a client that treats a fallback invoice as a failure.
-    <br><br>
-    Nobody can make that call for you, which is exactly why it is the part you type.
-    Everything else in this step was a prompt.
-  </div>
-  <!-- hand-edit: rewrite week4/repo/gaps.md VERDICT-TO-DECIDE blocking -->
-
-  <div class="step">
-    <span class="step__n">4</span><span class="step__t">The folder shape, then build it</span>
-    <span class="step__time">26-34 min</span>
-  </div>
-  <p>
-    <b>Why.</b> Retrieval is a folder problem before it is a model problem. A structure
-    chosen on purpose is the difference between pointing at one file and pasting a whole
-    specification into every request.
-  </p>
-
-  <p><b>a.</b> Two shapes, and you pick one. Thirty seconds, but make the choice rather than inherit it:</p>
-  <div class="snippet">
-    <div class="snippet__bar"><span class="snippet__lang">shape a - by document type</span></div>
-<pre><code>week4/repo/
-  index.md
-  CLAUDE.md
-  gaps.md
-  specs/      index.md, ordercore-fsd.md, ordercore-techspec.md
-  process/    not today - the narratives are already markdown
-  rubrics/    not today - the gates are already markdown</code></pre>
-  </div>
-  <div class="snippet">
-    <div class="snippet__bar"><span class="snippet__lang">shape b - by system</span></div>
-<pre><code>week4/repo/
-  index.md
-  CLAUDE.md
-  gaps.md
-  ordercore/  index.md, fsd.md, techspec.md, process.md
-  billing/    index.md
-  shop/       index.md</code></pre>
-  </div>
-  <p>
-    <b>Only the first three lines get built today</b>, and only <code>specs/</code> of the
-    folders - the process narratives and the rubrics are already markdown with front
-    matter, so they need converting no more than they need moving. They are in the
-    picture because a folder shape has to survive the documents you have not converted
-    yet, and that is the thing you are choosing between.
-    <br><br>
-    <b>Shape a</b> survives a reorganisation of the estate, and it puts every document
-    of a kind together, which is how documents are reviewed and how they go stale.
-    <b>Shape b</b> is the shape a question arrives in - somebody asks about OrderCore,
-    not about specifications - and it falls apart the moment a document covers two
-    systems, which both of today&apos;s do. This book uses shape a for that reason.
-    Choose shape b if you prefer; everything below names
-    <code>week4/repo/specs/</code>, so that is the one path you would change as you go.
-  </p>
-
-  <p><b>b.</b> Build it, and give the two specifications an owner:</p>
+  <p><b>a.</b> Front matter and index files, in one <b>coding</b> prompt:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">prompt - coding</span>
       <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>Build the repository around the two converted specifications. Work only inside
-week4.
+<pre><code>Work only inside week4/repo.
 
-Add a front matter block to the very top of week4/repo/specs/ordercore-fsd.md
-and week4/repo/specs/ordercore-techspec.md, in the exact shape and field order
-of templates/frontmatter-schema.md. Take owner, version, effective_date and
-review_date from the row for the original document in docs/governance-log.md.
-Do not invent a date. Add source: naming the original file it was converted
-from, and status: draft, because both originals are drafts.
+1. Put a front matter block at the very top of
+   week4/repo/specs/ordercore-fsd.md and
+   week4/repo/specs/ordercore-techspec.md, in the exact shape and field order
+   of templates/frontmatter-schema.md. Nothing goes above the block, not even
+   a heading. Take owner, version, effective_date and review_date from the row
+   for the original document in docs/governance-log.md, and invent no date.
+   Add source: naming the original file it was converted from, and status:
+   draft.
 
-Then write two index files.
+2. Write week4/repo/specs/index.md: one row per specification - file, what it
+   covers in one clause, owner, review date.
 
-week4/repo/specs/index.md - one row per specification: file, what it covers in
-one clause, owner, review date, and whether that review date is in the past
-today.
+3. Write week4/repo/index.md: one row per folder and per loose file directly
+   under week4/repo - what is in it, and which index to read next. Pointers
+   only, and no summaries of any document.
 
-week4/repo/index.md - one row per folder and per loose file in the repository:
-what is in it, and which index to read next. Pointers only. No contents, no
-summaries of documents, nothing that has to be rewritten when a document
-changes.
+4. Give both index files front matter of their own, same schema. They were
+   written today, so there is no row to copy: owner is Architect, version 1.0,
+   effective_date is today, and review_date is six months after today.
 
-week4/repo/gaps.md already exists and has my verdicts in it. Give it a row in
-the root index, and leave the file itself exactly as it is.
-
-Reply with one line: the two review dates, and whether each is in the past.</code></pre>
+Do not edit docs/governance-log.md, and do not edit anything under docs/specs.
+Reply with one line: the two review dates you copied, and whether each one is
+in the past.</code></pre>
   </div>
   <div class="expect">
-    <b>Expected.</b> Two files given front matter, two indexes written, and one line:
+    <b>Expected.</b> Two files given front matter, two indexes written, one line back:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output</span></div>
 <pre><code>2026-07-12 past, 2026-09-03 past</code></pre></div>
-    Both dates come from <code>docs/governance-log.md</code> and both are behind us.
-    That is not an accident in the data: the two documents that describe the service
-    are the two nobody has reviewed. <b>If Claude wrote today&apos;s date, or a date six
-    months out, it invented them</b> - the prompt says where they come from and the two
-    rows are four lines long. Send it again.
+    Both dates are behind us, and that is the data telling the truth: the two documents
+    that describe the service are the two nobody has re-read. If Claude produced
+    today&apos;s date, or a date six months out, for either specification, it invented
+    them - the prompt says where they come from and the two rows are four lines long.
+    Send it again.
   </div>
 
-  <p><b>c.</b> Look at what you built:</p>
-  <div class="snippet">
-    <div class="snippet__bar"><span class="snippet__lang">powershell</span>
-      <button class="snippet__copy" type="button">Copy</button></div>
-<pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
-dir week4\repo
-type week4\repo\index.md
-python -c "import pathlib; [print(p.as_posix(), repr(p.read_text(encoding='utf-8')[:3])) for p in sorted(pathlib.Path('week4/repo/specs').glob('*.md'))]"</code></pre>
-  </div>
-  <div class="expect">
-    <b>Expected.</b> A listing, the root index, then lines proving the front matter is
-    the <i>first</i> thing in each file:
-    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - the index wording is yours, the three characters are not</span></div>
-<pre><code>week4/repo/specs/index.md '---'
-week4/repo/specs/ordercore-fsd.md '---'
-week4/repo/specs/ordercore-techspec.md '---'</code></pre></div>
-    Anything other than <code>'---'</code> on the two specification lines means the
-    block is not at the top - usually a title was left above it - and the schema is
-    explicit that nothing goes above it, not even a heading. A tool that reads front
-    matter reads the first three characters and stops.
-    <br><br>
-    <code>index.md</code> shows <code>'---'</code> only if Claude gave it front matter
-    of its own. Either is fine today; the hands-on requires it of every file.
-  </div>
-
-  <div class="step">
-    <span class="step__n">5</span><span class="step__t">A CLAUDE.md under one page</span>
-    <span class="step__time">34-39 min</span>
-  </div>
-  <p>
-    <b>Why.</b> This file is re-read on every single request in the repository, so
-    every word in it is paid for every time. It is the one document where length is a
-    running cost rather than a one-off.
-  </p>
-
-  <p><b>a.</b> Write it from the template, not from imagination:</p>
+  <p><b>b.</b> Now the file that is re-read on every single request. It is a <b>coding</b> prompt with a hard ceiling in it:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">prompt - coding</span>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>Read templates/claude-md-template.md and write week4/repo/CLAUDE.md for the
-repository in week4/repo.
+repository in week4/repo. Use the five headings the template gives and no
+others.
 
-Use the five headings the template gives and no others. Replace the guidance
-under each with the real thing:
-
-- What is here: the two converted specifications and the gap register. Two or
+- What is here: the two converted specifications and the two indexes. Two or
   three lines.
 - Standards: the rules that would otherwise be repeated in every request about
   these documents. Front matter is mandatory and is the first thing in the
-  file. Dates are ISO. Money is whole pence. A converted document keeps a
-  source field naming its original. Five or six lines at most.
-- Where to look: point at week4/repo/index.md, week4/repo/specs/index.md and
-  week4/repo/gaps.md, and say what each one answers. Point, do not summarise.
-- Do not: the raw conversions under week4/raw are working files and are not
-  the repository; the originals under docs/specs are never edited; the content
-  of a figure is not in this markdown and must not be reconstructed from
-  memory.
+  file. Dates are ISO. A converted document keeps a source field naming its
+  original. Money is a whole number of pence. Five or six lines at most.
+- Where to look: point at week4/repo/index.md and week4/repo/specs/index.md,
+  and say what each one answers. Point, do not summarise.
+- Do not: week4/raw holds the raw conversions and is not the repository; the
+  originals under docs/specs are never edited; a fact that was only ever in a
+  diagram is not in this markdown and must not be filled in from memory.
 - Ownership: one line, by role.
 
-Under 400 words, which is one page. Nothing that a reader could get by opening
+Under 400 words, which is about a page. Nothing a reader could get by opening
 the directory. Reply with one line: the word count.</code></pre>
   </div>
   <div class="expect">
     <b>Expected.</b> A short file, and a number under 400:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - yours will differ</span></div>
-<pre><code>212 words</code></pre></div>
-    Anything between about 150 and 400 is a reasonable answer. Under 100 means a
-    heading was left empty. Over 400 means a document got summarised inside the index
-    instead of pointed at, which is the failure the template warns about.
+<pre><code>214 words</code></pre></div>
+    Anything between about 150 and 400 is a reasonable answer. Under 100 means a heading
+    was left empty. Over 400 means a document got summarised inside the file instead of
+    pointed at, which is the one mistake this file cannot afford: every word in it is
+    paid for on every request, so its length is a running cost rather than a one-off.
   </div>
 
-  <p><b>b.</b> Count it yourself, and then read it:</p>
+  <p><b>c.</b> Check all of it in one go:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">powershell</span>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
-dir week4\repo\CLAUDE.md
-python -c "import pathlib; t=pathlib.Path('week4/repo/CLAUDE.md').read_text(encoding='utf-8'); print(len(t.split()), 'words'); [print(('yes' if h in t else 'NO '), h) for h in ['## What is here','## Standards','## Where to look','## Do not','## Ownership']]"
-code week4\repo\CLAUDE.md</code></pre>
+dir week4\repo
+python -c "import datetime,pathlib; g=lambda t,f: next((l.split(':',1)[1].strip() for l in t.splitlines() if l.startswith(f)), 'MISSING'); today=datetime.date.today().isoformat(); [print(t[:3], g(t,'owner'), g(t,'review_date'), 'past' if g(t,'review_date') &lt; today else 'current', p.as_posix()) for p in sorted(pathlib.Path('week4/repo').rglob('*.md'), key=lambda q: q.as_posix()) if p.name != 'CLAUDE.md' for t in [p.read_text(encoding='utf-8')]]"
+python -c "import pathlib; t=pathlib.Path('week4/repo/CLAUDE.md').read_text(encoding='utf-8'); print(len(t.split()), 'words'); [print(('yes' if h in t else 'NO '), h) for h in ['## What is here','## Standards','## Where to look','## Do not','## Ownership']]"</code></pre>
   </div>
   <div class="expect">
-    <b>Expected.</b> A listing, a word count, five headings present, and the file open
-    in a tab:
-    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - the count is yours, the five answers are not</span></div>
-<pre><code>212 words
+    <b>Expected.</b> A listing, four front matter lines, then a word count and five
+    headings:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - the two 2027 dates are six months from the day you run this</span></div>
+<pre><code>--- Architect 2027-03-18 current week4/repo/index.md
+--- Architect 2027-03-18 current week4/repo/specs/index.md
+--- Product Manager 2026-07-12 past week4/repo/specs/ordercore-fsd.md
+--- Architect 2026-09-03 past week4/repo/specs/ordercore-techspec.md
+214 words
 yes ## What is here
 yes ## Standards
 yes ## Where to look
 yes ## Do not
 yes ## Ownership</code></pre></div>
-    A <code>NO</code> is usually a heading renamed to read better. Put it back: a fixed
-    set of headings is what lets somebody skim four of these files in a minute.
+    <b>Every one of those four lines has to start with <code>---</code>.</b> Anything
+    else means the block is not the first thing in the file, usually because a title was
+    left above it, and a tool that reads front matter reads the first three characters
+    and stops.
     <br><br>
-    <b>Read the Where to look section against the Do not section.</b> If anything under
-    Where to look would still be useful sitting in its own file with a pointer from
-    here, it belongs in its own file. That is the template&apos;s own test, and it is
-    the only thing that keeps this file small over a year.
+    <b>Two <code>past</code> and two <code>current</code> is the whole of the governance
+    lesson.</b> Nothing new happened to those two specifications this morning. A date that
+    had already gone by is now in a field a command can read, instead of being invisible
+    in a document nobody re-opens. That is all a review date does, and it is enough to
+    make a stale document announce itself.
+    <br><br>
+    <b>Two decisions the book made for you.</b> The folder is organised by kind of
+    document - <code>specs/</code> - rather than by the system each document describes,
+    because a document that covers two systems has nowhere to live in a by-system folder
+    and both of today&apos;s do. The two new index files were given the Architect as owner
+    and six months as a review interval, because an index that points at two
+    specifications can be wrong for a while before anybody is hurt, and a short interval
+    on a file that rarely changes only trains people to ignore the date.
   </div>
 
   <div class="step">
-    <span class="step__n">6</span><span class="step__t">One question, answered twice</span>
-    <span class="step__time">39-45 min</span>
+    <span class="step__n">5</span><span class="step__t">One question, asked twice</span>
+    <span class="step__time">32-40 min</span>
   </div>
-  <p>
-    <b>Why.</b> Everything so far is a claim that the repository is better. This is the
-    measurement, and it is the only part of today that could come out against you.
-  </p>
+  <p><b>Why.</b> Everything so far is a claim that the repository is better, and this is the only part of the session that could come out against you.</p>
 
-  <p><b>a.</b> Ask the raw conversions first:</p>
+  <p><b>a.</b> Ask the raw conversions. This is an <b>analysis</b> prompt: it reads and reports, and it writes no specification:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">prompt - analysis</span>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>Read only week4/raw/fsd.md and week4/raw/techspec.md. Use nothing else in this
-repository, and nothing you already know about OrderCore.
+repository, and nothing you already know about order services.
 
 Answer this in week4/answer-raw.md:
 
-  When the call from OrderCore to Billing fails, how many times is it
-  attempted, and what does the caller get back? Name the document and the
-  heading each fact came from, and give the owner and the review date of that
-  document.
+  When a call from the order service to the billing service fails, how many
+  times is it attempted, and what does the caller get back? Name the document
+  and the heading each fact came from, and give the owner and the review date
+  of each document you used.
 
 If a fact is not in what you read, say so in those words and say where it
-would have to come from. Do not fill a gap from memory. Under 200 words.
-Reply with one line: how many of the four things asked for you could answer.</code></pre>
+would have to come from. Fill no gap from memory. Under 200 words. Reply with
+one line: how many of the four things asked for you could answer.</code></pre>
   </div>
   <div class="expect">
     <b>Expected.</b> A short answer that mostly cannot answer:
-    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - one either way</span></div>
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - one either way is fine</span></div>
 <pre><code>1 of 4</code></pre></div>
-    There are no markdown headings to name and the retry rule went into Figure 2. The
-    one it can answer is what the caller gets back. Owner and review date are the
-    interesting half: both raw files open with a line like <code>Owner: Architect. Last
-    edited 3 March 2026</code>, so a careful run can produce <i>an</i> owner - a person&apos;s
-    name in one, a role in the other - and <b>no review date at all, because neither
-    document has one</b>. Credit that as half an answer if your run found it. Nothing
-    there is in a field a tool could read.
+    There are no headings to name, the retry rule went into a diagram, and neither raw
+    file carries an owner or a review date in any field a tool could read. The one it can
+    answer is what the caller gets back.
     <br><br>
-    <b>A confident four out of four is the answer to worry about.</b> It means the model
-    answered from what it knows about services in general rather than from the two
-    files, and the retry sentence it produced will be plausible and unsourced. That is
-    the failure this whole lab is about.
+    <b>A confident four out of four is the answer to worry about.</b> It means the run
+    answered from what it knows about services in general rather than from the two files,
+    and the retry sentence it produced will be plausible and unsourced.
   </div>
 
-  <p><b>b.</b> Now ask the repository. Same question, different sources:</p>
+  <p><b>b.</b> Same question, same pattern, different sources:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">prompt - analysis</span>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>Read only what is under week4/repo. Start at week4/repo/index.md and follow
 its pointers. Use nothing else in this repository, and nothing you already
-know about OrderCore.
+know about order services.
 
 Answer this in week4/answer-repo.md:
 
-  When the call from OrderCore to Billing fails, how many times is it
-  attempted, and what does the caller get back? Name the document and the
-  heading each fact came from, and give the owner and the review date of that
-  document.
+  When a call from the order service to the billing service fails, how many
+  times is it attempted, and what does the caller get back? Name the document
+  and the heading each fact came from, and give the owner and the review date
+  of each document you used.
 
 If a fact is not in what you read, say so in those words and say where it
-would have to come from. Do not fill a gap from memory. Under 200 words.
-Reply with one line: how many of the four things asked for you could answer.</code></pre>
+would have to come from. Fill no gap from memory. Under 200 words. Reply with
+one line: how many of the four things asked for you could answer.</code></pre>
   </div>
   <div class="expect">
-    <b>Expected.</b> Three or four - and the interesting part is which one is still missing:
+    <b>Expected.</b> Three, and the interesting part is which one is still missing:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - 3 is the usual answer</span></div>
 <pre><code>3 of 4</code></pre></div>
     The heading is nameable, the owner and the review date come out of the front matter
-    you added in step 4, and the retry count <b>is still not there</b> - but now the
-    answer says so, and points at <code>week4/repo/gaps.md</code>, which names Figure 2
-    of the PDF as where it went.
+    you added in step 4, and the retry count is <b>still not there</b> - but now the
+    answer says so in those words.
     <br><br>
     <b>That is the win, and it is smaller and better than the one you were expecting.</b>
-    The repository did not recover the missing fact. It made the absence visible and
-    attributable, which is the difference between a document that is incomplete and a
+    The repository did not recover a fact that was drawn rather than written. It made the
+    absence visible, which is the difference between a document that is incomplete and a
     document that is misleading.
   </div>
 
-  <p><b>c.</b> Score both, against the same five rows:</p>
-  <div class="snippet">
-    <div class="snippet__bar"><span class="snippet__lang">the rubric - 0, 1 or 2 per row, out of 10</span></div>
-<pre><code>1  Answers, or says plainly that these files cannot
-2  Names the document and the heading each fact came from
-3  Gives the owner and the review date of that document
-4  Invents nothing - every sentence traceable to something it read
-5  Says what a reader must do next to close the gap
-
-0  nothing of the kind
-1  partly, or without evidence
-2  fully, with the words quoted</code></pre>
-  </div>
+  <p><b>c.</b> Score both. This is a <b>validation</b> prompt: it checks two claims and writes neither of them:</p>
   <div class="snippet">
     <div class="snippet__bar"><span class="snippet__lang">prompt - validation</span>
       <button class="snippet__copy" type="button">Copy</button></div>
 <pre><code>Score week4/answer-raw.md and then week4/answer-repo.md against these five
-rows, 0, 1 or 2 each, out of 10. Score only what is written in the file. Give
-no credit for what it probably meant.
+rows, 0, 1 or 2 each, out of 10. Score only what is written in the file, and
+give no credit for what it probably meant.
 
 1. Answers the question, or says plainly that these files cannot.
 2. Names the document and the heading each fact came from.
-3. Gives the owner and the review date of that document.
+3. Gives the owner and the review date of each document used.
 4. Invents nothing - every sentence traceable to something it read.
-5. Says what a reader would have to do next to close the gap.
+5. Says where a fact it could not find would have to come from.
 
 For every row, quote the words you scored, taken from the file. Where you
 cannot quote anything, the row is 0.
 
 Write week4/score.md: the two scored tables, the two totals, and a section
 "## What the repository bought" of at most four lines saying which rows moved
-and which did not. Do not change either answer file.
+and which did not. Change neither answer file.
 
 Reply with one line: the two totals.</code></pre>
   </div>
   <div class="expect">
-    <b>Expected.</b> Two totals, three or four points apart:
-    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - yours will differ by a point or two</span></div>
-<pre><code>raw 6/10, repo 10/10</code></pre></div>
-    <b>Raw of 6 or 7 is the normal spread</b>, and which one you get turns on row 3: a run
-    that found the <code>Owner:</code> line in the raw file&apos;s header scores 1 there
-    rather than 0, and a run that only looked for a front matter block scores 0. Both are
-    defensible readings of &quot;gives the owner&quot;.
+    <b>Expected.</b> Two totals, a couple of points apart:
+    <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - raw of 7 or 8 is the normal spread</span></div>
+<pre><code>raw 8/10, repo 10/10</code></pre></div>
+    <b>The gap is smaller than you were expecting, and it is in rows 2 and 3.</b> Rows 1,
+    4 and 5 come out the same in both, and usually high: both prompts told the run to say
+    plainly when it could not answer and to say where a missing fact would have to come
+    from, and a run that follows that instruction scores well whatever it is reading.
     <br><br>
-    <b>Rows 1 and 4 should come out the same in both</b>, and usually high: the prompt
-    told each run to say plainly when it could not answer, and a model that follows that
-    instruction scores well on both rows whatever it is reading. <b>The whole gap is
-    rows 2, 3 and 5</b> - a heading to cite, front matter to read an owner and a date
-    out of, and a register that names where the missing fact went. Those are step 2,
-    step 4 and step 3 respectively, which is as direct a measurement of the morning as
-    you will get.
+    Row 2 moves because there is now a heading to cite instead of a file name, and row 3
+    moves because an owner and a review date are now fields instead of a sentence in a
+    preamble. Those are steps 3 and 4, which is as direct a measurement of the session as
+    you will get - and it says the repository bought an address and a provenance, not a
+    better answer.
     <br><br>
-    <b>A raw total of 8 or more means the scorer was generous on row 2</b>, and credited
-    a file name as a heading. There are no headings in
-    <code>week4/raw/fsd.md</code> at all - step 1b counted them, and the answer was
-    zero. Point that out and ask it to score row 2 again.
-    <br><br>
-    <b>If the two totals come out equal, read the quotations before concluding the
-    repository was pointless.</b> The other usual cause is that step 4 put the front
-    matter somewhere other than the top of the file, so the repository run had no owner
-    to quote either.
+    <b>Equal totals mean the scorer credited a file name as a heading in row 2.</b> There
+    are no headings in <code>week4
+awsd.md</code> at all; step 1b counted them and
+    the answer was zero. Point that out and ask it to score that row again.
   </div>
 
   <p><b>d.</b> Commit the lot as one thing:</p>
@@ -949,83 +655,79 @@ Reply with one line: the two totals.</code></pre>
 <pre><code>cd $env:USERPROFILE\Helios\helios-sandbox
 dir week4\score.md
 git add week4
-git commit -m "Week 4 lab: OrderCore specifications converted into a repository"
+git commit -m "Week 4 lab: two specifications turned into a repository"
 git log --oneline -1</code></pre>
   </div>
   <div class="expect">
     <b>Expected.</b> One listing, then one commit:
     <div class="snippet"><div class="snippet__bar"><span class="snippet__lang">output - the hash and the branch name are yours</span></div>
 <pre><code>score.md
-[main 4a91c23] Week 4 lab: OrderCore specifications converted into a repository
-4a91c23 Week 4 lab: OrderCore specifications converted into a repository</code></pre></div>
-    Nothing is pushed; a hook blocks it. Note what is in that commit: the raw
-    conversions as well as the repository. Six months from now, the only way to know
-    whether a sentence is the author&apos;s or a converter&apos;s is to have kept both.
+[main 4a91c23] Week 4 lab: two specifications turned into a repository
+4a91c23 Week 4 lab: two specifications turned into a repository</code></pre></div>
+    Git lists every file it added between those two lines; the commit line and the log
+    line are the two to read. The raw conversions go in as well as the repository,
+    because six months from now the only way to tell whether a sentence is the
+    author&apos;s or a converter&apos;s is to have kept both. Nothing is pushed; a hook
+    blocks it.
   </div>
 
   <h2>Passing bar</h2>
   <div class="bar">
-    Both documents converted, and a conversion log naming which converter read which
-    format and what each returned. Two specifications with a heading hierarchy, and the
-    same table separator counts before and after - six and nine - so nothing was
-    silently repaired or dropped. A gap register listing all eight figure captions, with
-    the five that hold facts the text does not, and <b>a verdict you typed in every row,
-    at least one of them blocking</b>. Front matter at the very top of both
-    specifications, with owner and dates taken from the governance log rather than
-    invented. Two index files that point and do not summarise. A CLAUDE.md under 400
-    words using the template&apos;s five headings. <b>The thing you hand in is
-    <code>week4/score.md</code></b>: the same question answered from the raw files and
-    from the repository, both scored against the same five rows, with a line saying
-    which rows moved. One local commit holding the repository and the raw conversions
-    together.
+    Both documents converted, with the raw conversions kept. The five-string check run,
+    and five <code>ABSENT</code> lines seen. Two specifications with a heading hierarchy:
+    the functional one still showing six separators and thirty-seven data rows, the
+    technical one showing four separators and nineteen data rows, and a line in it where
+    the image-only table used to be. Front matter first thing in every file under
+    <code>week4\repo</code>, with the two copied review dates reading <code>past</code>.
+    Two index files that point and do not summarise, and a CLAUDE.md under 400 words
+    using the template&apos;s five headings. <b>The thing you hand in is
+    <code>week4\score.md</code></b>: the same question answered from the raw files and
+    from the repository, both scored against the same five rows, with a line saying which
+    rows moved. One local commit holding all of it.
   </div>
 
   <h2>If something breaks</h2>
   <table>
     <thead><tr><th>Symptom</th><th>Fix</th></tr></thead>
     <tbody>
-      <tr><td><code>pandoc MISSING</code> in step 0a</td>
-          <td>Pandoc is not on PATH. Open a new terminal first - an installer adds to PATH only for windows opened afterwards. If it is genuinely absent, re-run <code>setup/Setup-HeliosWorkstation.ps1</code>, which installs it through winget.</td></tr>
       <tr><td><code>markitdown PDF SUPPORT MISSING</code> in step 0a</td>
-          <td><code>python -m pip install "markitdown[pdf]"</code>, then run step 0a again. The Week 1 setup installs plain <code>markitdown</code>, whose format support lives in optional extras; PDF reading needs <code>pdfminer.six</code> and <code>pdfplumber</code>, which that extra brings. The block under step 0a has the command with a copy button.</td></tr>
-      <tr><td><code>MissingDependencyException</code> from markitdown on the <b>PDF</b></td>
-          <td>Same cause as the row above, found one step later: the PDF extra is not installed. <code>python -m pip install "markitdown[pdf]"</code> and run step 1a again.</td></tr>
-      <tr><td><code>MissingDependencyException</code> from markitdown on the <b>.docx</b></td>
-          <td>Expected. The Word extra is not installed and is not meant to be. Pandoc reads Word; markitdown reads PDF.</td></tr>
-      <tr><td>The PDF converts, but with no pipe tables at all</td>
-          <td><code>pdfplumber</code> is absent while <code>pdfminer.six</code> is present, so markitdown fell back to plain text extraction and never looked for a table. Step 2b will read 0 separator rows instead of 9. <code>python -m pip install "markitdown[pdf]"</code>, delete <code>week4\raw\techspec.md</code> and run step 1a again.</td></tr>
-      <tr><td><code>cannot find path</code> for <code>docs\specs\ordercore-techspec.pdf</code></td>
-          <td>Step 0b did not merge. That file is new this week, which is why it is the one to watch. Run the step again and read the git output above the error; if the merge succeeds and the file is still absent, the week&apos;s files have not been published and your facilitator has to do that first.</td></tr>
+          <td>Run <code>python -m pip install "markitdown[pdf]"</code> once, then run step 0a again. It needs the internet, and it is the only command in this book that does.</td></tr>
+      <tr><td><code>pandoc MISSING</code> in step 0a</td>
+          <td>Open a new terminal first - an installer adds itself to the PATH of windows opened afterwards. If it is genuinely absent, re-run <code>setup/Setup-HeliosWorkstation.ps1</code>, which installs it.</td></tr>
+      <tr><td><code>MissingDependencyException</code> from markitdown</td>
+          <td>Same cause, found one step later: the PDF extra is not installed. <code>python -m pip install "markitdown[pdf]"</code>, then send the step 1a prompt again.</td></tr>
+      <tr><td>The PDF converts, but step 1b reads 0 separator rows for it</td>
+          <td>Half the PDF extra is installed, so markitdown fell back to plain text and never looked for a table. <code>python -m pip install "markitdown[pdf]"</code>, delete <code>week4\raw\techspec.md</code>, and send the step 1a prompt again.</td></tr>
+      <tr><td><code>cannot find path</code> in step 0b</td>
+          <td>The merge brought nothing. Run the step again and read the git output above the error; if the merge succeeds and the files are still absent, the week&apos;s files have not been published and your facilitator has to do that first.</td></tr>
+      <tr><td><code>'origin' does not appear to be a git repository</code></td>
+          <td>This copy of the repository was made without the remote it came from. Skip step 0b&apos;s first two lines and run the rest; if the three files it lists are there, you already have this week&apos;s material and nothing needs fetching.</td></tr>
       <tr><td><code>git merge</code> refuses, citing local changes</td>
           <td>Commit what you have: <code>git commit -am "wip"</code>, then run step 0b again.</td></tr>
-      <tr><td>Step 1a prints nothing and writes no file</td>
-          <td>The file already existed, so the <code>Test-Path</code> guard skipped the conversion. That is intended. To force a fresh conversion, <code>del week4\raw\techspec.md</code> and run the block again.</td></tr>
-      <tr><td>The conversion log says <code>fsd.md</code> has headings</td>
-          <td>Pandoc was given different flags, or the file had already been repaired. Delete <code>week4\raw\fsd.md</code> and send the step 1b prompt again exactly as written - the raw conversion is the before picture, and step 2 needs it unedited.</td></tr>
-      <tr><td><code>ordercore-techspec.md</code> shows four separator rows in step 2b</td>
-          <td>The broken tables were repaired a step early. Nothing is lost, but step 3 has less to look at. Send the step 2a prompt again with the &quot;leave them wrong&quot; sentence emphasised, or carry on and note it.</td></tr>
-      <tr><td>Any line in step 3b says <code>present</code></td>
-          <td><code>week4\raw\techspec.md</code> did not come from markitdown on this PDF - it was hand-edited, or written by a prompt. Delete it and run step 1a again.</td></tr>
-      <tr><td>The gap register fills in what the figures say</td>
-          <td>It read the PDF, which the prompt forbids. That is not a wrong answer, it is a different exercise - the point is what a retrieval tool can do with the markdown alone. Send the prompt again, first paragraph included.</td></tr>
-      <tr><td><code>Start-Process</code> does nothing</td>
-          <td>Nothing on this machine is registered for <code>.pdf</code>. Skip it. The contents of all five lost figures are described in step 3a and step 3c, and nothing below depends on having seen them.</td></tr>
-      <tr><td>Front matter is not the first thing in the file</td>
-          <td>A title was left above it. Move the block to the top; <code>templates/frontmatter-schema.md</code> is explicit that nothing goes above it, not even a heading.</td></tr>
+      <tr><td>Any line in step 2a says <code>present</code></td>
+          <td><code>week4\raw\techspec.md</code> did not come from the conversion in step 1 - it was edited afterwards. Delete it and send the step 1a prompt again.</td></tr>
+      <tr><td>Step 3b reads five or more separators for the technical specification</td>
+          <td>One table is still cut in half. Send the step 3a prompt again, naming the table: the four are the field mapping, the configuration table, the testing table and the known gaps table.</td></tr>
+      <tr><td>Step 3b reads twenty or more data rows for the technical specification</td>
+          <td>A row was invented, or a prose line that was never part of a table got promoted. Ask Claude to quote the line each row came from; the invented one will have no quotation.</td></tr>
+      <tr><td>A five-row error table appears in section 3 of the technical specification</td>
+          <td>It was reconstructed from the model&apos;s own knowledge. Those words were never in the file, because that table is an image. Ask for it to be replaced with a line saying the content is image-only.</td></tr>
+      <tr><td>Step 3b reads fewer than six separators for the functional specification</td>
+          <td>A table was dropped while the headings were being rewritten. Send the step 3a prompt again; that file&apos;s tables arrived intact and are to be carried across untouched.</td></tr>
+      <tr><td>A line in step 4c does not start with <code>---</code></td>
+          <td>The front matter block is not the first thing in that file, usually because a title was left above it. Ask Claude to move the block to the very top of the file the line names.</td></tr>
       <tr><td>Claude invents review dates</td>
-          <td>It did not open <code>docs/governance-log.md</code>. Send the step 4b prompt again and add: the two rows are in that file, quote them back to me first.</td></tr>
-      <tr><td><code>CLAUDE.md</code> comes back at 900 words</td>
-          <td>It summarised the documents inside the index instead of pointing at them. Ask again, under 400 words, with Where to look as pointers only.</td></tr>
-      <tr><td>The two totals in step 6c are equal</td>
-          <td>Read the quotations. Either the raw answer scored row 1 on general knowledge and should have lost row 4, or the front matter is not where a reader would find it.</td></tr>
+          <td>It did not open <code>docs/governance-log.md</code>. Send the step 4a prompt again and add: quote the two rows back to me first.</td></tr>
+      <tr><td><code>CLAUDE.md</code> comes back over 400 words</td>
+          <td>It summarised the documents instead of pointing at them. Send the step 4b prompt again with Where to look as pointers only.</td></tr>
+      <tr><td>The two totals in step 5c are equal</td>
+          <td>Read the quotations on rows 2 and 3. Either a file name was credited as a heading, or the front matter is not at the top of the files and the repository run had no owner to quote either.</td></tr>
       <tr><td>A prompt answered in the chat and wrote no file</td>
           <td>Send it again. Every prompt here names the file it writes, and none of them need the session to remember anything.</td></tr>
+      <tr><td>Claude asks to change a file outside <code>week4</code></td>
+          <td>Say no. Nothing in this book edits a shared document, and the originals under <code>docs/specs</code> are the evidence that the conversion was faithful.</td></tr>
       <tr><td><code>A positional parameter cannot be found</code> from <code>dir</code></td>
           <td>Two or more paths were put on one <code>dir</code>. PowerShell binds only the first. Give each path its own line, as every block here does.</td></tr>
-      <tr><td>Claude asks to change a file outside <code>week4</code></td>
-          <td>Say no. This lab never edits the shared documents, templates or rubrics, and the originals under <code>docs/specs</code> are the evidence that the conversion was faithful.</td></tr>
-      <tr><td><code>code</code> is not recognised</td>
-          <td>VS Code is not on PATH. On Windows that is set by the installer&apos;s &quot;Add to PATH&quot; option, so re-run the installer, or open a terminal that was started after VS Code was installed. Either way you can open the files from the editor by hand - nothing in the lab depends on the command itself.</td></tr>
       <tr><td><code>git commit</code> says there is nothing to commit</td>
           <td>The edits landed somewhere else. <code>git status</code> shows where; <code>git add</code> that path and commit again.</td></tr>
       <tr><td>A push is refused</td>
@@ -1040,10 +742,11 @@ git log --oneline -1</code></pre>
   <p class="foot">
     Helios Group is fictional. All data in this repository is synthetic.
     Week 4 of the Claude Code Capability Program. The hands-on,
-    <code>labs/week4-activity.html</code>, finishes this repository and packages a
+    <code>labs/week4-activity.html</code>, splits the long specification and packages a
     Skill; it needs nothing you did here.
   </p>
 </main>
+
 
 <script>
 // Copy buttons. Text is taken from the <pre> exactly as written, so what lands on

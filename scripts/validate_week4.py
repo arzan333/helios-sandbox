@@ -147,6 +147,68 @@ for rel, text in BOOKS:
                   or "reply" in code.lower(),
                   f"{rel}: a prompt that names no output - the answer lands in the chat: {code[:60]}")
 
+# --------------------------------------- no branches, no blanks to fill in by hand
+# Week 4 is run in front of a room. A book that offers a path to pick, or a blank the
+# participant has to type a value into, stalls everybody at the same moment: the
+# facilitator then answers the same question thirty times instead of teaching. Both
+# are build failures, not style.
+
+CHOICE_PHRASES = [
+    r"pick one", r"you pick", r"pick the (?:one|shape|option)",
+    r"your choice", r"whichever you (?:prefer|like|want)",
+    r"if you (?:prefer|would rather)", r"would rather", r"rather run",
+    r"instead of the prompt", r"choose", r"a choice between",
+    r"shape [ab]", r"option [ab]", r"either shape", r"two shapes",
+    r"up to you", r"decide which (?:one|shape|route)",
+]
+CHOICE_LANGS = ["only if", "alternative", "instead of", "rather than the prompt",
+                "optional", "shape a", "shape b"]
+PLACEHOLDERS = ["TO-DECIDE", "TO DECIDE", "PASTE", "FILL IN", "FILL-IN", "TODO",
+                "TBD", "XXX", "YOUR-", "REPLACE-ME", "<your", "<YOUR"]
+PATTERNS = ("prompt - analysis", "prompt - coding", "prompt - validation")
+
+for rel, text in BOOKS:
+    prose = html.unescape(re.sub(r"<[^>]+>", " ", text))
+
+    for pat in CHOICE_PHRASES:
+        m = re.search(pat, prose, re.I)
+        check(m is None,
+              f"{rel}: offers a path to pick ({m.group(0)!r} at {m.start()})" if m else "")
+
+    for d in re.findall(r"(?s)<details>.*?</details>", text):
+        check(not re.search(r'snippet__lang">(?:powershell|prompt|claude code)', d),
+              f"{rel}: a <details> block hides commands, which is a second route "
+              f"through the book: {re.sub(chr(60)+'[^'+chr(62)+']*'+chr(62), '', d)[:60]!r}")
+
+    for lang in re.findall(r'<span class="snippet__lang">([^<]+)</span>', text):
+        low = lang.lower()
+        hit = next((k for k in CHOICE_LANGS if k in low), None)
+        check(hit is None, f"{rel}: copy block labelled '{lang}' marks an optional or "
+                           f"alternative route ({hit!r})")
+        if low.startswith("prompt"):
+            check(low in PATTERNS,
+                  f"{rel}: every prompt is labelled with its pattern - '{lang}' is not "
+                  f"one of {PATTERNS}")
+
+    check("<!-- hand-edit" not in text,
+          f"{rel}: a hand-edit directive - the participant is being asked to edit a file "
+          f"by hand")
+    for token in PLACEHOLDERS:
+        check(token not in text, f"{rel}: contains the placeholder {token!r}, which a "
+                                 f"participant would have to replace by hand")
+    for lang, body in re.findall(r'<span class="snippet__lang">([^<]+)</span>.*?'
+                                 r'<pre><code>(.*?)</code></pre>', text, re.S):
+        if not lang.lower().startswith(("powershell", "prompt", "claude code")):
+            continue
+        code = html.unescape(body)
+        blank = re.search(r"[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+", code)
+        check(blank is None, f"{rel}: a blank to fill in inside a '{lang}' block: "
+                             f"{blank.group(0)!r}" if blank else "")
+        angle = re.search(r"<[A-Za-z][A-Za-z0-9_-]*>", code)
+        check(angle is None, f"{rel}: a placeholder inside a '{lang}' block: "
+                             f"{angle.group(0)!r}" if angle else "")
+
+
 # ------------------------------------------------------- paths really exist
 for rel, text in BOOKS:
     plain = html.unescape(text)
